@@ -2,6 +2,13 @@
 
 > Un simulateur de course de Formule 1 vu de dessus, où chaque monoplace est guidée par des forces.
 
+<p align="center">
+  <a href="https://eljazou.github.io/simulation-f1/"><img src="https://img.shields.io/badge/%E2%96%B6%20JOUER%20EN%20LIGNE-eljazou.github.io%2Fsimulation--f1-e10600?style=for-the-badge" alt="Jouer en ligne"></a>
+</p>
+
+<p align="center"><strong><a href="https://eljazou.github.io/simulation-f1/">▶️ Jouer en ligne</a></strong> — directement dans le navigateur, sans installation.</p>
+
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-en%20ligne-222222?logo=githubpages&logoColor=white)](https://eljazou.github.io/simulation-f1/)
 ![p5.js](https://img.shields.io/badge/p5.js-1.7.0-ED225D?logo=p5dotjs&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?logo=javascript&logoColor=black)
 ![Licence MIT](https://img.shields.io/badge/licence-MIT-blue)
@@ -140,7 +147,13 @@ Clavier **QWERTY**. La fenêtre d'aide (`?` ou `H`) rappelle toutes les touches 
 
 ## 🚀 Installation et lancement
 
-### Prérequis
+### Jouer en ligne
+Le jeu est publié sur **[eljazou.github.io/simulation-f1](https://eljazou.github.io/simulation-f1/)**.
+Il tourne entièrement dans le navigateur : aucun serveur ni installation n'est nécessaire. Utilisez
+de préférence un ordinateur avec un clavier (indispensable pour le mode pilote) et un navigateur
+récent : Chrome, Edge ou Firefox.
+
+### Prérequis (pour jouer en local)
 - Un navigateur récent (Chrome, Edge, Firefox).
 - **Node.js 18+** (22 pour les tests) ou **Python 3**, pour le serveur local.
 
@@ -283,6 +296,7 @@ node voix.mjs --synthese    # voix off : un fichier audio par réplique (narrati
 node demo.mjs               # enregistrement → videos/demo-f1.mp4 et rapport.md
 node voix.mjs --montage     # vidéo commentée → videos/demo-f1-voix.mp4
 node captures.mjs           # captures d'écran de ce README
+node verifier-site.mjs https://eljazou.github.io/simulation-f1/   # contrôle du site en ligne
 ```
 
 Sous Windows, `demo/lancer-demo.bat` fait tout d'un double-clic. Après une modification des textes
