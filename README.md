@@ -29,6 +29,7 @@
 | ![Page d'entraînement du réseau de neurones](docs/screenshots/06-entrainement.jpg) | ![Podium et classement final](docs/screenshots/07-podium.jpg) |
 
 Télémétrie dans le panneau latéral : [`docs/screenshots/03-telemetrie.jpg`](docs/screenshots/03-telemetrie.jpg).
+Version en ligne sur GitHub Pages : [`docs/screenshots/08-en-ligne.jpg`](docs/screenshots/08-en-ligne.jpg).
 
 🎬 **Vidéo de démonstration** (environ 6 min, commentée en français) : trop lourde pour le dépôt
 (limite GitHub de 100 Mo par fichier), elle est publiée dans les
