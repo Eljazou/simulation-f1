@@ -1,0 +1,464 @@
+{
+  "video": "videos/demo-f1.mp4",
+  "date": "2026-10-18 20:11:22",
+  "retardEnregistreur": 0,
+  "debutCoupe": 1.14,
+  "sousTitres": [
+    {
+      "ordre": 1,
+      "id": "intro",
+      "chapitre": "Bienvenue",
+      "texte": "Démonstration automatique du jeu Circuit Formule 1, filmée avec Playwright.",
+      "debut": 0,
+      "fin": 9.48,
+      "duree": 9.48
+    },
+    {
+      "ordre": 2,
+      "id": "grille",
+      "chapitre": "Circuit Formule 1",
+      "texte": "Douze monoplaces pilotées par des steering behaviors (seek, arrive, wander, séparation) se présentent sur la grille.",
+      "debut": 9.48,
+      "fin": 19.917,
+      "duree": 10.437
+    },
+    {
+      "ordre": 3,
+      "id": "feux",
+      "chapitre": "Feux de départ",
+      "texte": "Les cinq feux rouges s'allument un à un… puis s'éteignent : c'est le départ !",
+      "debut": 19.917,
+      "fin": 25.389,
+      "duree": 5.472
+    },
+    {
+      "ordre": 4,
+      "id": "course-ia",
+      "chapitre": "Course IA",
+      "texte": "Chaque voiture suit la ligne de course, freine avant les virages (arrive) et évite les autres.",
+      "debut": 25.389,
+      "fin": 32.907,
+      "duree": 7.518
+    },
+    {
+      "ordre": 5,
+      "id": "classement",
+      "chapitre": "Classement",
+      "texte": "La tour de classement : positions, écarts au leader, pneus et arrêts, mise à jour à chaque image.",
+      "debut": 32.907,
+      "fin": 40.859,
+      "duree": 7.952
+    },
+    {
+      "ordre": 6,
+      "id": "mini-carte",
+      "chapitre": "Mini-carte",
+      "texte": "La mini-carte montre tout le circuit, les secteurs et la position de chaque voiture.",
+      "debut": 40.859,
+      "fin": 46.975,
+      "duree": 6.116
+    },
+    {
+      "ordre": 7,
+      "id": "suivre-pilote",
+      "chapitre": "Suivre un pilote",
+      "texte": "Un clic sur une ligne du classement choisit ce pilote ; la caméra le suit.",
+      "debut": 46.975,
+      "fin": 52.424,
+      "duree": 5.449
+    },
+    {
+      "ordre": 8,
+      "id": "pilote-menu",
+      "chapitre": "Mode pilote",
+      "texte": "Bouton JOUER : on choisit « Solo » pour piloter soi-même une voiture contre l'IA.",
+      "debut": 52.424,
+      "fin": 58.709,
+      "duree": 6.285
+    },
+    {
+      "ordre": 9,
+      "id": "pilote-choix",
+      "chapitre": "Mode pilote",
+      "texte": "Avant le départ, un clic sur une monoplace de la grille : elle devient la nôtre.",
+      "debut": 58.709,
+      "fin": 64.057,
+      "duree": 5.348
+    },
+    {
+      "ordre": 10,
+      "id": "pilote-commandes",
+      "chapitre": "Mode pilote",
+      "texte": "Commandes au clavier QWERTY : W accélère, S freine, A et D tournent. Ici, les touches sont simulées par le script.",
+      "debut": 64.057,
+      "fin": 74.157,
+      "duree": 10.1
+    },
+    {
+      "ordre": 11,
+      "id": "drs",
+      "chapitre": "DRS",
+      "texte": "Dans une zone DRS, à moins d'une seconde de la voiture de devant, ESPACE ouvre l'aileron arrière : plus de vitesse en ligne droite.",
+      "debut": 74.157,
+      "fin": 83.04,
+      "duree": 8.883
+    },
+    {
+      "ordre": 12,
+      "id": "multi-intro",
+      "chapitre": "Multijoueur local",
+      "texte": "Mode multijoueur local : écran partagé. Échap met la course en pause, « Menu » ouvre le choix du mode.",
+      "debut": 83.04,
+      "fin": 90.912,
+      "duree": 7.872
+    },
+    {
+      "ordre": 13,
+      "id": "multi-carte",
+      "chapitre": "Mode multijoueur local : écran partagé",
+      "texte": "Carte « Deux joueurs » : deux pilotes sur le même clavier, l'écran est partagé en deux.",
+      "debut": 90.912,
+      "fin": 97.269,
+      "duree": 6.357
+    },
+    {
+      "ordre": 14,
+      "id": "multi-choix",
+      "chapitre": "Mode multijoueur local : écran partagé",
+      "texte": "Chaque joueur choisit sa voiture d'un clic sur la grille : J1 d'abord, puis J2.",
+      "debut": 97.269,
+      "fin": 102.431,
+      "duree": 5.162
+    },
+    {
+      "ordre": 15,
+      "id": "multi-touches",
+      "chapitre": "Mode multijoueur local : écran partagé",
+      "texte": "J1 : W A S D, Espace pour le DRS. J2 : flèches, Entrée pour le DRS. Les touches des deux joueurs sont simulées en même temps.",
+      "debut": 102.431,
+      "fin": 111.576,
+      "duree": 9.145
+    },
+    {
+      "ordre": 16,
+      "id": "multi-hud",
+      "chapitre": "Mode multijoueur local : écran partagé",
+      "texte": "En bas, le HUD de chaque joueur ; au centre, le duel : positions, écart entre J1 et J2, tours menés.",
+      "debut": 111.576,
+      "fin": 119.225,
+      "duree": 7.649
+    },
+    {
+      "ordre": 17,
+      "id": "multi-duel",
+      "chapitre": "Mode multijoueur local : écran partagé",
+      "texte": "Duel : J1 (SKO) lève le pied, J2 (BRE) se décale et tente le dépassement…",
+      "debut": 119.225,
+      "fin": 133.013,
+      "duree": 13.788
+    },
+    {
+      "ordre": 18,
+      "id": "multi-depassement",
+      "chapitre": "Mode multijoueur local : écran partagé",
+      "texte": "Dépassement ! J2 passe devant J1 : le duel s'inverse au centre de l'écran.",
+      "debut": 133.013,
+      "fin": 138.913,
+      "duree": 5.9
+    },
+    {
+      "ordre": 19,
+      "id": "pit-usure",
+      "chapitre": "Pit stop",
+      "texte": "Retour en spectateur. Dans le panneau, l'usure des pneus est poussée au maximum : les voitures vont devoir s'arrêter.",
+      "debut": 138.913,
+      "fin": 154.86,
+      "duree": 15.947
+    },
+    {
+      "ordre": 20,
+      "id": "pit-entree",
+      "chapitre": "Pit stop",
+      "texte": "KAR entre dans la voie des stands : limiteur de vitesse, arrêt au box, l'équipe change les quatre roues.",
+      "debut": 154.86,
+      "fin": 163.232,
+      "duree": 8.372
+    },
+    {
+      "ordre": 21,
+      "id": "pit-sortie",
+      "chapitre": "Pit stop",
+      "texte": "Pneus neufs : la voiture repart et rejoint la piste en sortie de voie des stands.",
+      "debut": 163.232,
+      "fin": 167.195,
+      "duree": 3.963
+    },
+    {
+      "ordre": 22,
+      "id": "vsc",
+      "chapitre": "VSC",
+      "texte": "Le bouton VSC du panneau déclare une Virtual Safety Car : tout le monde ralentit et garde ses écarts.",
+      "debut": 167.195,
+      "fin": 173.792,
+      "duree": 6.597
+    },
+    {
+      "ordre": 23,
+      "id": "vsc-fin",
+      "chapitre": "VSC",
+      "texte": "Fin du VSC : la course reprend.",
+      "debut": 173.792,
+      "fin": 177.725,
+      "duree": 3.933
+    },
+    {
+      "ordre": 24,
+      "id": "panne",
+      "chapitre": "Panne",
+      "texte": "Le bouton « Panne » provoque une panne moteur sur la voiture choisie : elle ralentit et s'arrête.",
+      "debut": 177.725,
+      "fin": 184.257,
+      "duree": 6.532
+    },
+    {
+      "ordre": 25,
+      "id": "safety-car",
+      "chapitre": "Safety car",
+      "texte": "Le bouton « Safety car » la fait sortir : le peloton se regroupe derrière elle, dépassements interdits.",
+      "debut": 184.257,
+      "fin": 192.238,
+      "duree": 7.981
+    },
+    {
+      "ordre": 26,
+      "id": "crepuscule",
+      "chapitre": "Ambiance",
+      "texte": "Le moment de la journée change l'éclairage : du jour au crépuscule…",
+      "debut": 192.238,
+      "fin": 197.396,
+      "duree": 5.158
+    },
+    {
+      "ordre": 27,
+      "id": "nuit",
+      "chapitre": "Ambiance",
+      "texte": "… puis la nuit : phares, piste éclairée, ciel étoilé.",
+      "debut": 197.396,
+      "fin": 202.398,
+      "duree": 5.002
+    },
+    {
+      "ordre": 28,
+      "id": "pluie",
+      "chapitre": "Pluie",
+      "texte": "Météo « manuel » et intensité de pluie au maximum : la piste se mouille, l'adhérence baisse, gerbes d'eau.",
+      "debut": 202.398,
+      "fin": 210.344,
+      "duree": 7.946
+    },
+    {
+      "ordre": 29,
+      "id": "pluie-etat",
+      "chapitre": "Pluie",
+      "texte": "État de la piste : PLUIE. Les voitures freinent plus tôt et glissent davantage.",
+      "debut": 210.344,
+      "fin": 216.409,
+      "duree": 6.065
+    },
+    {
+      "ordre": 30,
+      "id": "onglet-telemetrie",
+      "chapitre": "Panneau · Télémétrie",
+      "texte": "Télémétrie : vitesse, gaz et frein du pilote choisi, comparés à un autre pilote.",
+      "debut": 216.409,
+      "fin": 224.547,
+      "duree": 8.138
+    },
+    {
+      "ordre": 31,
+      "id": "onglet-prediction",
+      "chapitre": "Panneau · Prédiction",
+      "texte": "Prédiction : probabilités de victoire, de podium et de top 5 estimées pendant la course.",
+      "debut": 224.547,
+      "fin": 229.78,
+      "duree": 5.233
+    },
+    {
+      "ordre": 32,
+      "id": "onglet-historique",
+      "chapitre": "Panneau · Historique",
+      "texte": "Historique : l'évolution des positions tour après tour et les faits de course.",
+      "debut": 229.78,
+      "fin": 234.218,
+      "duree": 4.438
+    },
+    {
+      "ordre": 33,
+      "id": "onglet-reglages",
+      "chapitre": "Panneau · Réglages",
+      "texte": "Réglages : tous les curseurs du jeu (seek, arrive, wander, météo, incidents…), actifs pendant la course.",
+      "debut": 234.218,
+      "fin": 239.781,
+      "duree": 5.563
+    },
+    {
+      "ordre": 34,
+      "id": "ia-page",
+      "chapitre": "Entraînement IA",
+      "texte": "Le bouton « Entraînement IA » ouvre la page de neuroévolution : un petit réseau de neurones dose seek, arrive, wander et séparation.",
+      "debut": 239.781,
+      "fin": 248.351,
+      "duree": 8.57
+    },
+    {
+      "ordre": 35,
+      "id": "ia-reglages",
+      "chapitre": "Entraînement IA",
+      "texte": "Vitesse au maximum (20x), population de 20 voitures, graine fixe ; puis « Démarrer ».",
+      "debut": 248.351,
+      "fin": 254.735,
+      "duree": 6.384
+    },
+    {
+      "ordre": 36,
+      "id": "ia-reseau",
+      "chapitre": "Le réseau",
+      "texte": "À gauche, le réseau 8 → 12 → 4 : 8 capteurs (bords, courbure, vitesse, voisine…) en entrée, les 4 poids des comportements en sortie.",
+      "debut": 254.735,
+      "fin": 262.698,
+      "duree": 7.963
+    },
+    {
+      "ordre": 37,
+      "id": "ia-courbes",
+      "chapitre": "Les courbes",
+      "texte": "À droite, la fitness de chaque génération (meilleure et moyenne) : sélection, croisement et mutation améliorent la population.",
+      "debut": 262.698,
+      "fin": 271.106,
+      "duree": 8.408
+    },
+    {
+      "ordre": 38,
+      "id": "ia-poids",
+      "chapitre": "Les poids",
+      "texte": "Les poids choisis par le meilleur réseau tout au long du tour : seek, arrive, wander et séparation.",
+      "debut": 271.106,
+      "fin": 277.111,
+      "duree": 6.005
+    },
+    {
+      "ordre": 39,
+      "id": "sauvegarde",
+      "chapitre": "Sauvegarde",
+      "texte": "On nomme le meilleur réseau « Démo Playwright » et on le sauvegarde (stockage local du navigateur).",
+      "debut": 277.111,
+      "fin": 282.145,
+      "duree": 5.034
+    },
+    {
+      "ordre": 40,
+      "id": "retour-course",
+      "chapitre": "Sauvegarde",
+      "texte": "Retour à la course.",
+      "debut": 282.145,
+      "fin": 285.649,
+      "duree": 3.504
+    },
+    {
+      "ordre": 41,
+      "id": "ia-course-menu",
+      "chapitre": "Course IA entraînée",
+      "texte": "Menu JOUER : Solo, 1 tour, adversaires « IA entraînée » avec le modèle « Démo Playwright ».",
+      "debut": 285.649,
+      "fin": 292.933,
+      "duree": 7.284
+    },
+    {
+      "ordre": 42,
+      "id": "ia-badges",
+      "chapitre": "Course IA entraînée",
+      "texte": "Le badge « IA » du classement marque les voitures dont le réseau entraîné dose les comportements à chaque image.",
+      "debut": 292.933,
+      "fin": 301.471,
+      "duree": 8.538
+    },
+    {
+      "ordre": 43,
+      "id": "ia-course",
+      "chapitre": "Course IA entraînée",
+      "texte": "Un tour de course contre les IA (la voiture du joueur est conduite par les touches simulées).",
+      "debut": 301.471,
+      "fin": 308.952,
+      "duree": 7.481
+    },
+    {
+      "ordre": 44,
+      "id": "arrivee",
+      "chapitre": "Arrivée",
+      "texte": "Drapeau à damier ! Chaque voiture le reçoit à son passage sur la ligne.",
+      "debut": 308.952,
+      "fin": 314.686,
+      "duree": 5.734
+    },
+    {
+      "ordre": 45,
+      "id": "podium-arrivee",
+      "chapitre": "Podium",
+      "texte": "Les trois premiers rejoignent le podium…",
+      "debut": 314.686,
+      "fin": 318.142,
+      "duree": 3.456
+    },
+    {
+      "ordre": 46,
+      "id": "podium",
+      "chapitre": "Podium",
+      "texte": "Podium de fin : vainqueur, marches, classement final, points et meilleur tour. Boutons REJOUER et MENU.",
+      "debut": 318.142,
+      "fin": 325.673,
+      "duree": 7.531
+    },
+    {
+      "ordre": 47,
+      "id": "rejouer-defi",
+      "chapitre": "Écran REJOUER",
+      "texte": "En mode Défi, l'arrivée forme le mot REJOUER avec des points d'encre qui se placent en « arrive ».",
+      "debut": 325.673,
+      "fin": 331.981,
+      "duree": 6.308
+    },
+    {
+      "ordre": 48,
+      "id": "defi",
+      "chapitre": "Défi « Tour rapide »",
+      "texte": "Trois tours, simulation accélérée 2,5x ; le pilote automatique envoie toujours les touches W A S D.",
+      "debut": 331.981,
+      "fin": 360.281,
+      "duree": 28.3
+    },
+    {
+      "ordre": 49,
+      "id": "rejouer",
+      "chapitre": "Écran REJOUER",
+      "texte": "Le mot REJOUER se forme ; Entrée rejoue, Échap revient au menu. Fin de la démonstration.",
+      "debut": 360.281,
+      "fin": 367.583,
+      "duree": 7.302
+    },
+    {
+      "ordre": 50,
+      "id": "conclusion",
+      "chapitre": "En résumé",
+      "texte": "Steering behaviors, course complète, multijoueur et IA entraînée par neuroévolution : merci d'avoir regardé !",
+      "debut": 367.583,
+      "fin": 379.319,
+      "duree": 11.736
+    }
+  ],
+  "calage": {
+    "decalage": -0.5,
+    "mesures": 50,
+    "ecartMin": -1.9,
+    "ecartMax": 0.733
+  }
+}

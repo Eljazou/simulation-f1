@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Écran principal — pluie</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0b0d10}
+</style>
+</helmet>
+<div style="width:1920px;height:1080px;position:relative;overflow:hidden;background:#1a221e">
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px"><dc-import name="Scene" ambiance="pluie" accent="#e10600" hint-size="1920px,1080px"></dc-import></div>
+<div style="position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none"><dc-import name="Interface" ambiance="pluie" accent="#e10600" hint-size="1920px,1080px"></dc-import></div>
+<div style="position:absolute;top:64px;right:12px;width:280px;height:200px"><dc-import name="Minimap" mode="complet" evenement="aucun" infobulle="" hint-size="280px,200px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

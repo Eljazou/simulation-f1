@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Drapeau jaune, safety car, VSC</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.cond{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
+.glass{background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+@keyframes sweep{0%{background-position:0 0}100%{background-position:40px 0}}
+</style>
+</helmet>
+<div style="width:1280px;height:720px;box-sizing:border-box;padding:28px 32px;background:#1a2620;font-family:'Barlow',sans-serif;color:#e6edf3;display:flex;flex-direction:column;gap:14px">
+<div class="lbl" style="color:#c9d1d9">Bandeau de neutralisation · ancré sous la barre du haut (top 64, centré, 640 px, 44 px) · entrée en glissé 200 ms</div>
+
+<sc-for list="{{banners}}" as="b" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:640px 1fr;column-gap:28px;align-items:center">
+<div role="status" style="{{b.box}}">
+<span style="{{b.icoBox}}"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{b.ico}}"></path></svg></span>
+<span class="cond" style="font-size:20px;font-weight:700;letter-spacing:.1em">{{b.t}}</span>
+<span style="flex:1"></span>
+<span class="cond" style="font-size:14px;font-weight:600;letter-spacing:.04em;opacity:.85">{{b.s}}</span>
+</div>
+<p style="margin:0;font-size:13px;color:#a3acb6;line-height:1.45">{{b.d}}</p>
+</div>
+</sc-for>
+
+<div class="lbl" style="color:#c9d1d9;margin-top:10px">Répercussions sur les autres zones pendant un safety car</div>
+<div style="display:grid;grid-template-columns:230px 200px 460px 1fr;column-gap:24px;align-items:start">
+<div class="glass" style="overflow:hidden">
+<div style="display:flex;height:48px;border-bottom:1px solid rgba(255,255,255,.08)"><div style="width:4px;background:#f5c518"></div><div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 10px"><div class="cond" style="line-height:1"><div style="font-size:12px;font-weight:600;letter-spacing:.1em;color:#8b949e">TOUR</div><div style="font-size:24px;font-weight:700">3<span style="color:#8b949e;font-size:16px">/5</span></div></div><span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.08em;padding:2px 8px;border-radius:4px;background:#f5c518;color:#0f1115">SC</span></div></div>
+<div style="padding:8px 10px;font-size:12px;color:#c9d1d9;line-height:1.5">Écarts figés, gris clair. Le bandeau du tour passe au jaune.</div>
+</div>
+<div class="glass" style="height:140px;overflow:hidden">
+<div class="lbl" style="font-size:11px;padding:4px 8px">Valmora</div>
+<svg role="img" aria-label="Mini-carte, secteur 2 neutralisé en jaune" width="200" height="112" viewBox="380 150 1300 780">
+<path d="M 560 300 C 700 180, 1000 200, 1150 260 C 1300 320, 1420 240, 1520 330" fill="none" stroke="#5c6670" stroke-width="22"></path>
+<path d="M 1520 330 C 1620 420, 1560 560, 1440 600 C 1320 640, 1300 760, 1200 820" fill="none" stroke="#f5c518" stroke-width="30"></path>
+<path d="M 1200 820 C 1080 890, 820 880, 700 820 C 580 760, 640 640, 560 600 C 460 550, 420 400, 560 300" fill="none" stroke="#5c6670" stroke-width="22"></path>
+<circle cx="1440" cy="600" r="30" fill="#f5c518" stroke="#0f1115" stroke-width="6"></circle><text x="1440" y="612" text-anchor="middle" font-family="Barlow Condensed" font-weight="700" font-size="34" fill="#0f1115">SC</text>
+</svg>
+</div>
+<div class="glass" style="height:96px;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:0 16px;column-gap:16px">
+<div><div class="lbl" style="font-size:11px">Delta safety car</div><div class="mono" style="font-size:28px;font-weight:600;color:#2ecc71">+0.42</div></div>
+<div style="display:flex;flex-direction:column;gap:6px"><span class="lbl" style="font-size:11px">Limite</span><span style="height:8px;border-radius:4px;background:rgba(255,255,255,.08);position:relative"><span style="position:absolute;left:50%;top:-3px;width:2px;height:14px;background:#fff"></span><span style="position:absolute;left:50%;width:22%;height:8px;border-radius:0 4px 4px 0;background:#2ecc71"></span></span><span style="font-size:11px;color:#a3acb6">Vert = au-dessus du delta, OK</span></div>
+</div>
+<p style="margin:0;font-size:13px;color:#a3acb6;line-height:1.5">Pendant SC/VSC, le HUD remplace « écarts devant/derrière » par le delta à respecter. DRS forcé à « Indisponible ».</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const flag = 'M5 21V4M5 4h12l-2 4 2 4H5';
+    const car = 'M3 15h18l-2-5H5zM7 15v3M17 15v3M9 10l1-3h4l1 3';
+    const base = 'width:640px;height:44px;box-sizing:border-box;border-radius:8px;display:flex;align-items:center;gap:12px;padding:0 16px 0 0;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.35);';
+    const ico = 'width:44px;height:44px;display:flex;align-items:center;justify-content:center;';
+    const banners = [
+      { t: 'DRAPEAU JAUNE', s: 'Secteur 2 · virage 7 · dépassement interdit', ico: flag, box: base + 'background:rgba(15,17,21,.9);border:1px solid #f5c518;color:#f5c518', icoBox: ico + 'background:#f5c518;color:#0f1115',
+        d: 'Local. Contour jaune sur fond sombre : ne masque que l’information utile. Le secteur concerné s’allume sur la mini-carte.' },
+      { t: 'SAFETY CAR', s: 'Delta +0.42 · pas de dépassement', ico: car, box: base + 'background:#f5c518;color:#0f1115', icoBox: ico + 'background:#0f1115;color:#f5c518',
+        d: 'Plein jaune, texte noir (contraste 13:1). Reste affiché tant que la voiture de sécurité est en piste.' },
+      { t: 'VIRTUAL SAFETY CAR', s: 'Respectez le delta · −40 %', ico: car, box: base + 'color:#0f1115;background:repeating-linear-gradient(135deg,#f5c518 0 20px,#e0b000 20px 40px);animation:sweep 1.2s linear infinite', icoBox: ico + 'background:#0f1115;color:#f5c518',
+        d: 'Comme SC, mais hachures animées lentement pour les distinguer d’un coup d’œil, y compris en daltonisme.' },
+      { t: 'PISTE LIBRE', s: 'Fin de neutralisation', ico: flag, box: base + 'background:rgba(15,17,21,.9);border:1px solid #2ecc71;color:#2ecc71', icoBox: ico + 'background:#2ecc71;color:#0f1115',
+        d: 'Affiché 3 s puis fondu 250 ms. Les écarts reprennent leur couleur normale.' },
+      { t: 'DRAPEAU ROUGE', s: 'Course suspendue · retour aux stands', ico: flag, box: base + 'background:#e10600;color:#fff', icoBox: ico + 'background:#0f1115;color:#ff5a4f',
+        d: 'Seul bandeau plein rouge : jamais utilisé pour autre chose que l’arrêt de la course.' }
+    ];
+    return { banners };
+  }
+}
+</script>
+</body>
+</html>

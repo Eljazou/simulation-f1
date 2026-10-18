@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Animations de course — déclencheurs et durées</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:1920px;height:1300px;box-sizing:border-box;padding:28px 40px;background:#0d1013;font-family:'Barlow',sans-serif;color:#e6edf3;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:baseline;gap:14px"><span style="width:4px;height:20px;background:#e10600;border-radius:2px;align-self:center"></span><h1 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Animations</h1><span style="font-size:13px;color:#a3acb6">Chaque effet : déclencheur, durée, courbe et paramètres p5.js. Les illustrations sont animées.</span></div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px">
+<sc-for list="{{cards}}" as="c" hint-placeholder-count="8">
+<article style="border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);overflow:hidden;display:flex;flex-direction:column">
+<div style="height:180px;position:relative;background:#2c3035;overflow:hidden">
+<sc-if value="{{c.car}}" hint-placeholder-val="{{true}}"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)"><dc-import name="CarSprite" equipe="{{c.k}}" etat="{{c.e}}" pneu="{{c.ty}}" echelle="1.8" fond="{{yes}}" hint-size="288px,180px"></dc-import></div></sc-if>
+<sc-if value="{{c.lights}}" hint-placeholder-val="{{false}}">
+<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#17261c"><div style="display:flex;gap:8px;padding:10px 12px;border-radius:8px;background:#0b0c0f">
+<sc-for list="{{lamps}}" as="l" hint-placeholder-count="5"><div style="width:40px;padding:6px 0;border-radius:6px;background:#16181c;display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:26px;height:26px;border-radius:50%;background:#2a1414"></span><span style="{{l.s}}"></span></div></sc-for>
+</div></div>
+</sc-if>
+<sc-if value="{{c.speed}}" hint-placeholder-val="{{false}}">
+<div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 55% at 50% 50%,transparent 45%,rgba(0,0,0,.45) 100%)"></div>
+<svg aria-hidden="true" width="100%" height="180" viewBox="0 0 420 180" preserveAspectRatio="none" style="position:absolute;inset:0"><g stroke="#fff" stroke-width="1.2" stroke-dasharray="40 30" opacity=".35"><line x1="0" y1="30" x2="420" y2="40"><animate attributeName="stroke-dashoffset" from="0" to="70" dur=".3s" repeatCount="indefinite"></animate></line><line x1="0" y1="150" x2="420" y2="140"><animate attributeName="stroke-dashoffset" from="20" to="90" dur=".3s" repeatCount="indefinite"></animate></line><line x1="0" y1="60" x2="160" y2="78"><animate attributeName="stroke-dashoffset" from="10" to="80" dur=".3s" repeatCount="indefinite"></animate></line><line x1="0" y1="120" x2="160" y2="104"><animate attributeName="stroke-dashoffset" from="30" to="100" dur=".3s" repeatCount="indefinite"></animate></line></g></svg>
+</sc-if>
+<sc-if value="{{c.flag}}" hint-placeholder-val="{{false}}">
+<div style="position:absolute;inset:0;background:#17261c">
+<svg aria-hidden="true" width="100%" height="180" viewBox="0 0 420 180"><path d="M20 150 C 120 150, 140 40, 220 40 S 320 140, 400 120" fill="none" stroke="#4a4e55" stroke-width="30"></path><path d="M 140 80 C 160 50, 190 40, 220 40 S 280 70, 300 100" fill="none" stroke="#f5c518" stroke-width="30" opacity=".35"><animate attributeName="opacity" values=".35;.12;.35" dur="1s" repeatCount="indefinite"></animate></path></svg>
+<div style="position:absolute;left:50%;top:12px;transform:translateX(-50%);height:30px;display:flex;align-items:center;gap:8px;padding:0 12px 0 0;border-radius:6px;background:rgba(15,17,21,.92);border:1px solid #f5c518;color:#f5c518;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.1em;overflow:hidden"><span style="width:30px;height:30px;background:#f5c518;display:flex;align-items:center;justify-content:center;color:#0f1115"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5 21V3h2v1h12l-2.5 4 2.5 4H7v9z"></path></svg></span>DRAPEAU JAUNE · S2</div>
+</div>
+</sc-if>
+<sc-if value="{{c.pit}}" hint-placeholder-val="{{false}}"><div style="position:absolute;right:10px;bottom:10px;padding:4px 10px;border-radius:6px;background:rgba(15,17,21,.92);border:1px solid rgba(255,255,255,.12);font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600">2.1<span style="color:#8b949e">8</span> s</div></sc-if>
+</div>
+<div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;flex:1">
+<h2 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">{{c.n}}</h2>
+<div>
+<div style="display:flex;height:16px;border-radius:3px;overflow:hidden;gap:2px">
+<sc-for list="{{c.tl}}" as="t" hint-placeholder-count="3"><span style="flex:{{t.w}};background:{{t.c}};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:9px;color:#0f1115;font-weight:600;white-space:nowrap;overflow:hidden">{{t.l}}</span></sc-for>
+</div>
+<div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;color:#8b949e;margin-top:3px"><span>0</span><span>{{c.end}}</span></div>
+</div>
+<div style="display:grid;grid-template-columns:92px 1fr;row-gap:5px;column-gap:10px;font-size:12.5px;line-height:1.4">
+<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Déclencheur</span><span>{{c.trig}}</span>
+<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Durée</span><span>{{c.dur}}</span>
+<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Courbe</span><span>{{c.ease}}</span>
+<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">p5.js</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c9d1d9">{{c.code}}</span>
+</div>
+</div>
+</article>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const base = { car: false, lights: false, speed: false, flag: false, pit: false, k: 'corsa', e: 'normal', ty: 'M' };
+    const C = o => Object.assign({}, base, o);
+    const cards = [
+      C({ car: true, k: 'halden', e: 'freinage', n: 'Fumée de freinage', end: '600 ms / particule',
+        tl: [{ w: 1, c: '#ff7a1a', l: 'apparition 80' }, { w: 4, c: '#c9d1d9', l: 'expansion' }, { w: 2, c: '#6e7781', l: 'fondu' }],
+        trig: 'frein > 0,6 et vitesse > 120 km/h ; disques rouges dès frein > 0,4', dur: 'émission toutes les 40 ms tant que la condition dure ; disques : retour en 900 ms', ease: 'rayon easeOutQuad 4 → 11 px, opacité .45 → 0 linéaire', code: 'puff(x,y,{r0:4,r1:11,life:600,a:.45}) aux roues AV' }),
+      C({ car: true, k: 'halden', e: 'difficulte', n: 'Étincelles', end: '220 ms',
+        tl: [{ w: 1, c: '#fff1b0', l: 'burst' }, { w: 3, c: '#ffb347', l: 'vol' }, { w: 1, c: '#6e7781', l: '' }],
+        trig: 'vitesse > 290 km/h en ligne droite, passage sur vibreur, ou dégât fond plat', dur: 'rafale de 6 à 10 segments, vie 120–220 ms, toutes les 90 ms', ease: 'linéaire, vitesse 4–7 px/image vers l’arrière ±25°', code: 'spark({len:10..32,col:[#fff1b0,#ffd36e,#ff9d2e]})' }),
+      C({ car: true, k: 'aurel', e: 'glisse', ty: 'S', n: 'Glisse · gerbes de gomme', end: '900 ms · traces 8 s',
+        tl: [{ w: 2, c: '#eceef0', l: 'fumée' }, { w: 5, c: '#9aa1aa', l: 'dissipation' }, { w: 3, c: '#2b2e33', l: 'traces' }],
+        trig: 'angle de glisse > 8° (traces dès 5°) ; gomme projetée en entrée de virage', dur: 'fumée 900 ms par nuage, traces persistantes 8 s puis fondu 2 s', ease: 'fumée easeOutCubic r 9 → 24 px ; traces opacité .5 → 0', code: 'skid(rearL,rearR,w:4,#0e0f11) + puff(r1:24,life:900)' }),
+      C({ car: true, k: 'corsa', e: 'aspiration', n: 'Aspiration', end: '450 ms (boucle)',
+        tl: [{ w: 1, c: '#7dbbff', l: 'fondu 200' }, { w: 4, c: '#eaf5ff', l: 'lignes en boucle' }, { w: 1, c: '#7dbbff', l: '200' }],
+        trig: 'voiture derrière à < 0,9 s, écart d’angle < 25°, vitesse > 200 km/h', dur: 'tant que la condition dure ; apparition/disparition 200 ms', ease: 'dashOffset linéaire 48 px / 450 ms', code: 'drawingContext.setLineDash([14,10]); lignes 1,1 px blanc 60 %' }),
+      C({ lights: true, n: 'Feux de départ', end: '5 s + 0,2–3 s',
+        tl: [{ w: 1, c: '#e10600', l: '1' }, { w: 1, c: '#e10600', l: '2' }, { w: 1, c: '#e10600', l: '3' }, { w: 1, c: '#e10600', l: '4' }, { w: 1, c: '#e10600', l: '5' }, { w: 1.6, c: '#6e7781', l: 'attente' }, { w: .6, c: '#2ecc71', l: 'GO' }],
+        trig: 'grille formée, toutes les voitures à v = 0', dur: '1 feu par seconde, extinction aléatoire 0,2–3 s ; « GO » affiché 600 ms', ease: 'allumage immédiat + halo 120 ms ; extinction 80 ms', code: 'overlay HTML #overlay ; faux départ si v > 2 km/h avant extinction' }),
+      C({ car: true, speed: true, k: 'corsa', e: 'normal', n: 'Effet de vitesse', end: '400 ms rampe',
+        tl: [{ w: 2, c: '#7dbbff', l: 'rampe 400' }, { w: 5, c: '#c9d1d9', l: 'actif' }, { w: 2, c: '#7dbbff', l: 'retour 300' }],
+        trig: 'caméra suivie, vitesse > 250 km/h, uniquement en ligne droite', dur: 'tant que v > 250 ; intensité ∝ (v − 250) / 80', ease: 'easeInOutSine ; lignes dashOffset 60 px / 300 ms', code: 'vignette radiale 0 → .15 + 4 lignes 1 px blanc 30 %' }),
+      C({ car: true, pit: true, k: 'novaro', e: 'stand', ty: 'H', n: 'Pit stop', end: '≈ 3,2 s',
+        tl: [{ w: 1, c: '#5aa9ff', l: 'arrivée 300' }, { w: 6, c: '#ff8a1f', l: 'roues 2,0–2,6 s' }, { w: 1, c: '#2ecc71', l: 'go 250' }],
+        trig: 'voiture à v = 0 dans son box (zone 50 × 31 px)', dur: 'mécaniciens convergent 300 ms, travail 2,0–2,6 s, dispersion 250 ms ; chrono visible dès l’arrêt', ease: 'easeOutBack pour l’arrivée, easeInQuad pour la sortie', code: 'crew[10] lerp vers slots ; chrono HTML #pit (mono 44 px)' }),
+      C({ flag: true, n: 'Drapeau jaune', end: '200 ms + durée de l’incident',
+        tl: [{ w: 1, c: '#f5c518', l: '200' }, { w: 6, c: '#e0b84a', l: 'secteur 1 Hz' }, { w: 1, c: '#6e7781', l: 'fondu 250' }],
+        trig: 'voiture arrêtée ou hors piste dans un secteur (incident > 2 s)', dur: 'bandeau glisse depuis le haut 200 ms ; secteur et mini-carte clignotent 1 Hz', ease: 'easeOutCubic entrée ; opacité .9 ↔ .45', code: 'scène : aplat #f5c518 12 % sur le secteur, stroke 120 px' })
+    ];
+    const on = 'width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff6a5c,#e10600 55%,#8a0400);box-shadow:0 0 14px rgba(225,6,0,.85)';
+    const lamps = [0, 1, 2, 3, 4].map(i => ({ s: i < 3 ? on : 'width:26px;height:26px;border-radius:50%;background:#2a1414' }));
+    return { cards, lamps, yes: true };
+  }
+}
+</script>
+</body>
+</html>

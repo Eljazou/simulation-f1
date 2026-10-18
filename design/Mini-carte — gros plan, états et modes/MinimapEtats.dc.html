@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mini-carte — états et modes</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:1240px;height:1080px;box-sizing:border-box;padding:28px 40px;background:#1a2620;font-family:'Barlow',sans-serif;color:#e6edf3;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;align-items:baseline;gap:14px"><span style="width:4px;height:20px;background:#e10600;border-radius:2px;align-self:center"></span><h1 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Mini-carte · 280 × 200</h1><span style="font-size:13px;color:#a3acb6">Affichée ici à ×1,9 · survolez un point pour l’infobulle, les deux boutons changent de mode</span></div>
+<div style="display:grid;grid-template-columns:532px 532px;column-gap:56px;row-gap:28px">
+<sc-for list="{{states}}" as="s" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:baseline;gap:10px"><span style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">{{s.t}}</span><span style="font-size:12px;color:#a3acb6">{{s.d}}</span></div>
+<div style="width:532px;height:380px;position:relative">
+<div style="position:absolute;left:0;top:0;width:280px;height:200px;transform:scale(1.9);transform-origin:0 0"><dc-import name="Minimap" mode="{{s.m}}" evenement="{{s.e}}" infobulle="{{s.i}}" hint-size="280px,200px"></dc-import></div>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;font-size:12.5px;line-height:1.5;color:#c9d1d9">
+<p style="margin:0"><b style="font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.05em">TRACÉ</b> · contour 9 px #06080b, ligne 6 px par secteur : S1 #5b8def, S2 #e0b84a, S3 #4fbf86. Stands 2 px #7d848d. DRS 2,5 px #2ecc71 décalés de 7 px vers l’extérieur.</p>
+<p style="margin:0"><b style="font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.05em">VOITURES</b> · points Ø 8 px, liseré blanc 1 px. Écart mini 9 px : si deux points sont plus proches, chacun est poussé de moitié perpendiculairement au tracé.</p>
+<p style="margin:0"><b style="font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.05em">ÉTATS</b> · leader : pastille « 1 ». Stand : clé orange. Abandon : gris barré. Suivie : anneau rouge pulsé 1,4 s + étiquette.</p>
+<p style="margin:0"><b style="font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:.05em">ZOOM</b> · fenêtre 760 × 396 px monde centrée sur la voiture suivie, lissée (lerp 0,15 par image). Agrandir : ouvre la carte en pleine largeur du panneau (320 px).</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { states: [
+      { t: 'Normal · circuit complet', d: 'infobulle au survol', m: 'complet', e: 'aucun', i: 'TAV' },
+      { t: 'Drapeau jaune', d: 'secteur 2 clignotant + drapeau', m: 'complet', e: 'jaune', i: '' },
+      { t: 'Safety car', d: 'point orange « SC » + étiquette', m: 'complet', e: 'sc', i: '' },
+      { t: 'Zoom sur ma voiture', d: 'piste à l’échelle, codes visibles', m: 'zoom', e: 'aucun', i: '' }
+    ] };
+  }
+}
+</script>
+</body>
+</html>

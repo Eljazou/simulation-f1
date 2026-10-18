@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Onglets Prédiction, Historique, Réglages</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.cond{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
+.pnl{width:320px;height:1004px;box-sizing:border-box;border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 24px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden}
+.tab{flex:1;height:40px;border:0;background:transparent;color:#8b949e;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
+.tab.on{color:#fff;box-shadow:inset 0 -2px 0 #e10600}
+.seg{flex:1;height:26px;border:0;border-radius:5px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;background:transparent;color:#8b949e}
+.seg.on{background:rgba(255,255,255,.12);color:#fff}
+.rng{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:linear-gradient(90deg,#e10600 0 var(--v),rgba(255,255,255,.14) var(--v) 100%);margin:0;outline:none}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(225,6,0,.35);cursor:pointer}
+.rng::-moz-range-thumb{width:14px;height:14px;border:0;border-radius:50%;background:#fff;cursor:pointer}
+.sw{-webkit-appearance:none;appearance:none;width:32px;height:18px;border-radius:9px;background:rgba(255,255,255,.18);position:relative;margin:0;cursor:pointer;transition:background .15s}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw:checked{background:#e10600}
+.sw:checked::after{transform:translateX(14px)}
+.acc{width:100%;height:40px;display:flex;align-items:center;gap:8px;padding:0 12px;border:0;background:transparent;color:#e6edf3;cursor:pointer;box-sizing:border-box;text-align:left}
+.acc:hover{background:rgba(255,255,255,.04)}
+</style>
+</helmet>
+<div style="width:1120px;height:1080px;box-sizing:border-box;padding:20px 40px;background:#1a2620;font-family:'Barlow',sans-serif;color:#e6edf3;display:grid;grid-template-columns:repeat(3,320px);column-gap:40px">
+
+<!-- PRÉDICTION -->
+<div style="display:flex;flex-direction:column;gap:8px">
+<span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#c9d1d9;height:24px">Prédiction</span>
+<aside class="pnl" aria-label="Panneau — Prédiction">
+<div role="tablist" style="display:flex"><button role="tab" aria-selected="false" class="tab">Télém.</button><button role="tab" aria-selected="true" class="tab on">Prédiction</button><button role="tab" aria-selected="false" class="tab">Histo.</button><button role="tab" aria-selected="false" class="tab">Réglages</button></div>
+<div style="padding:12px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;gap:4px;padding:3px;border-radius:7px;background:rgba(255,255,255,.04)"><button class="seg on">Victoire</button><button class="seg">Podium</button><button class="seg">Top 5</button></div>
+<div style="display:flex;justify-content:space-between"><span class="lbl" style="font-size:11px">Probabilité de victoire</span><span class="lbl" style="font-size:11px">Après tour 3/5</span></div>
+</div>
+<div style="padding:0 12px;display:flex;flex-direction:column">
+<sc-for list="{{pred}}" as="p" hint-placeholder-count="12">
+<div style="display:grid;grid-template-columns:22px 3px 34px 1fr 52px 40px;column-gap:8px;align-items:center;height:32px;{{p.rs}}">
+<span class="cond" style="font-size:14px;font-weight:600;color:#8b949e;text-align:right">{{p.pos}}</span>
+<span style="width:3px;height:16px;border-radius:2px;background:{{p.color}}"></span>
+<span class="cond" style="font-size:15px;font-weight:700;color:{{p.cc}}">{{p.code}}</span>
+<span style="height:10px;border-radius:2px;background:rgba(255,255,255,.05);overflow:hidden"><span style="display:block;height:100%;width:{{p.w}};background:{{p.bar}};border-radius:2px"></span></span>
+<span class="mono" style="font-size:12px;text-align:right;color:{{p.cc}}">{{p.pct}}</span>
+<span class="mono" style="font-size:10px;text-align:right;color:{{p.dc}}">{{p.d}}</span>
+</div>
+</sc-for>
+</div>
+<div style="margin:6px 12px 0 12px;display:grid;grid-template-columns:22px 3px 34px 1fr 52px 40px;column-gap:8px"><span></span><span></span><span></span><span class="mono" style="display:flex;justify-content:space-between;font-size:9px;color:#6e7781"><span>0</span><span>20</span><span>40 %</span></span><span></span><span class="lbl" style="font-size:9px;text-align:right">Δ tour</span></div>
+<p style="margin:auto 0 0 0;padding:12px 14px;font-size:12px;color:#8b949e;line-height:1.45;border-top:1px solid rgba(255,255,255,.06)">Total = 100 %. Recalculé à chaque passage de ligne ; la barre du pilote suivi est en rouge.</p>
+</aside>
+</div>
+
+<!-- HISTORIQUE -->
+<div style="display:flex;flex-direction:column;gap:8px">
+<span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#c9d1d9;height:24px">Historique</span>
+<aside class="pnl" aria-label="Panneau — Historique">
+<div role="tablist" style="display:flex"><button role="tab" aria-selected="false" class="tab">Télém.</button><button role="tab" aria-selected="false" class="tab">Prédic.</button><button role="tab" aria-selected="true" class="tab on">Historique</button><button role="tab" aria-selected="false" class="tab">Réglages</button></div>
+<div style="padding:12px;display:flex;justify-content:space-between;align-items:center">
+<span class="cond" style="font-size:16px;font-weight:700">Positions par tour</span>
+<span class="lbl" style="font-size:11px">Survol = isoler</span>
+</div>
+<svg role="img" aria-label="Évolution des positions des 12 voitures, de la grille au tour 3" width="320" height="360" viewBox="0 0 320 360" style="display:block">
+<rect x="186" y="4" width="108" height="314" fill="rgba(255,255,255,.025)"></rect>
+<text x="240" y="170" text-anchor="middle" font-family="Barlow Condensed" font-weight="600" font-size="12" letter-spacing="1" fill="#5b636d">À VENIR</text>
+<g font-family="JetBrains Mono" font-size="9" fill="#6e7781">
+<sc-for list="{{ticks}}" as="k" hint-placeholder-count="12"><text x="22" y="{{k.y}}" text-anchor="end">{{k.t}}</text><line x1="30" x2="294" y1="{{k.ly}}" y2="{{k.ly}}" stroke="rgba(255,255,255,.05)"></line></sc-for>
+</g>
+<g font-family="Barlow Condensed" font-weight="600" font-size="11" fill="#8b949e" text-anchor="middle">
+<text x="40" y="340">GRILLE</text><text x="88" y="340">T1</text><text x="136" y="340">T2</text><text x="184" y="340" fill="#fff">T3</text><text x="232" y="340">T4</text><text x="280" y="340">T5</text>
+</g>
+<sc-for list="{{hist}}" as="h" hint-placeholder-count="12">
+<path d="{{h.d}}" fill="none" stroke="{{h.color}}" stroke-width="{{h.sw}}" stroke-linejoin="round" stroke-linecap="round" opacity="{{h.op}}"></path>
+<circle cx="{{h.ex}}" cy="{{h.ey}}" r="{{h.r}}" fill="{{h.color}}" opacity="{{h.op}}"></circle>
+<text x="{{h.lx}}" y="{{h.ly}}" font-family="Barlow Condensed" font-weight="700" font-size="11" fill="{{h.tc}}">{{h.code}}</text>
+</sc-for>
+<g transform="translate(146 300)"><line x1="0" y1="-6" x2="0" y2="6" stroke="#e74c3c" stroke-width="2"></line><line x1="-5" y1="-5" x2="5" y2="5" stroke="#e74c3c" stroke-width="2"></line><line x1="5" y1="-5" x2="-5" y2="5" stroke="#e74c3c" stroke-width="2"></line></g>
+</svg>
+<div style="padding:4px 12px 0 12px;display:flex;flex-direction:column;gap:6px">
+<span class="lbl" style="font-size:11px">Faits marquants</span>
+<div style="display:grid;grid-template-columns:28px 1fr;gap:6px 8px;font-size:13px;line-height:1.35">
+<span class="cond" style="font-weight:700;color:#8b949e">T3</span><span><b class="cond" style="font-size:14px">MIR</b> dépasse TAV · P3 → P2</span>
+<span class="cond" style="font-weight:700;color:#8b949e">T3</span><span><b class="cond" style="font-size:14px">LUN</b> gagne 2 places</span>
+<span class="cond" style="font-weight:700;color:#8b949e">T2</span><span><b class="cond" style="font-size:14px">YSA</b> abandonne · sortie de piste</span>
+<span class="cond" style="font-weight:700;color:#8b949e">T1</span><span><b class="cond" style="font-size:14px">KAR</b> prend la tête au virage 1</span>
+</div>
+</div>
+</aside>
+</div>
+
+<!-- RÉGLAGES -->
+<div style="display:flex;flex-direction:column;gap:8px">
+<span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#c9d1d9;height:24px">Réglages</span>
+<aside class="pnl" aria-label="Panneau — Réglages">
+<div role="tablist" style="display:flex"><button role="tab" aria-selected="false" class="tab">Télém.</button><button role="tab" aria-selected="false" class="tab">Prédic.</button><button role="tab" aria-selected="false" class="tab">Histo.</button><button role="tab" aria-selected="true" class="tab on">Réglages</button></div>
+<div style="padding:12px;border-bottom:1px solid rgba(255,255,255,.06)">
+<label style="display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Rechercher un réglage</span>
+<input type="search" placeholder="Rechercher un réglage…" style="flex:1;border:0;background:transparent;color:#e6edf3;font-family:'Barlow',sans-serif;font-size:14px;outline:none">
+<span class="mono" style="font-size:10px;color:#8b949e;border:1px solid rgba(255,255,255,.15);border-radius:3px;padding:0 4px">/</span>
+</label>
+</div>
+<div style="flex:1;overflow:hidden">
+<sc-for list="{{sections}}" as="s" hint-placeholder-count="7">
+<div style="border-bottom:1px solid rgba(255,255,255,.06)">
+<button class="acc" aria-expanded="{{s.open}}">
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="3" style="{{s.chev}}"><path d="m9 6 6 6-6 6"></path></svg>
+<span class="cond" style="font-size:15px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;flex:1">{{s.name}}</span>
+<span style="font-size:12px;color:#8b949e">{{s.sum}}</span>
+</button>
+<sc-if value="{{s.open}}" hint-placeholder-val="{{false}}">
+<div style="padding:2px 12px 14px 32px;display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{s.items}}" as="it" hint-placeholder-count="3">
+<sc-if value="{{it.slider}}" hint-placeholder-val="{{true}}">
+<label style="display:flex;flex-direction:column;gap:6px">
+<span style="display:flex;justify-content:space-between;font-size:13px"><span>{{it.label}}</span><span class="mono" style="font-size:12px;color:#fff;background:rgba(255,255,255,.06);padding:0 6px;border-radius:3px">{{it.val}}</span></span>
+<input type="range" class="rng" value="{{it.raw}}" min="0" max="100" style="--v:{{it.raw}}%">
+</label>
+</sc-if>
+<sc-if value="{{it.toggle}}" hint-placeholder-val="{{false}}">
+<label style="display:flex;justify-content:space-between;align-items:center;font-size:13px;min-height:24px"><span>{{it.label}}</span><input type="checkbox" role="switch" class="sw" checked="{{it.on}}"></label>
+</sc-if>
+<sc-if value="{{it.segs}}" hint-placeholder-val="{{false}}">
+<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px">{{it.label}}</span><div style="display:flex;gap:4px;padding:3px;border-radius:7px;background:rgba(255,255,255,.04)"><sc-for list="{{it.opts}}" as="o" hint-placeholder-count="3"><button class="{{o.cls}}">{{o.t}}</button></sc-for></div></div>
+</sc-if>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.08)">
+<button class="cond" style="flex:1;height:36px;border-radius:6px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#e6edf3;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Réinitialiser</button>
+<button class="cond" style="flex:1;height:36px;border-radius:6px;border:0;background:#e10600;color:#fff;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer">Relancer</button>
+</div>
+</aside>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1120,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = [['1','KAR','#2f7bff',34.2,'+3.1'],['2','MIR','#ff8a1f',27.8,'+6.4',1],['3','TAV','#19c3a6',14.1,'−7.9'],['4','ODE','#2f7bff',8.6,'−0.4'],['5','LUN','#f2c200',5.2,'+1.8'],['6','SKO','#d9dde3',3.4,'−0.6'],['7','BRE','#c0186b',2.6,'−1.9'],['8','ADE','#ff8a1f',1.7,'0.0'],['9','ROW','#d9dde3',1.1,'−0.2'],['10','FEN','#19c3a6',0.8,'−1.1'],['11','ILM','#f2c200',0.5,'−0.1'],['—','YSA','#c0186b',0,'',2]];
+    const pred = P.map(p => {
+      const d = p[4];
+      return { pos: p[0], code: p[1], color: p[2], w: (p[3] / 40 * 100).toFixed(1) + '%', pct: p[5] === 2 ? 'ABD' : p[3].toFixed(1).replace('.', ',') + ' %',
+        bar: p[5] === 1 ? '#e10600' : 'rgba(230,237,243,.55)', cc: p[5] === 2 ? '#6e7781' : (p[5] === 1 ? '#fff' : '#e6edf3'),
+        d, dc: d.startsWith('+') ? '#2ecc71' : (d.startsWith('−') ? '#e74c3c' : '#8b949e'),
+        rs: p[5] === 1 ? 'background:rgba(225,6,0,.12);box-shadow:inset 3px 0 0 #e10600;margin:0 -12px;padding:0 12px' : 'border-top:1px solid rgba(255,255,255,.04)' };
+    });
+    const seq = { KAR:[2,1,1,1], MIR:[4,3,3,2], TAV:[1,2,2,3], ODE:[3,4,4,4], LUN:[7,6,7,5], SKO:[5,5,6,6], BRE:[6,7,5,7], ADE:[9,8,8,8], ROW:[8,9,10,9], FEN:[10,10,9,10], ILM:[12,12,11,11], YSA:[11,11,12] };
+    const col = { KAR:'#2f7bff', MIR:'#ff8a1f', TAV:'#19c3a6', ODE:'#2f7bff', LUN:'#f2c200', SKO:'#d9dde3', BRE:'#c0186b', ADE:'#ff8a1f', ROW:'#d9dde3', FEN:'#19c3a6', ILM:'#f2c200', YSA:'#c0186b' };
+    const X = i => 40 + i * 48, Y = p => 14 + (p - 1) * 26;
+    const hist = Object.keys(seq).map(k => {
+      const s = seq[k], me = k === 'MIR';
+      const d = s.map((p, i) => (i ? 'L' : 'M') + X(i) + ' ' + Y(p)).join(' ');
+      const last = s.length - 1;
+      return { code: k, d, color: col[k], sw: me ? 3.5 : 1.6, op: me ? 1 : (k === 'YSA' ? .4 : .6), ex: X(last), ey: Y(s[last]), r: me ? 4.5 : 2.5,
+        lx: X(last) + 8, ly: Y(s[last]) + 4, tc: me ? '#fff' : (k === 'YSA' ? '#6e7781' : '#a3acb6') };
+    });
+    const ticks = Array.from({ length: 12 }, (_, i) => ({ t: 'P' + (i + 1), y: Y(i + 1) + 3, ly: Y(i + 1) }));
+    const sl = (label, val, raw) => ({ slider: true, toggle: false, segs: false, label, val, raw });
+    const tg = (label, on) => ({ slider: false, toggle: true, segs: false, label, on });
+    const sg = (label, opts, sel) => ({ slider: false, toggle: false, segs: true, label, opts: opts.map((t, i) => ({ t, cls: i === sel ? 'seg on' : 'seg' })) });
+    const sections = [
+      { name: 'Course', sum: '5 tours · 12 voitures', open: true, items: [sl('Nombre de tours', '5', 20), sl('Niveau des adversaires', '70 %', 70), tg('Dégâts', true), tg('Drapeaux et safety car', true)] },
+      { name: 'Glisse', sum: 'Adhérence 0,85', open: true, items: [sl('Adhérence', '0,85', 85), sl('Sensibilité direction', '1,20', 60), tg('Antipatinage', false)] },
+      { name: 'Météo', sum: 'Sec · 24 °C', open: false, items: [] },
+      { name: 'Pit stop', sum: 'Auto · 2,4 s', open: false, items: [] },
+      { name: 'Ambiance', sum: 'Foule 60 %', open: false, items: [] },
+      { name: 'Effets', sum: 'Traces, fumée', open: false, items: [] },
+      { name: 'Mode', sum: 'Solo', open: true, items: [sg('Joueurs', ['Solo', '2 joueurs', 'Spectateur'], 0)] }
+    ].map(s => Object.assign(s, { chev: s.open ? 'transform:rotate(90deg);transition:transform .15s' : 'transition:transform .15s' }));
+    return { pred, hist, ticks, sections };
+  }
+}
+</script>
+</body>
+</html>

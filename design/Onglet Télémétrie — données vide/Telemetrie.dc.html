@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Onglet Télémétrie</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.cond{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
+.tab{flex:1;height:40px;border:0;background:transparent;color:#8b949e;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
+.tab:hover{color:#e6edf3}
+.tab.on{color:#fff;box-shadow:inset 0 -2px 0 #e10600}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="width:760px;height:1080px;box-sizing:border-box;padding:20px 40px;background:#1a2620;font-family:'Barlow',sans-serif;color:#e6edf3;display:grid;grid-template-columns:320px 320px;column-gap:40px">
+<sc-for list="{{panels}}" as="p" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:8px">
+<span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#c9d1d9;height:24px">{{p.title}}</span>
+<aside aria-label="Panneau latéral — Télémétrie" style="width:320px;height:1004px;box-sizing:border-box;border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 24px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden">
+<div style="display:flex;align-items:stretch">
+<div role="tablist" aria-label="Onglets du panneau" style="display:flex;flex:1">
+<button role="tab" aria-selected="true" class="tab on">Télémétrie</button>
+<button role="tab" aria-selected="false" class="tab">Prédic.</button>
+<button role="tab" aria-selected="false" class="tab">Histo.</button>
+<button role="tab" aria-selected="false" class="tab">Réglages</button>
+</div>
+<button aria-label="Fermer le panneau" style="width:36px;border:0;background:transparent;color:#8b949e;cursor:pointer;box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06)">
+<div style="display:flex;gap:12px;align-items:center">
+<span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:3px;border-radius:2px;background:{{p.cA}}"></span><span class="cond" style="font-size:14px;font-weight:700;color:{{p.tA}}">MIR</span></span>
+<span class="lbl" style="font-size:11px">vs</span>
+<span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:0;border-top:3px dashed {{p.cB}}"></span><span class="cond" style="font-size:14px;font-weight:700;color:{{p.tB}}">TAV</span>
+<svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg></span>
+</div>
+<span class="lbl" style="font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.06);color:#c9d1d9">Fenêtre 30 s</span>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;padding:8px 12px 12px 12px">
+<sc-for list="{{p.charts}}" as="c" hint-placeholder-count="4">
+<section style="flex:1;display:flex;flex-direction:column;border-radius:6px;background:rgba(255,255,255,.025);padding:8px 8px 4px 8px">
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<span style="display:flex;gap:6px;align-items:baseline"><span class="cond" style="font-size:16px;font-weight:700;letter-spacing:.03em">{{c.name}}</span><span class="lbl" style="font-size:11px">{{c.unit}}</span></span>
+<span class="mono" style="font-size:11px;display:flex;gap:8px"><span style="color:{{p.cA}}">{{c.vA}}</span><span style="color:{{p.cB}}">{{c.vB}}</span></span>
+</div>
+<svg role="img" aria-label="{{c.aria}}" width="280" height="170" viewBox="0 0 280 170" style="display:block;margin-top:4px">
+<g font-family="JetBrains Mono" font-size="9" fill="#8b949e">
+<text x="30" y="14" text-anchor="end">{{c.max}}</text>
+<text x="30" y="79" text-anchor="end">{{c.mid}}</text>
+<text x="30" y="144" text-anchor="end">{{c.min}}</text>
+<text x="36" y="162">−30 s</text><text x="153" y="162" text-anchor="middle">−15 s</text><text x="276" y="162" text-anchor="end">0</text>
+</g>
+<g stroke="rgba(255,255,255,.07)" stroke-width="1">
+<line x1="36" y1="11" x2="276" y2="11"></line><line x1="36" y1="43" x2="276" y2="43"></line><line x1="36" y1="76" x2="276" y2="76"></line><line x1="36" y1="108" x2="276" y2="108"></line><line x1="36" y1="141" x2="276" y2="141"></line>
+<line x1="156" y1="11" x2="156" y2="141"></line>
+</g>
+<line x1="36" y1="11" x2="36" y2="141" stroke="rgba(255,255,255,.2)"></line>
+<rect x="36" y="{{c.bandY}}" width="240" height="{{c.bandH}}" fill="#2ecc71" opacity=".08"></rect>
+<line x1="36" y1="{{c.zeroY}}" x2="276" y2="{{c.zeroY}}" stroke="rgba(255,255,255,.22)" stroke-dasharray="{{c.zeroDash}}"></line>
+<path d="{{c.pB}}" fill="none" stroke="{{p.cB}}" stroke-width="1.6" stroke-dasharray="4 3"></path>
+<path d="{{c.pA}}" fill="none" stroke="{{p.cA}}" stroke-width="2"></path>
+<circle cx="276" cy="{{c.endA}}" r="{{p.dot}}" fill="{{p.cA}}"></circle>
+</svg>
+<sc-if value="{{p.empty}}" hint-placeholder-val="{{false}}">
+<div style="margin-top:-118px;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#8b949e">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linecap="round" style="animation:spin 1.2s linear infinite"><path d="M12 3a9 9 0 1 1-9 9"></path></svg>
+<span class="cond" style="font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">En attente de données</span>
+</div>
+<div style="height:38px"></div>
+</sc-if>
+</section>
+</sc-for>
+</div>
+<sc-if value="{{p.empty}}" hint-placeholder-val="{{false}}">
+<p style="margin:0;padding:10px 14px 14px 14px;font-size:12px;color:#8b949e;line-height:1.45;border-top:1px solid rgba(255,255,255,.06)">L’enregistrement démarre au départ de la course. Les 30 dernières secondes défilent de droite à gauche.</p>
+</sc-if>
+</aside>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":760,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const N = 90, X0 = 36, W = 240, Y0 = 11, H = 130;
+    const path = (fn, lo, hi) => {
+      let s = '';
+      for (let i = 0; i <= N; i++) {
+        const t = i / N * 30;
+        const v = Math.max(lo, Math.min(hi, fn(t)));
+        const x = X0 + i / N * W, y = Y0 + (1 - (v - lo) / (hi - lo)) * H;
+        s += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+      }
+      return s;
+    };
+    const yOf = (v, lo, hi) => (Y0 + (1 - (v - lo) / (hi - lo)) * H).toFixed(1);
+    const corner = t => { const c = [4, 11, 17.5, 25]; let m = 0; c.forEach(k => { m = Math.max(m, Math.exp(-Math.pow(t - k, 2) / 1.6)); }); return m; };
+    const spd = d => t => 320 - 190 * corner(t - d) + 6 * Math.sin(t * 2.1);
+    const thrbrk = d => t => { const c = corner(t - d); const dc = corner(t - d + 0.9); return dc > 0.35 && c < dc ? -95 * dc : 100 * (1 - c * 0.85); };
+    const tmp = d => t => 99 + 7 * corner(t - d) + 2.5 * Math.sin(t / 5 + d);
+    const slip = d => t => { const c = [4, 11, 17.5, 25]; let s = 0; c.forEach((k, j) => { s += (j % 2 ? -1 : 1) * 7 * Math.exp(-Math.pow(t - d - k, 2) / 1.1); }); return s + 0.8 * Math.sin(t * 3 + d); };
+    const mkCharts = empty => {
+      const c = (name, unit, lo, hi, labels, fA, fB, vA, vB, band, zero, aria) => ({
+        name, unit, max: labels[0], mid: labels[1], min: labels[2], aria,
+        pA: empty ? '' : path(fA, lo, hi), pB: empty ? '' : path(fB, lo, hi),
+        endA: empty ? -10 : yOf(Math.max(lo, Math.min(hi, fA(30))), lo, hi),
+        vA: empty ? '—' : vA, vB: empty ? '—' : vB,
+        bandY: band ? yOf(band[1], lo, hi) : 0, bandH: band ? (yOf(band[0], lo, hi) - yOf(band[1], lo, hi)).toFixed(1) : 0,
+        zeroY: zero === null ? -10 : yOf(zero, lo, hi), zeroDash: '3 3'
+      });
+      return [
+        c('Vitesse', 'km/h', 80, 340, ['340', '210', '80'], spd(0), spd(0.6), '287', '281', null, null, 'Vitesse sur 30 s, MIR contre TAV'),
+        c('Gaz / Frein', '% · ↑ gaz ↓ frein', -100, 100, ['100', '0', '100'], thrbrk(0), thrbrk(0.6), 'G 100', 'G 100', null, 0, 'Gaz et frein sur 30 s'),
+        c('Temp. pneus', '°C · moy. 4 roues', 80, 120, ['120', '100', '80'], tmp(0), tmp(1.4), '99°', '103°', [90, 105], null, 'Température moyenne des pneus, fenêtre optimale 90 à 105 °C'),
+        c('Angle de glisse', '° · arrière', -10, 10, ['+10', '0', '−10'], slip(0), slip(0.6), '+1.2°', '+0.4°', null, 0, 'Angle de glisse sur 30 s')
+      ];
+    };
+    return {
+      panels: [
+        { title: 'Avec données · 2 pilotes comparés', charts: mkCharts(false), empty: false, cA: '#ff8a1f', cB: '#19c3a6', tA: '#ffb066', tB: '#5fe0c9', dot: 3 },
+        { title: 'État vide · en attente de données', charts: mkCharts(true), empty: true, cA: '#4a525c', cB: '#4a525c', tA: '#8b949e', tB: '#8b949e', dot: 0 }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tour de classement — états</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.glass{background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.cond{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
+.h{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;margin:0}
+</style>
+</helmet>
+<div style="width:1240px;height:860px;box-sizing:border-box;padding:40px;background:#1a2620;font-family:'Barlow',sans-serif;color:#e6edf3;display:grid;grid-template-columns:230px 230px 1fr;column-gap:48px">
+
+<sc-for list="{{towers}}" as="tw" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:12px">
+<h2 class="h">{{tw.title}}</h2>
+<p class="lbl" style="margin:0;text-transform:none;letter-spacing:0;font-family:'Barlow',sans-serif;font-size:12px;font-weight:400">{{tw.sub}}</p>
+<section class="glass" style="width:230px;overflow:hidden">
+<div style="display:flex;align-items:stretch;height:48px;border-bottom:1px solid rgba(255,255,255,.08)">
+<div style="width:4px;background:#e10600"></div>
+<div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 10px">
+<div class="cond" style="line-height:1"><div style="font-size:12px;font-weight:600;letter-spacing:.1em;color:#8b949e">TOUR</div><div style="font-size:24px;font-weight:700">3<span style="color:#8b949e;font-size:16px">/5</span></div></div>
+<div class="mono" style="font-size:15px">12:48.302</div>
+</div>
+</div>
+<div class="lbl" style="display:grid;grid-template-columns:20px 10px 3px 1fr 64px 18px;column-gap:6px;align-items:center;height:22px;padding:0 8px;font-size:11px;color:#6e7781"><span style="text-align:right">P</span><span></span><span></span><span>Pilote</span><span style="text-align:right">{{tw.col}}</span><span></span></div>
+<sc-for list="{{tw.rows}}" as="r" hint-placeholder-count="12">
+<div style="{{r.rowStyle}}">
+<span class="cond" style="text-align:right;font-size:15px;font-weight:600;color:#c9d1d9">{{r.pos}}</span>
+<span style="display:flex;justify-content:center">
+<sc-if value="{{r.up}}" hint-placeholder-val="{{false}}"><svg role="img" aria-label="gagnée" width="8" height="6" viewBox="0 0 8 6"><path d="M4 0 8 6H0z" fill="#2ecc71"></path></svg></sc-if>
+<sc-if value="{{r.down}}" hint-placeholder-val="{{false}}"><svg role="img" aria-label="perdue" width="8" height="6" viewBox="0 0 8 6"><path d="M4 6 0 0h8z" fill="#e74c3c"></path></svg></sc-if>
+</span>
+<span style="width:3px;height:16px;border-radius:2px;background:{{r.color}}"></span>
+<span style="display:flex;align-items:center;gap:5px"><span class="cond" style="font-size:16px;font-weight:{{r.cw}};letter-spacing:.04em;color:{{r.codeColor}}">{{r.code}}</span>
+<sc-if value="{{r.best}}" hint-placeholder-val="{{false}}"><svg role="img" aria-label="meilleur tour" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9b59ff" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 13V9M10 2h4"></path></svg></sc-if></span>
+<span style="display:flex;justify-content:flex-end"><span class="mono" style="{{r.gapStyle}}">{{r.gap}}</span></span>
+<span style="width:18px;height:18px;border-radius:50%;box-sizing:border-box;border:2px solid {{r.tyreC}};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:{{r.tyreC}}">{{r.tyre}}</span>
+</div>
+</sc-for>
+<div style="display:flex;gap:4px;padding:8px;border-top:1px solid rgba(255,255,255,.08)">
+<button class="cond" style="{{tw.btnA}}">Écart leader</button>
+<button class="cond" style="{{tw.btnB}}">Intervalle</button>
+</div>
+</section>
+</div>
+</sc-for>
+
+<div style="display:flex;flex-direction:column;gap:20px">
+<h2 class="h">Anatomie d'une ligne · 26 px</h2>
+<div style="position:relative;padding-top:22px">
+<div style="display:grid;grid-template-columns:40px 20px 6px 1fr 128px 36px;column-gap:12px;align-items:end;margin-bottom:6px" class="lbl">
+<span style="text-align:right;font-size:10px">20 px</span><span style="font-size:10px;text-align:center">10</span><span style="font-size:10px">3</span><span style="font-size:10px">flex</span><span style="font-size:10px;text-align:right">64 px · aligné droite</span><span style="font-size:10px;text-align:center">18</span>
+</div>
+<div class="glass" style="width:100%;box-sizing:border-box;border-radius:8px;overflow:hidden">
+<div style="display:grid;grid-template-columns:40px 20px 6px 1fr 128px 36px;column-gap:12px;align-items:center;height:52px;padding:0 16px;background:linear-gradient(90deg,rgba(225,6,0,.25),rgba(225,6,0,.08));box-shadow:inset 6px 0 0 #e10600;outline:1px dashed rgba(255,255,255,.18);outline-offset:-1px">
+<span class="cond" style="text-align:right;font-size:30px;font-weight:600">2</span>
+<span style="display:flex;justify-content:center"><svg role="img" aria-label="gagnée" width="16" height="12" viewBox="0 0 8 6"><path d="M4 0 8 6H0z" fill="#2ecc71"></path></svg></span>
+<span style="width:6px;height:32px;border-radius:3px;background:#ff8a1f"></span>
+<span class="cond" style="font-size:32px;font-weight:700;letter-spacing:.04em">MIR</span>
+<span class="mono" style="font-size:24px;text-align:right;font-weight:600">+1.284</span>
+<span style="width:36px;height:36px;border-radius:50%;box-sizing:border-box;border:4px solid #f5c518;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-size:20px;font-weight:700;color:#f5c518">M</span>
+</div>
+</div>
+<div class="lbl" style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-top:10px;font-size:11px;text-transform:none;letter-spacing:.02em;color:#a3acb6">
+<span>Position · Barlow Cond. 15/600</span><span>Flèche ▲ vert / ▼ rouge, 250 ms puis reste 1 tour</span><span>Bande écurie 3×16 px</span><span>Code 3 lettres · 16/600</span><span>JetBrains Mono 12 · chasse fixe</span><span>Pneu : cercle 2 px + lettre</span>
+</div>
+</div>
+
+<h2 class="h" style="margin-top:6px">États d'une ligne</h2>
+<div class="glass" style="overflow:hidden">
+<sc-for list="{{states}}" as="s" hint-placeholder-count="8">
+<div style="display:grid;grid-template-columns:230px 1fr;align-items:center;border-top:1px solid rgba(255,255,255,.05)">
+<div style="{{s.rowStyle}}">
+<span class="cond" style="text-align:right;font-size:15px;font-weight:600;color:#c9d1d9">{{s.pos}}</span>
+<span style="display:flex;justify-content:center">
+<sc-if value="{{s.up}}" hint-placeholder-val="{{false}}"><svg role="img" aria-label="gagnée" width="8" height="6" viewBox="0 0 8 6"><path d="M4 0 8 6H0z" fill="#2ecc71"></path></svg></sc-if>
+<sc-if value="{{s.down}}" hint-placeholder-val="{{false}}"><svg role="img" aria-label="perdue" width="8" height="6" viewBox="0 0 8 6"><path d="M4 6 0 0h8z" fill="#e74c3c"></path></svg></sc-if>
+</span>
+<span style="width:3px;height:16px;border-radius:2px;background:{{s.color}}"></span>
+<span style="display:flex;align-items:center;gap:5px"><span class="cond" style="font-size:16px;font-weight:{{s.cw}};color:{{s.codeColor}}">{{s.code}}</span>
+<sc-if value="{{s.best}}" hint-placeholder-val="{{false}}"><svg role="img" aria-label="meilleur tour" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9b59ff" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 13V9M10 2h4"></path></svg></sc-if></span>
+<span style="display:flex;justify-content:flex-end"><span class="mono" style="{{s.gapStyle}}">{{s.gap}}</span></span>
+<span style="width:18px;height:18px;border-radius:50%;box-sizing:border-box;border:2px solid {{s.tyreC}};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-size:11px;font-weight:700;color:{{s.tyreC}}">{{s.tyre}}</span>
+</div>
+<div style="padding:0 16px;display:flex;gap:10px;align-items:baseline"><span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;width:150px">{{s.name}}</span><span style="font-size:12px;color:#a3acb6">{{s.desc}}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = { S:'#ff3b30', M:'#f5c518', H:'#f2f2f2', I:'#34c759', W:'#2f80ff' };
+    const base = 'display:grid;grid-template-columns:20px 10px 3px 1fr 64px 18px;column-gap:6px;align-items:center;height:26px;padding:0 8px;border-top:1px solid rgba(255,255,255,.04);';
+    const mk = (d, mode) => {
+      const f = d[7] || '';
+      let g = 'font-size:12px;color:#c9d1d9';
+      if (d[0] === '1') g = 'font-size:12px;color:#8b949e';
+      if (f === 'sel') g = 'font-size:12px;color:#fff;font-weight:600';
+      if (f === 'pit') g = 'font-size:11px;font-weight:600;color:#0f1115;background:#ff8a1f;padding:1px 6px;border-radius:3px';
+      if (f === 'out') g = 'font-size:11px;font-weight:600;color:#ffb066;border:1px solid rgba(255,138,31,.6);padding:0 5px;border-radius:3px';
+      if (f === 'dnf') g = 'font-size:11px;color:#6e7781';
+      if (f === 'best') g = 'font-size:12px;color:#c9a6ff';
+      if (f === 'hover') g = 'font-size:12px;color:#e6edf3';
+      let rs = base;
+      if (f === 'sel') rs += 'background:linear-gradient(90deg,rgba(225,6,0,.25),rgba(225,6,0,.08));box-shadow:inset 3px 0 0 #e10600;';
+      if (f === 'hover') rs += 'background:rgba(255,255,255,.06);';
+      if (f === 'dnf') rs += 'opacity:.55;';
+      if (f === 'best') rs += 'box-shadow:inset 3px 0 0 #9b59ff;';
+      return { pos: d[0], up: d[1] === 'up', down: d[1] === 'down', code: d[2], color: d[3], gap: mode === 'i' ? d[5] : d[4], tyre: d[6], tyreC: T[d[6]], best: f === 'best', rowStyle: rs, gapStyle: g, codeColor: f === 'dnf' ? '#6e7781' : (f === 'sel' ? '#fff' : '#e6edf3'), cw: f === 'sel' ? '700' : '600' };
+    };
+    const data = [
+      ['1','','KAR','#2f7bff','Tour 3','—','M'],['2','up','MIR','#ff8a1f','+1.284','+1.284','M','sel'],['3','down','TAV','#19c3a6','+2.031','+0.747','S'],['4','','ODE','#2f7bff','+4.556','+2.525','M'],['5','up','LUN','#f2c200','+6.102','+1.546','H'],['6','','SKO','#d9dde3','+7.890','+1.788','M'],['7','down','BRE','#c0186b','+9.415','+1.525','S','best'],['8','','ADE','#ff8a1f','+11.207','+1.792','M'],['9','','ROW','#d9dde3','+15.338','+4.131','S'],['10','down','FEN','#19c3a6','PIT','PIT','H','pit'],['11','','ILM','#f2c200','OUT','OUT','M','out'],['—','','YSA','#c0186b','ABD','ABD','S','dnf']
+    ];
+    const on = 'flex:1;height:26px;border-radius:5px;border:0;font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;background:rgba(255,255,255,.12);color:#fff';
+    const off = 'flex:1;height:26px;border-radius:5px;border:0;font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;background:transparent;color:#8b949e';
+    const towers = [
+      { title: 'Mode écart au leader', sub: 'Défaut. Écart cumulé au P1.', col: 'Leader', rows: data.map(d => mk(d, 'e')), btnA: on, btnB: off },
+      { title: 'Mode intervalle', sub: 'Écart à la voiture devant.', col: 'Interv.', rows: data.map(d => mk(d, 'i')), btnA: off, btnB: on }
+    ];
+    const st = [
+      [['6','','SKO','#d9dde3','+7.890','','M'], 'Normal', 'Fond transparent, texte #e6edf3.'],
+      [['6','','SKO','#d9dde3','+7.890','','M','hover'], 'Survol', 'Fond blanc 6 %, curseur pointeur. Clic = suivre.'],
+      [['2','up','MIR','#ff8a1f','+1.284','','M','sel'], 'Sélectionnée', 'Dégradé accent 25→8 %, filet 3 px rouge.'],
+      [['3','down','TAV','#19c3a6','+2.031','','S'], 'Position ±', 'Flèche ▲/▼ pendant 1 tour après le dépassement.'],
+      [['7','','BRE','#c0186b','+9.415','','S','best'], 'Meilleur tour', 'Chrono violet + filet violet, sur 1 seule ligne.'],
+      [['10','','FEN','#19c3a6','PIT','','H','pit'], 'Au stand', 'Badge plein orange « PIT » à la place de l’écart.'],
+      [['11','','ILM','#f2c200','OUT','','M','out'], 'Sortie stand', 'Badge contour orange « OUT », 1 secteur.'],
+      [['—','','YSA','#c0186b','ABD','','S','dnf'], 'Abandon', 'Opacité 55 %, renvoyée en bas, position « — ».']
+    ];
+    const states = st.map(s => Object.assign(mk(s[0], 'e'), { name: s[1], desc: s[2] }));
+    return { towers, states };
+  }
+}
+</script>
+</body>
+</html>

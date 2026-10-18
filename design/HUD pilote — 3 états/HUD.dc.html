@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>HUD pilote — états</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.cond{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes warn{0%,100%{box-shadow:0 8px 24px rgba(0,0,0,.35),0 0 0 1px rgba(231,76,60,.9)}50%{box-shadow:0 8px 24px rgba(0,0,0,.35),0 0 0 3px rgba(231,76,60,.35)}}
+</style>
+</helmet>
+<div style="width:1500px;height:400px;box-sizing:border-box;padding:40px;background:#1a2620;font-family:'Barlow',sans-serif;color:#e6edf3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:20px">
+<sc-for list="{{huds}}" as="h" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:baseline;gap:10px"><span class="cond" style="font-size:18px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">{{h.title}}</span><span style="font-size:12px;color:#a3acb6">{{h.sub}}</span></div>
+<section aria-label="HUD pilote" style="{{h.frame}}">
+<div style="flex:1;display:grid;grid-template-columns:132px 52px 1fr 88px;column-gap:14px;padding:12px 14px 10px 14px">
+<div style="display:flex;flex-direction:column;justify-content:center">
+<div class="cond" style="font-size:56px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums">{{h.speed}}</div>
+<div class="lbl" style="margin-top:4px">km/h</div>
+</div>
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;background:rgba(255,255,255,.05)">
+<div class="cond" style="font-size:36px;font-weight:700;line-height:1">{{h.gear}}</div>
+<div class="lbl" style="font-size:10px">Rapport</div>
+</div>
+<div style="display:flex;flex-direction:column;justify-content:center;gap:9px">
+<div style="display:grid;grid-template-columns:40px 1fr 34px;align-items:center;gap:6px"><span class="lbl" style="font-size:11px">Gaz</span><span style="height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden"><span style="display:block;width:{{h.thrW}};height:100%;background:#2ecc71;border-radius:4px"></span></span><span class="mono" style="font-size:11px;text-align:right;color:#c9d1d9">{{h.thr}}</span></div>
+<div style="display:grid;grid-template-columns:40px 1fr 34px;align-items:center;gap:6px"><span class="lbl" style="font-size:11px">Frein</span><span style="height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden"><span style="display:block;width:{{h.brkW}};height:100%;background:#e74c3c;border-radius:4px"></span></span><span class="mono" style="font-size:11px;text-align:right;color:#c9d1d9">{{h.brk}}</span></div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:2px"><span class="cond" style="{{h.drsStyle}}">DRS</span><span class="lbl" style="font-size:11px;color:{{h.drsLblC}}">{{h.drsLabel}}</span></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:center">
+<sc-for list="{{h.tyres}}" as="t" hint-placeholder-count="4">
+<div style="height:38px;border-radius:5px;background:{{t.bg}};display:flex;align-items:center;gap:5px;padding:0 5px">
+<span style="width:5px;height:28px;border-radius:3px;background:rgba(255,255,255,.1);display:flex;align-items:flex-end;overflow:hidden"><span style="display:block;width:100%;height:{{t.wear}};background:{{t.c}}"></span></span>
+<span style="display:flex;flex-direction:column;line-height:1.1"><span class="mono" style="font-size:11px;color:{{t.tc}}">{{t.temp}}°</span><span class="mono" style="font-size:10px;color:#8b949e">{{t.pct}}</span></span>
+</div>
+</sc-for>
+</div>
+</div>
+<sc-if value="{{h.alert}}" hint-placeholder-val="{{false}}">
+<div class="cond" style="height:22px;display:flex;align-items:center;gap:8px;padding:0 14px;background:rgba(231,76,60,.18);color:#ff8a80;font-size:13px;font-weight:700;letter-spacing:.08em"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3 2 20h20z"></path><path d="M12 10v4M12 17v.5"></path></svg>PNEUS USÉS · 72 % · BOX CONSEILLÉ</div>
+</sc-if>
+<div style="height:46px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:86px 1fr 1fr 1fr;align-items:center;background:rgba(0,0,0,.18)">
+<div class="cond" style="height:100%;display:flex;align-items:center;justify-content:center;background:#e10600;font-size:24px;font-weight:700">{{h.pos}}<span style="font-size:15px;opacity:.75">/12</span></div>
+<div style="padding:0 12px;display:flex;flex-direction:column;line-height:1.15"><span class="lbl" style="font-size:10px">Tour</span><span class="mono" style="font-size:14px">{{h.lap}}</span></div>
+<div style="padding:0 12px;display:flex;flex-direction:column;line-height:1.15;border-left:1px solid rgba(255,255,255,.08)"><span class="lbl" style="font-size:10px">{{h.aheadL}}</span><span class="mono" style="font-size:14px;color:{{h.aheadC}}">{{h.ahead}}</span></div>
+<div style="padding:0 12px;display:flex;flex-direction:column;line-height:1.15;border-left:1px solid rgba(255,255,255,.08)"><span class="lbl" style="font-size:10px">{{h.behindL}}</span><span class="mono" style="font-size:14px;color:{{h.behindC}}">{{h.behind}}</span></div>
+</div>
+</section>
+<p style="margin:0;font-size:12px;color:#a3acb6;line-height:1.5">{{h.note}}</p>
+</div>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1500,"height":400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const frame = 'position:relative;width:460px;height:212px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 24px rgba(0,0,0,.35)';
+    const ok = (temp, p) => ({ temp, pct: p + '%', wear: (100 - p) + '%', c: '#2ecc71', tc: '#e6edf3', bg: 'rgba(255,255,255,.05)' });
+    const bad = (temp, p, c) => ({ temp, pct: p + '%', wear: (100 - p) + '%', c, tc: c, bg: 'rgba(231,76,60,.12)' });
+    const drsBase = 'font-size:14px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:4px;';
+    const huds = [
+      { title: 'Roulage normal', sub: 'Défaut', frame, speed: '214', gear: '5', thr: '64', thrW: '64%', brk: '0', brkW: '0%',
+        drsStyle: drsBase + 'border:1px solid rgba(255,255,255,.18);color:#6e7781', drsLabel: 'Indisponible', drsLblC: '#6e7781',
+        tyres: [ok(92, 12), ok(95, 14), ok(90, 10), ok(91, 11)], alert: false, pos: 'P2', lap: '1:32.418',
+        aheadL: 'Devant · KAR', ahead: '+1.284 ▾', aheadC: '#2ecc71', behindL: 'Derrière · TAV', behind: '−1.102 ▴', behindC: '#2ecc71',
+        note: 'Vert = l’écart évolue en notre faveur (on reprend du temps devant, on en creuse derrière).' },
+      { title: 'DRS disponible', sub: 'À moins d’1 s en zone DRS', frame, speed: '318', gear: '8', thr: '100', thrW: '100%', brk: '0', brkW: '0%',
+        drsStyle: drsBase + 'border:1px solid #2ecc71;color:#2ecc71;animation:blink .9s steps(2,start) infinite', drsLabel: 'Disponible · appuie sur Espace', drsLblC: '#2ecc71',
+        tyres: [ok(98, 18), ok(101, 21), ok(94, 15), ok(96, 16)], alert: false, pos: 'P2', lap: '1:32.106',
+        aheadL: 'Devant · KAR', ahead: '+0.842 ▾', aheadC: '#2ecc71', behindL: 'Derrière · TAV', behind: '−0.747 ▾', behindC: '#e74c3c',
+        note: 'Clignote 2 Hz tant qu’il est disponible ; devient pastille verte pleine « Actif » une fois ouvert.' },
+      { title: 'Pneus usés · alerte', sub: 'Usure > 70 % ou T° > 115 °C', frame: frame + ';border-color:rgba(231,76,60,.9);animation:warn 1.6s ease-in-out infinite', speed: '176', gear: '4', thr: '0', thrW: '0%', brk: '82', brkW: '82%',
+        drsStyle: drsBase + 'border:1px solid rgba(255,255,255,.18);color:#6e7781', drsLabel: 'Indisponible', drsLblC: '#6e7781',
+        tyres: [bad(118, 72, '#e74c3c'), bad(121, 76, '#e74c3c'), bad(109, 61, '#ff8a1f'), bad(111, 64, '#ff8a1f')], alert: true, pos: 'P4', lap: '1:34.977',
+        aheadL: 'Devant · ODE', ahead: '+2.310 ▴', aheadC: '#e74c3c', behindL: 'Derrière · LUN', behind: '−0.391 ▾', behindC: '#e74c3c',
+        note: 'Le cadre passe en rouge (pulsation lente), les roues concernées se colorent ; un message radio « Box » suit dans le bandeau.' }
+    ];
+    return { huds };
+  }
+}
+</script>
+</body>
+</html>

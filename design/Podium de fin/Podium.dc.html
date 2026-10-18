@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Podium de fin de course</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.cond{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
+@keyframes fall{0%{transform:translateY(-40px) rotate(0)}100%{transform:translateY(760px) rotate(540deg)}}
+.cf{position:absolute;top:0;animation:fall linear infinite}
+</style>
+</helmet>
+<div style="width:1280px;height:720px;position:relative;overflow:hidden;font-family:'Barlow',sans-serif;color:#e6edf3;background:#0d0f13">
+<div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 55% at 32% 55%,rgba(225,6,0,.16),transparent 70%)"></div>
+<div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none">
+<sc-for list="{{conf}}" as="c" hint-placeholder-count="40"><span class="cf" style="{{c.s}}"></span></sc-for>
+</div>
+
+<div style="position:absolute;left:48px;top:40px;display:flex;flex-direction:column;gap:4px">
+<span class="lbl" style="color:#e10600;font-size:14px">Arrivée · Grand Prix de Valmora · 5 tours</span>
+<h1 class="cond" style="margin:0;font-size:56px;font-weight:700;letter-spacing:.02em;line-height:1">VICTOIRE DE <span style="color:#ff8a1f">MIR</span></h1>
+<span style="font-size:14px;color:#a3acb6">Corsa Nera · parti 4ᵉ · 2 dépassements · 1 arrêt</span>
+</div>
+
+<div style="position:absolute;left:48px;bottom:112px;width:620px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:10px;align-items:end">
+<sc-for list="{{podium}}" as="p" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+<div style="text-align:center">
+<div class="cond" style="font-size:28px;font-weight:700;letter-spacing:.04em">{{p.code}}</div>
+<div style="font-size:12px;color:#a3acb6">{{p.team}}</div>
+<div class="mono" style="font-size:13px;color:{{p.gc}};margin-top:2px">{{p.time}}</div>
+</div>
+<div style="{{p.block}}">
+<span style="height:6px;width:100%;background:{{p.color}};border-radius:6px 6px 0 0"></span>
+<span class="cond" style="font-size:{{p.fs}};font-weight:700;line-height:1;margin-top:14px;color:#fff">{{p.pos}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+
+<section aria-label="Classement final" style="position:absolute;right:48px;top:40px;width:440px;border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 24px rgba(0,0,0,.35);overflow:hidden">
+<div style="display:flex;justify-content:space-between;align-items:center;height:44px;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.08)"><span class="cond" style="font-size:18px;font-weight:700;letter-spacing:.06em">CLASSEMENT FINAL</span><span class="lbl" style="font-size:11px">Meilleur tour <span class="mono" style="color:#c9a6ff;letter-spacing:0">1:31.874 · BRE</span></span></div>
+<div class="lbl" style="display:grid;grid-template-columns:22px 3px 44px 1fr 86px 26px;column-gap:8px;height:24px;align-items:center;padding:0 14px;font-size:10px"><span style="text-align:right">P</span><span></span><span>Pilote</span><span>Écurie</span><span style="text-align:right">Temps / écart</span><span style="text-align:right">Pts</span></div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+<div style="{{r.rs}}">
+<span class="cond" style="font-size:15px;font-weight:600;text-align:right;color:#c9d1d9">{{r.pos}}</span>
+<span style="width:3px;height:16px;border-radius:2px;background:{{r.color}}"></span>
+<span class="cond" style="font-size:16px;font-weight:700;color:{{r.cc}}">{{r.code}}</span>
+<span style="font-size:12px;color:#8b949e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{r.team}}</span>
+<span class="mono" style="font-size:12px;text-align:right;color:{{r.tc}}">{{r.time}}</span>
+<span class="mono" style="font-size:12px;text-align:right;color:#c9d1d9">{{r.pts}}</span>
+</div>
+</sc-for>
+</section>
+
+<div style="position:absolute;left:48px;bottom:40px;display:flex;gap:10px">
+<button class="cond" style="height:44px;padding:0 22px;border-radius:6px;border:0;background:#e10600;color:#fff;font-size:16px;font-weight:700;letter-spacing:.08em;cursor:pointer;display:flex;align-items:center;gap:8px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"></path></svg>REJOUER</button>
+<button class="cond" style="height:44px;padding:0 20px;border-radius:6px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.04);color:#e6edf3;font-size:16px;font-weight:600;letter-spacing:.08em;cursor:pointer">REVOIR LA COURSE</button>
+<button class="cond" style="height:44px;padding:0 20px;border-radius:6px;border:0;background:transparent;color:#a3acb6;font-size:16px;font-weight:600;letter-spacing:.08em;cursor:pointer">MENU</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const cols = ['#e10600', '#f5c518', '#ffffff', '#2f7bff', '#ff8a1f', '#19c3a6', '#9b59ff'];
+    let seed = 7; const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    const conf = Array.from({ length: 46 }, (_, i) => {
+      const w = 5 + Math.round(rnd() * 6), h = 8 + Math.round(rnd() * 8);
+      return { s: 'left:' + Math.round(rnd() * 1280) + 'px;width:' + w + 'px;height:' + h + 'px;background:' + cols[i % cols.length] + ';border-radius:1px;opacity:.85;animation-duration:' + (4 + rnd() * 4).toFixed(2) + 's;animation-delay:-' + (rnd() * 8).toFixed(2) + 's' };
+    });
+    const blk = (h, sel) => 'width:100%;height:' + h + 'px;border-radius:6px 6px 0 0;display:flex;flex-direction:column;align-items:center;background:' + (sel ? 'linear-gradient(180deg,rgba(225,6,0,.35),rgba(225,6,0,.08))' : 'rgba(255,255,255,.06)') + ';border:1px solid rgba(255,255,255,.08);border-bottom:0;box-sizing:border-box';
+    const podium = [
+      { pos: '2', code: 'KAR', team: 'Halden Motorsport', time: '+0.912', gc: '#c9d1d9', color: '#2f7bff', block: blk(150), fs: '64px' },
+      { pos: '1', code: 'MIR', team: 'Corsa Nera', time: '7:42.118', gc: '#fff', color: '#ff8a1f', block: blk(210, true), fs: '88px' },
+      { pos: '3', code: 'TAV', team: 'Velis GP', time: '+3.406', gc: '#c9d1d9', color: '#19c3a6', block: blk(110), fs: '56px' }
+    ];
+    const R = [['1','MIR','Corsa Nera','#ff8a1f','7:42.118','25',1],['2','KAR','Halden Motorsport','#2f7bff','+0.912','18'],['3','TAV','Velis GP','#19c3a6','+3.406','15'],['4','LUN','Kestrel','#f2c200','+6.771','12'],['5','ODE','Halden Motorsport','#2f7bff','+8.020','10'],['6','SKO','Ardent Racing','#d9dde3','+11.385','8'],['7','BRE','Moravia','#c0186b','+12.940','6+1',2],['8','ADE','Corsa Nera','#ff8a1f','+16.512','4'],['9','ROW','Ardent Racing','#d9dde3','+21.077','2'],['10','FEN','Velis GP','#19c3a6','+24.660','1'],['11','ILM','Kestrel','#f2c200','+31.204','0'],['—','YSA','Moravia','#c0186b','ABD · T2','0',3]];
+    const rows = R.map(r => ({ pos: r[0], code: r[1], team: r[2], color: r[3], time: r[4], pts: r[5],
+      cc: r[6] === 3 ? '#6e7781' : '#fff', tc: r[6] === 2 ? '#c9a6ff' : (r[6] === 3 ? '#6e7781' : '#c9d1d9'),
+      rs: 'display:grid;grid-template-columns:22px 3px 44px 1fr 86px 26px;column-gap:8px;height:30px;align-items:center;padding:0 14px;border-top:1px solid rgba(255,255,255,.04);' + (r[6] === 1 ? 'background:rgba(225,6,0,.16);box-shadow:inset 3px 0 0 #e10600;' : '') + (r[6] === 3 ? 'opacity:.6;' : '') }));
+    return { conf, podium, rows };
+  }
+}
+</script>
+</body>
+</html>

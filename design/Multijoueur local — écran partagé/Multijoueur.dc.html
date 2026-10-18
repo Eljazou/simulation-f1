@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Multijoueur local — écran partagé</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.glass{background:rgba(15,17,21,.85);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.08);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.cond{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
+@keyframes pulse{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.4);opacity:0}}
+.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 1.4s ease-out infinite}
+</style>
+</helmet>
+<div style="width:1920px;height:1080px;position:relative;overflow:hidden;font-family:'Barlow',sans-serif;color:#e6edf3;background:#0b0d10;display:grid;grid-template-columns:1fr 1fr;column-gap:4px">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="2">
+<div style="position:relative;overflow:hidden;background:#17261c">
+<svg aria-hidden="true" width="958" height="1080" viewBox="{{v.vb}}" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0">
+<rect x="0" y="-400" width="2400" height="1800" fill="#17261c"></rect>
+<g fill="none" stroke-linejoin="round">
+<path d="M 560 300 C 700 180, 1000 200, 1150 260 C 1300 320, 1420 240, 1520 330 C 1620 420, 1560 560, 1440 600 C 1320 640, 1300 760, 1200 820 C 1080 890, 820 880, 700 820 C 580 760, 640 640, 560 600 C 460 550, 420 400, 560 300 Z" stroke="#3b3a33" stroke-width="110" opacity=".55"></path>
+<path d="M 560 300 C 700 180, 1000 200, 1150 260 C 1300 320, 1420 240, 1520 330 C 1620 420, 1560 560, 1440 600 C 1320 640, 1300 760, 1200 820 C 1080 890, 820 880, 700 820 C 580 760, 640 640, 560 600 C 460 550, 420 400, 560 300 Z" stroke="#e9e9e9" stroke-width="54"></path>
+<path d="M 560 300 C 700 180, 1000 200, 1150 260 C 1300 320, 1420 240, 1520 330 C 1620 420, 1560 560, 1440 600 C 1320 640, 1300 760, 1200 820 C 1080 890, 820 880, 700 820 C 580 760, 640 640, 560 600 C 460 550, 420 400, 560 300 Z" stroke="#c8102e" stroke-width="54" stroke-dasharray="14 14"></path>
+<path d="M 560 300 C 700 180, 1000 200, 1150 260 C 1300 320, 1420 240, 1520 330 C 1620 420, 1560 560, 1440 600 C 1320 640, 1300 760, 1200 820 C 1080 890, 820 880, 700 820 C 580 760, 640 640, 560 600 C 460 550, 420 400, 560 300 Z" stroke="#2b2e33" stroke-width="44"></path>
+</g>
+<g stroke="#0b0c0f" stroke-width="1.5">
+<rect x="-13" y="-5" width="26" height="10" rx="4" fill="#2f7bff" transform="translate(1354 284)"></rect>
+<rect x="-13" y="-5" width="26" height="10" rx="4" fill="#2f7bff" transform="translate(1073 236) rotate(14)"></rect>
+<rect x="-13" y="-5" width="26" height="10" rx="4" fill="#f2c200" transform="translate(918 214) rotate(3)"></rect>
+</g>
+<circle cx="{{v.cx}}" cy="{{v.cy}}" r="14" fill="none" stroke="{{v.acc}}" stroke-width="2.5" class="pulse"></circle>
+<rect x="-13" y="-5" width="26" height="10" rx="4" fill="#ff8a1f" stroke="{{v.s1}}" stroke-width="1.5" transform="translate(1277 285) rotate(2)"></rect>
+<rect x="-13" y="-5" width="26" height="10" rx="4" fill="#19c3a6" stroke="{{v.s2}}" stroke-width="1.5" transform="translate(1215 279) rotate(10)"></rect>
+</svg>
+
+<div style="{{v.tag}}" class="glass">
+<span class="cond" style="height:100%;padding:0 10px;display:flex;align-items:center;background:{{v.acc}};font-size:16px;font-weight:700;letter-spacing:.06em;border-radius:7px 0 0 7px">{{v.j}}</span>
+<span class="cond" style="font-size:16px;font-weight:700;letter-spacing:.04em;padding:0 10px">{{v.code}}</span>
+<span class="lbl" style="font-size:11px;padding-right:12px">{{v.keys}}</span>
+</div>
+
+<section aria-label="{{v.aria}}" style="{{v.hud}}" class="glass">
+<div style="flex:1;display:grid;grid-template-columns:118px 46px 1fr;column-gap:14px;padding:12px 14px 8px 14px;align-items:center">
+<div><div class="cond" style="font-size:52px;font-weight:700;line-height:.9">{{v.speed}}</div><div class="lbl" style="margin-top:3px">km/h</div></div>
+<div style="height:62px;border-radius:6px;background:rgba(255,255,255,.05);display:flex;flex-direction:column;align-items:center;justify-content:center"><span class="cond" style="font-size:32px;font-weight:700;line-height:1">{{v.gear}}</span><span class="lbl" style="font-size:9px">Rapport</span></div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="height:7px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden"><span style="display:block;height:100%;width:{{v.thr}};background:#2ecc71"></span></span>
+<span style="height:7px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden"><span style="display:block;height:100%;width:{{v.brk}};background:#e74c3c"></span></span>
+<span style="display:flex;gap:8px;align-items:center"><span class="cond" style="{{v.drs}}">DRS</span><span style="display:flex;gap:3px"><sc-for list="{{v.tyres}}" as="t" hint-placeholder-count="4"><span style="width:16px;height:6px;border-radius:2px;background:{{t}}"></span></sc-for></span><span class="lbl" style="font-size:10px">{{v.tyreTxt}}</span></span>
+</div>
+</div>
+<div style="height:40px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:72px 1fr 1fr;align-items:center;background:rgba(0,0,0,.18)">
+<span class="cond" style="height:100%;display:flex;align-items:center;justify-content:center;background:{{v.acc}};font-size:22px;font-weight:700">{{v.pos}}<span style="font-size:13px;opacity:.75">/12</span></span>
+<span style="padding:0 12px;display:flex;flex-direction:column;line-height:1.1"><span class="lbl" style="font-size:9px">Tour</span><span class="mono" style="font-size:13px">{{v.lap}}</span></span>
+<span style="padding:0 12px;display:flex;flex-direction:column;line-height:1.1;border-left:1px solid rgba(255,255,255,.08)"><span class="lbl" style="font-size:9px">{{v.gapL}}</span><span class="mono" style="font-size:13px;color:{{v.gapC}}">{{v.gap}}</span></span>
+</div>
+</section>
+</div>
+</sc-for>
+
+<header class="glass" style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:520px;height:40px;box-sizing:border-box;display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:0 4px 0 12px">
+<span class="cond" style="font-size:14px;font-weight:600;letter-spacing:.06em;color:#8b949e">DUEL</span>
+<span class="cond" style="text-align:center;font-size:16px;font-weight:600;letter-spacing:.08em">COURSE · TOUR 3/5 · SEC</span>
+<span style="display:flex;gap:2px"><button aria-label="Pause" style="width:32px;height:32px;border:0;border-radius:6px;background:transparent;color:#c9d1d9"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button><button aria-label="Aide" style="width:32px;height:32px;border:0;border-radius:6px;background:transparent;color:#c9d1d9;font-family:'Barlow Condensed';font-size:17px;font-weight:700">?</button></span>
+</header>
+
+<section class="glass" aria-label="Duel des joueurs" style="position:absolute;top:64px;left:50%;transform:translateX(-50%);width:300px;box-sizing:border-box;padding:8px 12px">
+<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center">
+<span style="display:flex;align-items:center;gap:6px"><span class="cond" style="font-size:12px;font-weight:700;padding:1px 6px;border-radius:3px;background:#e10600">J1</span><span class="cond" style="font-size:20px;font-weight:700">P2</span></span>
+<span class="mono" style="font-size:13px;color:#c9d1d9">0.747</span>
+<span style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><span class="cond" style="font-size:20px;font-weight:700">P3</span><span class="cond" style="font-size:12px;font-weight:700;padding:1px 6px;border-radius:3px;background:#1f8fe0">J2</span></span>
+</div>
+<div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin-top:6px"><span style="flex:62;background:#e10600"></span><span style="flex:38;background:#1f8fe0"></span></div>
+<div class="lbl" style="font-size:10px;text-align:center;margin-top:4px">Tours menés · J1 2 – J2 1</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tagBase = 'position:absolute;top:64px;height:36px;display:flex;align-items:center;box-sizing:border-box;';
+    const hudBase = 'position:absolute;bottom:12px;width:400px;height:168px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;';
+    const drsOn = 'font-size:13px;font-weight:700;letter-spacing:.1em;padding:1px 7px;border-radius:4px;border:1px solid #2ecc71;color:#2ecc71';
+    const drsOff = 'font-size:13px;font-weight:700;letter-spacing:.1em;padding:1px 7px;border-radius:4px;border:1px solid rgba(255,255,255,.18);color:#6e7781';
+    const views = [
+      { j: 'J1', code: 'MIR · Corsa Nera', keys: 'WASD · Espace', acc: '#e10600', vb: '1037 15 480 540', cx: 1277, cy: 285, s1: '#fff', s2: '#0b0c0f',
+        tag: tagBase + 'left:12px', hud: hudBase + 'left:12px', aria: 'HUD joueur 1',
+        speed: '287', gear: '7', thr: '100%', brk: '0%', drs: drsOn, tyres: ['#2ecc71', '#2ecc71', '#2ecc71', '#2ecc71'], tyreTxt: 'M · 18 %',
+        pos: 'P2', lap: '1:32.418', gapL: 'Devant · KAR', gap: '+1.284', gapC: '#2ecc71' },
+      { j: 'J2', code: 'TAV · Velis GP', keys: 'Flèches · Entrée', acc: '#1f8fe0', vb: '975 9 480 540', cx: 1215, cy: 279, s1: '#0b0c0f', s2: '#fff',
+        tag: tagBase + 'right:12px;flex-direction:row-reverse', hud: hudBase + 'right:12px', aria: 'HUD joueur 2',
+        speed: '279', gear: '7', thr: '92%', brk: '0%', drs: drsOn, tyres: ['#2ecc71', '#f5c518', '#2ecc71', '#2ecc71'], tyreTxt: 'S · 31 %',
+        pos: 'P3', lap: '1:32.705', gapL: 'Devant · J1 MIR', gap: '+0.747', gapC: '#e74c3c' }
+    ];
+    return { views };
+  }
+}
+</script>
+</body>
+</html>

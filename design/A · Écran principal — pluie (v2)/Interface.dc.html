@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Calque interface</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:1920px;height:1080px;position:relative;pointer-events:none;font-family:'Barlow',sans-serif;color:#e6edf3">
+
+<header style="{{panel}};pointer-events:auto;position:absolute;top:12px;left:12px;right:12px;height:40px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 4px">
+<div style="display:flex;align-items:center;gap:8px">
+<button style="height:32px;display:flex;align-items:center;gap:8px;padding:0 10px;border-radius:6px;border:0;background:rgba(255,255,255,.06);color:#e6edf3;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;cursor:pointer">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+Scénario<span style="color:#8b949e;font-weight:500;text-transform:none;letter-spacing:0">{{scen}}</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"></path></svg>
+</button>
+</div>
+<div style="display:flex;align-items:center;gap:10px;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">
+<span style="width:8px;height:8px;border-radius:50%;background:#2ecc71"></span>
+<span>Course</span><span style="color:#5b636d">·</span><span>Tour <b style="color:#fff">3</b>/5</span><span style="color:#5b636d">·</span>
+<span style="display:flex;align-items:center;gap:5px;color:{{wxC}}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{wxIco}}"></path></svg>{{wx}}</span>
+</div>
+<div style="display:flex;justify-content:flex-end;gap:2px">
+<button aria-label="Pause" style="{{ib}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button>
+<button aria-label="Caméra" style="{{ib}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 8h3l2-3h8l2 3h3v11H3z"></path><circle cx="12" cy="13" r="3.5"></circle></svg></button>
+<button aria-label="Afficher le panneau latéral" style="{{ib}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M15 4v16"></path></svg></button>
+<button aria-label="Aide" style="{{ib}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.6V14"></path><circle cx="12" cy="17.3" r=".6" fill="currentColor"></circle></svg></button>
+</div>
+</header>
+
+<section aria-label="Classement" style="{{panel}};pointer-events:auto;position:absolute;top:64px;left:12px;width:230px;overflow:hidden">
+<div style="display:flex;align-items:stretch;height:48px;border-bottom:1px solid rgba(255,255,255,.08)">
+<div style="width:4px;background:{{accent}}"></div>
+<div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 10px">
+<div style="line-height:1;font-family:'Barlow Condensed',sans-serif"><div style="font-size:12px;font-weight:600;letter-spacing:.1em;color:#8b949e">TOUR</div><div style="font-size:24px;font-weight:700">3<span style="color:#8b949e;font-size:16px">/5</span></div></div>
+<div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500">12:48.302</div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:20px 10px 3px 1fr 64px 18px;column-gap:6px;align-items:center;height:22px;padding:0 8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6e7781">
+<span style="text-align:right">P</span><span></span><span></span><span>Pilote</span><span style="text-align:right">Leader</span><span></span>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+<div style="{{r.rowStyle}}">
+<span style="text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600;color:{{r.posColor}}">{{r.pos}}</span>
+<span style="display:flex;justify-content:center">
+<sc-if value="{{r.up}}" hint-placeholder-val="{{false}}"><svg aria-label="position gagnée" role="img" width="8" height="6" viewBox="0 0 8 6"><path d="M4 0 8 6H0z" fill="#2ecc71"></path></svg></sc-if>
+<sc-if value="{{r.down}}" hint-placeholder-val="{{false}}"><svg aria-label="position perdue" role="img" width="8" height="6" viewBox="0 0 8 6"><path d="M4 6 0 0h8z" fill="#e74c3c"></path></svg></sc-if>
+</span>
+<span style="width:3px;height:16px;border-radius:2px;background:{{r.color}};opacity:{{r.op}}"></span>
+<span style="display:flex;align-items:center;gap:5px">
+<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:{{r.cw}};letter-spacing:.04em;color:{{r.codeColor}}">{{r.code}}</span>
+<sc-if value="{{r.best}}" hint-placeholder-val="{{false}}"><svg role="img" aria-label="meilleur tour" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9b59ff" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 13V9M10 2h4"></path></svg></sc-if>
+</span>
+<span style="display:flex;justify-content:flex-end"><span style="{{r.gapStyle}}">{{r.gap}}</span></span>
+<span style="width:18px;height:18px;border-radius:50%;box-sizing:border-box;border:2px solid {{r.tyreC}};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:{{r.tyreC}};opacity:{{r.op}}">{{r.tyre}}</span>
+</div>
+</sc-for>
+<div style="display:flex;gap:4px;padding:8px;border-top:1px solid rgba(255,255,255,.08)">
+<button style="flex:1;height:26px;border-radius:5px;border:0;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;background:rgba(255,255,255,.12);color:#fff">Écart leader</button>
+<button style="flex:1;height:26px;border-radius:5px;border:0;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;background:transparent;color:#8b949e">Intervalle</button>
+</div>
+</section>
+
+<nav aria-label="Panneau latéral (fermé)" style="{{panel}};pointer-events:auto;position:absolute;top:328px;right:12px;width:40px;padding:4px;display:flex;flex-direction:column;gap:4px">
+<button aria-label="Télémétrie" style="{{ib}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 3 5-8 4 5"></path></svg></button>
+<button aria-label="Prédiction" style="{{ib}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h12M4 12h16M4 18h8"></path></svg></button>
+<button aria-label="Historique" style="{{ib}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></button>
+<button aria-label="Réglages" style="{{ib}}"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></button>
+</nav>
+
+<section aria-label="HUD pilote" style="{{panel}};pointer-events:auto;position:absolute;left:12px;bottom:12px;width:440px;height:196px;display:flex;flex-direction:column;overflow:hidden">
+<div style="flex:1;display:grid;grid-template-columns:124px 50px 1fr 84px;column-gap:12px;padding:10px 12px 8px 14px;align-items:stretch">
+<div style="display:flex;flex-direction:column;justify-content:center">
+<div style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums">287</div>
+<div style="margin-top:4px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">km/h</div>
+</div>
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;background:rgba(255,255,255,.05)">
+<div style="font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:700;line-height:1">7</div>
+<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Rapport</div>
+</div>
+<div style="display:flex;flex-direction:column;justify-content:center;gap:9px">
+<div style="display:grid;grid-template-columns:38px 1fr 30px;align-items:center;gap:6px"><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Gaz</span><span style="height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden"><span style="display:block;width:100%;height:100%;background:#2ecc71;border-radius:4px"></span></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;text-align:right;color:#c9d1d9">100</span></div>
+<div style="display:grid;grid-template-columns:38px 1fr 30px;align-items:center;gap:6px"><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Frein</span><span style="height:8px;border-radius:4px;background:rgba(255,255,255,.08)"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;text-align:right;color:#c9d1d9">0</span></div>
+<div style="display:flex;align-items:center;gap:8px"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:4px;border:1px solid #2ecc71;color:#2ecc71">DRS</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Disponible · zone 1</span></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;align-content:center" aria-label="Pneus : usure et température">
+<sc-for list="{{wheels}}" as="t" hint-placeholder-count="4">
+<div style="height:36px;border-radius:5px;background:rgba(255,255,255,.05);display:flex;align-items:center;gap:5px;padding:0 5px">
+<span style="width:5px;height:26px;border-radius:3px;background:rgba(255,255,255,.1);display:flex;align-items:flex-end;overflow:hidden"><span style="display:block;width:100%;height:{{t.wear}};background:#2ecc71"></span></span>
+<span style="display:flex;flex-direction:column;line-height:1.1"><span style="font-family:'JetBrains Mono',monospace;font-size:11px">{{t.temp}}°</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8b949e">{{t.pct}}</span></span>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="height:44px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:84px 1fr 1fr 1fr;align-items:center;background:rgba(0,0,0,.2)">
+<div style="height:100%;display:flex;align-items:center;justify-content:center;background:{{accent}};font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700">P2<span style="font-size:15px;opacity:.75">/12</span></div>
+<div style="padding:0 12px;display:flex;flex-direction:column;line-height:1.15"><span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Tour</span><span style="font-family:'JetBrains Mono',monospace;font-size:14px">1:32.418</span></div>
+<div style="padding:0 12px;display:flex;flex-direction:column;line-height:1.15;border-left:1px solid rgba(255,255,255,.08)"><span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Devant · KAR</span><span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#2ecc71">+1.284 ▾</span></div>
+<div style="padding:0 12px;display:flex;flex-direction:column;line-height:1.15;border-left:1px solid rgba(255,255,255,.08)"><span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e">Derrière · TAV</span><span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#e74c3c">−0.747 ▾</span></div>
+</div>
+</section>
+
+<div role="status" style="{{panel}};pointer-events:auto;position:absolute;bottom:12px;left:50%;transform:translateX(-50%);max-width:480px;height:36px;display:flex;align-items:center;gap:10px;padding:0 14px 0 0;overflow:hidden">
+<span style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:{{ev.c}};color:#0f1115"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{ev.ico}}"></path></svg></span>
+<span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:.08em;color:{{ev.tc}}">{{ev.k}}</span>
+<span style="font-size:14px;white-space:nowrap"><b style="font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:.04em">{{ev.who}}</b> {{ev.t}}</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambiance":{"editor":"enum","options":["jour","nuit","pluie"],"default":"jour"},"accent":{"editor":"color","default":"#e10600"},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const amb = this.props.ambiance ?? 'jour';
+    const accent = this.props.accent ?? '#e10600';
+    const wet = amb === 'pluie';
+    const panels = {
+      jour: 'box-sizing:border-box;background:rgba(15,17,21,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.09);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.4)',
+      nuit: 'box-sizing:border-box;background:rgba(9,11,14,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.16);border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.6)',
+      pluie: 'box-sizing:border-box;background:rgba(13,16,20,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.13);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.45)'
+    };
+    const sun = 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4';
+    const moon = 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z';
+    const rain = 'M7 15a4 4 0 1 1 1-7.9A6 6 0 0 1 19 9a3.5 3.5 0 0 1-1 6.9M8 18l-1 3M12 18l-1 3M16 18l-1 3';
+    const W = { jour: ['Sec', sun, '#f5c518', 'Grand Prix · 5 tours'], nuit: ['Nuit · sec', moon, '#c9d6ff', 'GP de nuit · 5 tours'], pluie: ['Pluie · 68 %', rain, '#7dbbff', 'GP sous la pluie · 5 tours'] }[amb];
+    const wrench = 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z';
+    const radio = 'M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4';
+    const ev = { jour: { c: '#ff8a1f', tc: '#ffb066', k: 'PIT', who: 'FEN', t: 'entre au stand · chausse des durs', ico: wrench },
+      nuit: { c: '#6aa8ff', tc: '#9cc4ff', k: 'RADIO', who: 'MIR', t: '« Piste qui refroidit, garde la température. »', ico: radio },
+      pluie: { c: '#5aa9ff', tc: '#7dbbff', k: 'RADIO', who: 'BOX', t: '« Pluie en hausse, prépare les pneus pluie. »', ico: radio } }[amb];
+    const T = { S: '#ff3b30', M: '#f5c518', H: '#f2f2f2', I: '#34c759', W: '#3b8bff' };
+    const wetT = ['I', 'I', 'W', 'I', 'I', 'W', 'I', 'I', 'W', 'W', 'I', 'I'];
+    const data = [
+      ['1', '', 'KAR', '#2f7bff', 'Tour 3', 'M'], ['2', 'up', 'MIR', '#ff8a1f', '+1.284', 'M', 'sel'], ['3', 'down', 'TAV', '#19c3a6', '+2.031', 'S'],
+      ['4', '', 'ODE', '#2f7bff', '+4.556', 'M'], ['5', 'up', 'LUN', '#f2c200', '+6.102', 'H'], ['6', '', 'SKO', '#d9dde3', '+7.890', 'M'],
+      ['7', 'down', 'BRE', '#c0186b', '+9.415', 'S', 'best'], ['8', '', 'ADE', '#ff8a1f', '+11.207', 'M'], ['9', '', 'ROW', '#2fb36a', '+15.338', 'S'],
+      ['10', 'down', 'FEN', '#8fa6ff', 'PIT', 'H', 'pit'], ['11', '', 'ILM', '#c9a24a', 'OUT', 'M', 'out'], ['—', '', 'YSA', '#c9773f', 'ABD', 'S', 'dnf']
+    ];
+    const rows = data.map((d, i) => {
+      const fl = d[6] || '', sel = fl === 'sel', dnf = fl === 'dnf';
+      let g = "font-family:'JetBrains Mono',monospace;font-size:12px;color:#c9d1d9";
+      if (d[0] === '1') g = "font-family:'JetBrains Mono',monospace;font-size:12px;color:#8b949e";
+      if (sel) g = "font-family:'JetBrains Mono',monospace;font-size:12px;color:#fff;font-weight:600";
+      if (fl === 'pit') g = "font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#0f1115;background:#ff8a1f;padding:1px 6px;border-radius:3px";
+      if (fl === 'out') g = "font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#ffb066;border:1px solid rgba(255,138,31,.6);padding:0 5px;border-radius:3px";
+      if (dnf) g = "font-family:'JetBrains Mono',monospace;font-size:11px;color:#6e7781";
+      if (fl === 'best') g = "font-family:'JetBrains Mono',monospace;font-size:12px;color:#c9a6ff";
+      const ty = wet ? wetT[i] : d[5];
+      return { pos: d[0], up: d[1] === 'up', down: d[1] === 'down', code: d[2], color: d[3], gap: d[4], tyre: ty, tyreC: T[ty], best: fl === 'best', gapStyle: g,
+        rowStyle: 'display:grid;grid-template-columns:20px 10px 3px 1fr 64px 18px;column-gap:6px;align-items:center;height:26px;padding:0 8px;border-top:1px solid rgba(255,255,255,.04);' + (sel ? 'background:linear-gradient(90deg,' + accent + '40,' + accent + '14);box-shadow:inset 3px 0 0 ' + accent + ';' : '') + (dnf ? 'opacity:.55;' : ''),
+        op: dnf ? '.5' : '1', codeColor: dnf ? '#6e7781' : (sel ? '#fff' : '#e6edf3'), cw: sel ? '700' : '600', posColor: sel ? '#fff' : '#c9d1d9' };
+    });
+    const wheels = wet ? [{ temp: 64, pct: '9%', wear: '91%' }, { temp: 66, pct: '10%', wear: '90%' }, { temp: 61, pct: '8%', wear: '92%' }, { temp: 63, pct: '8%', wear: '92%' }]
+      : [{ temp: 98, pct: '18%', wear: '82%' }, { temp: 101, pct: '21%', wear: '79%' }, { temp: 94, pct: '15%', wear: '85%' }, { temp: 96, pct: '16%', wear: '84%' }];
+    return { panel: panels[amb] || panels.jour, accent, rows, wheels, ev, wx: W[0], wxIco: W[1], wxC: W[2], scen: W[3],
+      ib: 'width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:0;background:transparent;color:#c9d1d9;cursor:pointer;padding:0' };
+  }
+}
+</script>
+</body>
+</html>

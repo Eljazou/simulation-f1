@@ -1,0 +1,1389 @@
+/* Interface du jeu « Circuit Formule 1 » : calque HTML/CSS par-dessus le canvas p5.js.
+   Valeurs reprises du dossier design/ (« Design system », bloc « Implémentation » : tokens.css ;
+   « Tour de classement », « HUD pilote », « Onglet Télémétrie », « Onglets Prédiction ·
+   Historique · Réglages », « Fenêtre d'aide »). Le calque ne bouge rien : il lit la course. */
+
+:root {
+  --bg-panel: rgba(15, 17, 21, .85);
+  --blur: 14px;
+  --line: rgba(255, 255, 255, .08);
+  --text: #e6edf3;
+  --text-2: #8b949e;
+  --accent: #e10600;
+  --gain: #2ecc71;
+  --loss: #e74c3c;
+  --best: #9b59ff;
+  --pit: #ff8a1f;
+  --flag-yellow: #f5c518;
+  --radio: #5aa9ff;
+  --off: #6e7781;
+  --tyre-s: #ff3b30;
+  --tyre-m: #f5c518;
+  --tyre-h: #f2f2f2;
+  --tyre-i: #34c759;
+  --tyre-w: #2f80ff;
+  --gap: 12px;
+  --radius: 8px;
+  --bar-h: 40px;
+  --tower-w: 230px;
+  --row-h: 26px;
+  --hud-w: 460px;
+  --hud-h: 212px;
+  --map-w: 280px;
+  --map-h: 200px;
+  --panel-w: 320px;
+  --rail-w: 40px;
+  --speed: 56px;
+  --fast: 150ms;
+  --std: 200ms;
+  --slow: 250ms;
+}
+
+/* Taille « M » : sous 1600 px de large (Design system, « Zones, ancrages et adaptation »). */
+@media (max-width: 1599px) {
+  :root {
+    --tower-w: 210px;
+    --row-h: 24px;
+    --hud-w: 400px;
+    --hud-h: 184px;
+    --map-w: 240px;
+    --map-h: 172px;
+    --panel-w: 300px;
+    --rail-w: 36px;
+    --speed: 48px;
+  }
+}
+
+.theme-nuit {
+  --bg-panel: rgba(9, 11, 14, .92);
+  --line: rgba(255, 255, 255, .16);
+  --accent: #ff2a1f;
+}
+
+.theme-pluie {
+  --bg-panel: rgba(13, 16, 20, .90);
+  --blur: 18px;
+}
+
+.cond { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; }
+.mono { font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace; font-variant-numeric: tabular-nums; }
+.lbl {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* Texte lu par les lecteurs d'écran, invisible à l'écran. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.glass {
+  box-sizing: border-box;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+}
+
+#f1-ui {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  font-family: 'Barlow', system-ui, sans-serif;
+  color: var(--text);
+}
+
+#f1-ui > *,
+#panneau-f1 > * {
+  pointer-events: auto;
+}
+
+/* Calques plein écran (feux, écran REJOUER, écran partagé) : ils laissent passer les clics vers la
+   scène (choix du pilote au clic sur sa voiture). La règle ci-dessus, plus forte qu'une simple
+   classe, les rendait cliquables et ils captaient tous les clics. Seuls leurs boutons répondent. */
+#f1-ui > .feux,
+#f1-ui > .rejouer,
+#f1-ui > .decompte-reprise,
+#f1-ui > .duel {
+  pointer-events: none;
+}
+
+/* Boutons icônes (32 × 32) de la barre du haut et du rail. */
+.ib {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: #c9d1d9;
+  cursor: pointer;
+  padding: 0;
+  transition: background var(--fast) ease-out;
+}
+
+.ib:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+.ib:focus-visible, .seg:focus-visible, .tab:focus-visible, .acc:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.ib.actif { background: rgba(255, 255, 255, .12); color: #fff; }
+
+/* ---- Barre du haut : top 12 · left 12 · right 12 · h 40 ---- */
+#f1-barre {
+  position: absolute;
+  top: var(--gap);
+  left: var(--gap);
+  right: var(--gap);
+  height: var(--bar-h);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.barre-gauche { display: flex; align-items: center; gap: 8px; }
+.barre-droite { display: flex; justify-content: flex-end; gap: 2px; }
+
+/* Bouton « Entraînement IA » (barre du haut) : même gabarit que l'ancien menu Scénario du design
+   (32 px, verre clair, Barlow Condensed en capitales) ; l'accent rouge au survol. */
+.bouton-entrainement {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .06);
+  color: var(--text);
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--fast), border-color var(--fast);
+}
+
+.bouton-entrainement:hover,
+.bouton-entrainement:focus-visible {
+  background: rgba(225, 6, 0, .16);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.statut {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statut .point { color: #5b636d; }
+.statut b { color: #fff; }
+.statut .pastille { width: 8px; height: 8px; border-radius: 50%; background: var(--gain); }
+.statut .meteo { display: flex; align-items: center; gap: 5px; }
+
+/* ---- Tour de classement : top 64 · left 12 · 230 px ---- */
+#f1-tour {
+  position: absolute;
+  top: calc(var(--gap) * 2 + var(--bar-h));
+  left: var(--gap);
+  width: var(--tower-w);
+  max-height: calc(100vh - var(--bar-h) - var(--hud-h) - var(--gap) * 4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Sans voiture pilotée (pas de HUD), le classement peut descendre jusqu'en bas. */
+#f1-tour.sans-hud { max-height: calc(100vh - var(--bar-h) - var(--gap) * 4); }
+
+.tour-entete { display: flex; align-items: stretch; height: 48px; border-bottom: 1px solid var(--line); flex: none; }
+.tour-entete .bande { width: 4px; background: var(--accent); }
+.tour-entete .contenu { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; }
+.tour-entete .titre { line-height: 1; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; }
+.tour-entete .titre .petit { font-size: 12px; font-weight: 600; letter-spacing: .1em; color: var(--text-2); }
+.tour-entete .titre .grand { font-size: 24px; font-weight: 700; }
+.tour-entete .titre .sur { color: var(--text-2); font-size: 16px; }
+.tour-entete .temps { font-size: 15px; font-weight: 500; }
+
+.ligne-tour {
+  display: grid;
+  grid-template-columns: 20px 10px 3px 1fr 64px 18px;
+  column-gap: 6px;
+  align-items: center;
+  height: var(--row-h);
+  padding: 0 8px;
+  box-sizing: border-box;
+  flex: none;
+}
+
+.tour-colonnes { height: 22px; font-size: 11px; color: var(--off); }
+.tour-colonnes span:first-child, .tour-colonnes span:nth-child(5) { text-align: right; }
+
+.tour-lignes { overflow-y: auto; scrollbar-width: thin; }
+
+.ligne-tour.pilote { border-top: 1px solid rgba(255, 255, 255, .04); cursor: pointer; transition: background var(--fast) ease-out; }
+.ligne-tour.pilote:hover { background: rgba(255, 255, 255, .06); }
+.ligne-tour .pos { text-align: right; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 15px; font-weight: 600; color: #c9d1d9; }
+.ligne-tour .fleche { display: flex; justify-content: center; }
+.ligne-tour .fleche svg { display: none; }
+.ligne-tour.monte .fleche .haut, .ligne-tour.descend .fleche .bas { display: block; }
+.ligne-tour .bande { width: 3px; height: 16px; border-radius: 2px; }
+.ligne-tour .pilote-nom { display: flex; align-items: center; gap: 5px; }
+.ligne-tour .code { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 16px; font-weight: 600; letter-spacing: .04em; color: var(--text); }
+.ligne-tour .chrono-best { display: none; }
+.ligne-tour .ecart-cellule { display: flex; justify-content: flex-end; }
+.ligne-tour .ecart { font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace; font-size: 12px; color: #c9d1d9; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ligne-tour.leader .ecart { color: var(--text-2); }
+
+.pneu {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pneu.S { color: var(--tyre-s); }
+.pneu.M { color: var(--tyre-m); }
+.pneu.H { color: var(--tyre-h); }
+.pneu.I { color: var(--tyre-i); }
+.pneu.W { color: var(--tyre-w); }
+
+.ligne-tour.choisie { background: linear-gradient(90deg, rgba(225, 6, 0, .25), rgba(225, 6, 0, .08)); box-shadow: inset 3px 0 0 var(--accent); }
+.ligne-tour.choisie .pos { color: #fff; }
+.ligne-tour.choisie .code { color: #fff; font-weight: 700; }
+.ligne-tour.choisie .ecart { color: #fff; font-weight: 600; }
+.ligne-tour.meilleur { box-shadow: inset 3px 0 0 var(--best); }
+.ligne-tour.meilleur .ecart { color: #c9a6ff; }
+.ligne-tour.meilleur .chrono-best { display: block; }
+.ligne-tour.stand .ecart { font-size: 11px; font-weight: 600; color: #0f1115; background: var(--pit); padding: 1px 6px; border-radius: 3px; }
+.ligne-tour.sortie .ecart { font-size: 11px; font-weight: 600; color: #ffb066; border: 1px solid rgba(255, 138, 31, .6); padding: 0 5px; border-radius: 3px; }
+.ligne-tour.abandon { opacity: .55; }
+.ligne-tour.abandon .code { color: var(--off); }
+.ligne-tour.abandon .ecart { font-size: 11px; color: var(--off); }
+
+.segments { display: flex; gap: 4px; padding: 8px; border-top: 1px solid var(--line); flex: none; }
+
+.seg {
+  flex: 1;
+  height: 26px;
+  border-radius: 5px;
+  border: 0;
+  cursor: pointer;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--text-2);
+}
+
+.seg.on { background: rgba(255, 255, 255, .12); color: #fff; }
+
+/* ---- HUD pilote : bottom 12 · left 12 · 460 × 212 ---- */
+@keyframes clignote { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes alerte {
+  0%, 100% { box-shadow: 0 8px 24px rgba(0, 0, 0, .35), 0 0 0 1px rgba(231, 76, 60, .9); }
+  50% { box-shadow: 0 8px 24px rgba(0, 0, 0, .35), 0 0 0 3px rgba(231, 76, 60, .35); }
+}
+
+#f1-hud {
+  position: absolute;
+  left: var(--gap);
+  bottom: var(--gap);
+  width: var(--hud-w);
+  height: var(--hud-h);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#f1-hud.alerte { border-color: rgba(231, 76, 60, .9); animation: alerte 1.6s ease-in-out infinite; }
+
+.hud-haut {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 132px 52px 1fr 88px;
+  column-gap: 14px;
+  padding: 12px 14px 10px 14px;
+  min-height: 0;
+}
+
+@media (max-width: 1599px) {
+  .hud-haut { grid-template-columns: 110px 48px 1fr 80px; column-gap: 10px; padding: 8px 10px; }
+}
+
+.hud-vitesse { display: flex; flex-direction: column; justify-content: center; }
+.hud-vitesse .valeur { font-size: var(--speed); font-weight: 700; line-height: .9; font-variant-numeric: tabular-nums; }
+.hud-rapport { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 6px; background: rgba(255, 255, 255, .05); }
+.hud-rapport .valeur { font-size: 36px; font-weight: 700; line-height: 1; }
+.hud-commandes { display: flex; flex-direction: column; justify-content: center; gap: 9px; }
+.jauge { display: grid; grid-template-columns: 40px 1fr 34px; align-items: center; gap: 6px; }
+.jauge .piste { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.jauge .barre { display: block; height: 100%; border-radius: 4px; width: 0; transition: width 60ms linear; }
+.jauge.gaz .barre { background: var(--gain); }
+.jauge.frein .barre { background: var(--loss); }
+.jauge .nombre { font-size: 11px; text-align: right; color: #c9d1d9; }
+
+.drs-ligne { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+.drs {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  color: var(--off);
+}
+
+.drs.disponible { border-color: var(--gain); color: var(--gain); animation: clignote .9s steps(2, start) infinite; }
+.drs.actif { border-color: var(--gain); background: var(--gain); color: #0f1115; }
+.drs-ligne .lbl { font-size: 11px; color: var(--off); }
+.drs-ligne.disponible .lbl, .drs-ligne.actif .lbl { color: var(--gain); }
+
+@media (prefers-reduced-motion: reduce) {
+  .drs.disponible { animation: none; background: rgba(46, 204, 113, .18); }
+  #f1-hud.alerte { animation: none; }
+}
+
+/* Les pneus : un seul train (le modèle n'a qu'une usure et une température par voiture). */
+.hud-pneus { display: flex; align-items: center; }
+.cellule-pneu {
+  width: 100%;
+  height: 82px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, .05);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+.cellule-pneu .usure { width: 5px; height: 62px; border-radius: 3px; background: rgba(255, 255, 255, .1); display: flex; align-items: flex-end; overflow: hidden; }
+.cellule-pneu .usure span { display: block; width: 100%; background: var(--gain); }
+.cellule-pneu .infos { display: flex; flex-direction: column; gap: 4px; line-height: 1.1; }
+.cellule-pneu .temp { font-size: 11px; }
+.cellule-pneu .pct { font-size: 10px; color: var(--text-2); }
+.cellule-pneu.mauvais { background: rgba(231, 76, 60, .12); }
+
+.hud-alerte {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  background: rgba(231, 76, 60, .18);
+  color: #ff8a80;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  flex: none;
+}
+
+.hud-bas {
+  height: 46px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 86px 1fr 1fr 1fr;
+  align-items: center;
+  background: rgba(0, 0, 0, .18);
+  flex: none;
+}
+
+.hud-bas .position { height: 100%; display: flex; align-items: center; justify-content: center; background: var(--accent); font-size: 24px; font-weight: 700; }
+.hud-bas .position span { font-size: 15px; opacity: .75; }
+.hud-bas .bloc { padding: 0 12px; display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.hud-bas .bloc + .bloc { border-left: 1px solid var(--line); }
+.hud-bas .bloc .lbl { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud-bas .bloc .mono { font-size: 14px; white-space: nowrap; }
+.gain { color: var(--gain); }
+.perte { color: var(--loss); }
+
+/* ---- Rail d'onglets (panneau fermé) : sous la mini-carte, à droite ---- */
+#f1-rail {
+  position: absolute;
+  top: calc(var(--gap) * 3 + var(--bar-h) + var(--map-h) + 52px);
+  right: var(--gap);
+  width: var(--rail-w);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (max-width: 1599px) { #f1-rail .ib { width: 28px; height: 28px; } }
+
+/* ---- Bandeau d'événement : bottom 12, centré, max 480 × 36, un message, 4 s, fondu 250 ms ---- */
+#f1-evenement {
+  position: absolute;
+  bottom: var(--gap);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 480px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 0 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity var(--slow) ease-in-out;
+}
+
+@media (max-width: 1599px) { #f1-evenement { max-width: 420px; } }
+#f1-evenement.visible { opacity: 1; }
+#f1-evenement.panneau-ouvert { left: calc(50% - var(--panel-w) / 2 - var(--gap) / 2); }
+#f1-evenement .icone { width: 36px; height: 36px; flex: none; display: flex; align-items: center; justify-content: center; color: #0f1115; }
+#f1-evenement .type { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: .08em; }
+#f1-evenement .texte { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#f1-evenement .texte b { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 15px; letter-spacing: .04em; }
+
+/* ---- Panneau latéral : top 64 · right 12 · bottom 12 · 320 px ---- */
+#panneau-f1 {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none;
+  font-family: 'Barlow', system-ui, sans-serif;
+  color: var(--text);
+}
+
+#f1-contenu {
+  position: absolute;
+  top: calc(var(--gap) * 2 + var(--bar-h));
+  right: var(--gap);
+  bottom: var(--gap);
+  width: var(--panel-w);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.onglets { display: flex; align-items: stretch; flex: none; }
+.onglets [role="tablist"] { display: flex; flex: 1; }
+
+.tab {
+  flex: 1;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset 0 -1px 0 var(--line);
+  transition: color var(--fast) ease-out;
+}
+
+.tab:hover { color: var(--text); }
+.tab.on { color: #fff; box-shadow: inset 0 -2px 0 var(--accent); }
+
+/* Bouton de fermeture : son texte (« Replier ▸ ») reste lu par les lecteurs d'écran ; à l'écran,
+   une croix. */
+#f1-replier {
+  position: relative;
+  width: 36px;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+  box-shadow: inset 0 -1px 0 var(--line);
+}
+
+#f1-replier::before,
+#f1-replier::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 19px;
+  width: 14px;
+  height: 2.4px;
+  border-radius: 2px;
+  background: var(--text-2);
+  transform: rotate(45deg);
+}
+
+#f1-replier::after { transform: rotate(-45deg); }
+#f1-replier:hover::before, #f1-replier:hover::after { background: #fff; }
+
+.page-onglet { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.page-onglet .note { margin: auto 0 0 0; padding: 12px 14px; font-size: 12px; color: var(--text-2); line-height: 1.45; border-top: 1px solid rgba(255, 255, 255, .06); }
+
+/* Télémétrie */
+.tele-entete { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid rgba(255, 255, 255, .06); flex: none; }
+.tele-pilotes { display: flex; gap: 12px; align-items: center; }
+.tele-pilotes .pilote { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; }
+.tele-pilotes .trait-a { width: 14px; height: 3px; border-radius: 2px; }
+.tele-pilotes .trait-b { width: 14px; height: 0; border-top: 3px dashed; }
+.tele-pilotes button { border: 0; background: transparent; padding: 0 2px; cursor: pointer; color: var(--text-2); }
+.badge-fenetre { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: rgba(255, 255, 255, .06); color: #c9d1d9; }
+.tele-graphes { flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 8px 12px 12px 12px; min-height: 0; overflow-y: auto; }
+.tele-graphe { flex: 1; display: flex; flex-direction: column; border-radius: 6px; background: rgba(255, 255, 255, .025); padding: 8px 8px 4px 8px; position: relative; min-height: 120px; }
+.tele-graphe .titre { display: flex; justify-content: space-between; align-items: baseline; }
+.tele-graphe .nom { font-size: 16px; font-weight: 700; letter-spacing: .03em; }
+.tele-graphe .valeurs { font-size: 11px; display: flex; gap: 8px; }
+.tele-graphe svg { display: block; margin-top: 4px; width: 100%; height: auto; }
+.tele-attente { position: absolute; left: 0; right: 0; top: 40%; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-2); font-size: 14px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+@keyframes tourne { to { transform: rotate(360deg); } }
+.tele-attente svg { animation: tourne 1.2s linear infinite; }
+
+/* Prédiction */
+.pred-haut { padding: 12px; display: flex; flex-direction: column; gap: 12px; flex: none; }
+.segments-boite { display: flex; gap: 4px; padding: 3px; border-radius: 7px; background: rgba(255, 255, 255, .04); }
+.pred-titres { display: flex; justify-content: space-between; }
+.pred-titres .lbl { font-size: 11px; }
+.pred-lignes { padding: 0 12px; display: flex; flex-direction: column; overflow-y: auto; }
+.ligne-pred { display: grid; grid-template-columns: 22px 3px 34px 1fr 52px 40px; column-gap: 8px; align-items: center; height: 32px; border-top: 1px solid rgba(255, 255, 255, .04); flex: none; }
+.ligne-pred .pos { font-size: 14px; font-weight: 600; color: var(--text-2); text-align: right; }
+.ligne-pred .bande { width: 3px; height: 16px; border-radius: 2px; }
+.ligne-pred .code { font-size: 15px; font-weight: 700; color: var(--text); }
+.ligne-pred .piste { height: 10px; border-radius: 2px; background: rgba(255, 255, 255, .05); overflow: hidden; }
+.ligne-pred .barre { display: block; height: 100%; border-radius: 2px; background: rgba(230, 237, 243, .55); }
+.ligne-pred .pct { font-size: 12px; text-align: right; }
+.ligne-pred .delta { font-size: 10px; text-align: right; color: var(--text-2); }
+.ligne-pred.suivie { background: rgba(225, 6, 0, .12); box-shadow: inset 3px 0 0 var(--accent); margin: 0 -12px; padding: 0 12px; border-top: 0; }
+.ligne-pred.suivie .barre { background: var(--accent); }
+.ligne-pred.suivie .code, .ligne-pred.suivie .pct { color: #fff; }
+.ligne-pred.abandon .code, .ligne-pred.abandon .pct { color: var(--off); }
+.pred-axe { margin: 6px 12px 0 12px; display: grid; grid-template-columns: 22px 3px 34px 1fr 52px 40px; column-gap: 8px; flex: none; }
+.pred-axe .graduations { display: flex; justify-content: space-between; font-size: 9px; color: var(--off); }
+.pred-axe .lbl { font-size: 9px; text-align: right; }
+
+/* Historique */
+.histo-titre { padding: 12px; display: flex; justify-content: space-between; align-items: center; flex: none; }
+.histo-titre .cond { font-size: 16px; font-weight: 700; }
+#f1-histo-svg { display: block; flex: none; }
+#f1-histo-svg path.isole { opacity: 1 !important; stroke-width: 3 !important; }
+#f1-histo-svg.isolement path:not(.isole) { opacity: .12 !important; }
+.histo-faits { padding: 4px 12px 0 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+.histo-faits .liste { display: grid; grid-template-columns: 28px 1fr; gap: 6px 8px; font-size: 13px; line-height: 1.35; }
+.histo-faits .tour { font-weight: 700; color: var(--text-2); }
+
+/* Réglages : recherche, sections repliables (les <details> existants), curseurs et interrupteurs */
+.recherche-boite { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, .06); flex: none; }
+.recherche {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--line);
+}
+
+.recherche input { flex: 1; border: 0; background: transparent; color: var(--text); font-family: 'Barlow', system-ui, sans-serif; font-size: 14px; outline: none; min-width: 0; }
+.recherche kbd { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10px; color: var(--text-2); border: 1px solid rgba(255, 255, 255, .15); border-radius: 3px; padding: 0 4px; }
+
+/* Zone qui défile : la place de la barre de défilement est réservée (scrollbar-gutter) et 8 px
+   la séparent du contenu : rien ne passe dessous. */
+#f1-reglages { flex: 1; overflow-y: auto; font-size: 13px; scrollbar-width: thin; scrollbar-gutter: stable; padding-right: 8px; }
+/* Une section : le contenu ouvert est en retrait sous le titre (2px 12px 14px 32px). Le retrait
+   est un padding de la section : aucune règle de ligne (marges) ne peut l'annuler. */
+#f1-reglages details { border-bottom: 1px solid rgba(255, 255, 255, .06); padding: 0 12px 0 32px; }
+#f1-reglages details[open] { padding-bottom: 14px; }
+#f1-reglages summary {
+  /* le titre garde toute la largeur de la section (survol pleine largeur) */
+  margin: 0 -12px 2px -32px;
+  list-style: none;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  cursor: pointer;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+#f1-reglages summary::-webkit-details-marker { display: none; }
+#f1-reglages summary::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 2.4px solid var(--text-2);
+  border-bottom: 2.4px solid var(--text-2);
+  transform: rotate(-45deg);
+  transition: transform var(--fast);
+  margin-right: 4px;
+}
+
+#f1-reglages details[open] > summary::before { transform: rotate(45deg); }
+#f1-reglages summary:hover { background: rgba(255, 255, 255, .04); }
+/* Lignes (interrupteurs, liste « Circuit », textes), curseurs et rangées de boutons : 12 px entre
+   deux réglages, tous alignés sur le bord gauche du retrait. */
+#f1-reglages .ligne { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 12px 0 0; min-height: 24px; }
+#f1-reglages .boutons { margin: 12px 0 0; }
+#f1-reglages details > summary + .ligne,
+#f1-reglages details > summary + .boutons { margin-top: 0; }
+/* Un curseur, en colonne : ligne 1 « libellé à gauche, valeur à droite », ligne 2 la barre.
+   (style.css donne aux .reglage de la barre de contrôle un inline-flex et une police réduite.) */
+#f1-reglages .reglage { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; row-gap: 6px; column-gap: 8px; font-size: inherit; white-space: normal; }
+#f1-reglages .reglage label { color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#f1-reglages .reglage input[type="range"] { grid-column: 1 / -1; grid-row: 2; }
+#f1-reglages .reglage output { grid-row: 1; grid-column: 2; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; line-height: 18px; color: #fff; background: rgba(255, 255, 255, .06); padding: 0 6px; border-radius: 3px; min-width: 0; }
+#f1-reglages p.ligne { color: var(--text-2); font-size: 12px; }
+
+/* Curseur (design system) : une zone de clic de 14 px, une piste de 4 px remplie en rouge
+   jusqu'à la valeur (--v, mis à jour à l'input par PanneauLateral.remplir), un rond blanc de
+   14 px. Le rond reste dans la largeur du curseur aux valeurs min et max ; son halo (3 à 6 px)
+   tient dans le retrait de la section. style.css donne aux curseurs de la barre de contrôle
+   60 px de large et 20 px de haut : neutralisés ici. */
+#panneau-f1 input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 14px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+#panneau-f1 input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent) 0 var(--v, 50%), rgba(255, 255, 255, .14) var(--v, 50%) 100%);
+}
+
+#panneau-f1 input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent) 0 var(--v, 50%), rgba(255, 255, 255, .14) var(--v, 50%) 100%);
+}
+
+#panneau-f1 input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(225, 6, 0, .35);
+  transition: box-shadow var(--fast);
+}
+
+#panneau-f1 input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(225, 6, 0, .35);
+  transition: box-shadow var(--fast);
+}
+
+#panneau-f1 input[type="range"]:hover::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgba(225, 6, 0, .35); }
+#panneau-f1 input[type="range"]:hover::-moz-range-thumb { box-shadow: 0 0 0 6px rgba(225, 6, 0, .35); }
+#panneau-f1 input[type="range"]:focus { outline: none; }
+#panneau-f1 input[type="range"]:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+#panneau-f1 input[type="range"]:disabled { opacity: .5; cursor: default; }
+
+#panneau-f1 input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: none;
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .18);
+  position: relative;
+  margin: 0;
+  cursor: pointer;
+  transition: background var(--fast);
+  order: 2;
+}
+
+#panneau-f1 input[type="checkbox"]::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform var(--fast);
+}
+
+#panneau-f1 input[type="checkbox"]:checked { background: var(--accent); }
+#panneau-f1 input[type="checkbox"]:checked::after { transform: translateX(14px); }
+#panneau-f1 input[type="checkbox"]:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+#panneau-f1 select,
+#panneau-f1 .boutons button,
+#panneau-f1 .ligne button {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  cursor: pointer;
+}
+
+#panneau-f1 select { background: #15181d; text-transform: none; letter-spacing: 0; font-family: 'Barlow', system-ui, sans-serif; }
+#panneau-f1 .boutons { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+#panneau-f1 .boutons button:hover, #panneau-f1 .ligne button:hover { border-color: rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .06); color: #fff; }
+.reglages-pied { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); flex: none; }
+.bouton-secondaire, .bouton-primaire {
+  flex: 1;
+  height: 36px;
+  border-radius: 6px;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.bouton-secondaire { border: 1px solid rgba(255, 255, 255, .16); background: transparent; color: var(--text); }
+.bouton-secondaire:hover { border-color: rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .06); }
+.bouton-primaire { border: 0; background: var(--accent); color: #fff; font-weight: 700; }
+.bouton-primaire:hover { background: #ff1f14; box-shadow: 0 0 0 3px rgba(225, 6, 0, .25); }
+.cache-recherche { display: none !important; }
+
+/* ---- Fenêtre d'aide (dialogue modal, 760 px) ---- */
+#f1-aide {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(5, 6, 8, .62);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  font-family: 'Barlow', system-ui, sans-serif;
+  color: var(--text);
+}
+
+#f1-aide .dialogue {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(760px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: rgba(15, 17, 21, .96);
+  border: 1px solid rgba(255, 255, 255, .1);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .5);
+}
+
+#f1-aide .entete { display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 12px 0 20px; border-bottom: 1px solid var(--line); }
+#f1-aide h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+#f1-aide .titre { display: flex; align-items: center; gap: 10px; }
+#f1-aide .titre::before { content: ''; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; }
+#f1-aide .fermer { display: flex; align-items: center; gap: 10px; }
+#f1-aide .groupes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; padding: 20px 24px 8px 24px; }
+#f1-aide h3 { margin: 0 0 8px 0; color: var(--accent); font-size: 13px; }
+#f1-aide section { margin-bottom: 18px; }
+#f1-aide .rangee { display: flex; align-items: center; justify-content: space-between; min-height: 34px; border-top: 1px solid rgba(255, 255, 255, .05); font-size: 14px; }
+#f1-aide .touches { display: flex; gap: 4px; align-items: center; }
+#f1-aide .ou { font-size: 11px; color: var(--off); padding: 0 2px; }
+#f1-aide .pied { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: rgba(255, 255, 255, .03); border-top: 1px solid rgba(255, 255, 255, .06); font-size: 12px; color: var(--text-2); }
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  background: #1d2128;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-bottom-width: 2px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ---- Mini-carte (design/ « Mini-carte — gros plan, états et modes ») : top 64 · right 12 ·
+   280 × 200 ; à gauche du panneau quand il est ouvert ; agrandie : la largeur du panneau ---- */
+@keyframes pulse-suivie { from { r: 6; opacity: 1; } to { r: 13; opacity: 0; } }
+@keyframes clignote-jaune { 0%, 100% { opacity: .9; } 50% { opacity: .45; } }
+
+#f1-carte {
+  position: absolute;
+  top: calc(var(--gap) * 2 + var(--bar-h));
+  right: var(--gap);
+  width: var(--map-w);
+  height: var(--map-h);
+  background: rgba(15, 17, 21, .88);
+  border-color: rgba(255, 255, 255, .09);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+  overflow: hidden;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  transition: right var(--std) ease-out, width var(--std) ease-out, height var(--std) ease-out;
+}
+
+#f1-carte.panneau-ouvert { right: calc(var(--gap) * 2 + var(--panel-w)); }
+#f1-carte.agrandie { width: var(--panel-w); height: calc(var(--panel-w) * 0.72); }
+
+.carte-entete { height: 28px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px 0 10px; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+.carte-nom { font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--text); text-transform: uppercase; white-space: nowrap; }
+.carte-nom .point { color: var(--off); }
+.carte-nom .longueur { color: var(--text-2); font-weight: 600; }
+.carte-boutons { display: flex; align-items: center; gap: 2px; }
+.carte-modes { display: flex; padding: 2px; border-radius: 5px; background: rgba(255, 255, 255, .05); }
+.carte-modes button, .carte-agrandir {
+  width: 24px;
+  height: 22px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.carte-modes button.on { background: rgba(255, 255, 255, .14); color: #fff; }
+.carte-agrandir { width: 24px; height: 24px; border-radius: 5px; }
+.carte-agrandir:hover, .carte-modes button:hover { color: #fff; }
+#f1-carte-svg { display: block; width: 100%; height: calc(100% - 54px); }
+#f1-carte-svg .voiture-carte { cursor: pointer; }
+#f1-carte-svg .anneau-suivie { animation: pulse-suivie 1.4s linear infinite; }
+#f1-carte-svg .jaune-clignote { animation: clignote-jaune 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  #f1-carte-svg .anneau-suivie, #f1-carte-svg .jaune-clignote { animation: none; }
+}
+
+.carte-infobulle {
+  position: absolute;
+  white-space: nowrap;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #0b0d10;
+  border: 1px solid rgba(255, 255, 255, .18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .5);
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.carte-infobulle .mono { color: var(--text-2); }
+.carte-infobulle .point { color: var(--off); }
+.carte-badge { position: absolute; left: 8px; top: 34px; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+.carte-badge.sc { background: var(--flag-yellow); color: #0f1115; }
+.carte-badge.jaune { background: rgba(15, 17, 21, .9); border: 1px solid var(--flag-yellow); color: var(--flag-yellow); }
+.carte-pied {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 26px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  column-gap: 8px;
+  align-items: center;
+  padding: 0 10px;
+  border-top: 1px solid rgba(255, 255, 255, .06);
+  background: rgba(0, 0, 0, .18);
+}
+
+#f1-carte-tour { font-size: 12px; font-weight: 700; letter-spacing: .06em; }
+#f1-carte-tour .sur { color: var(--text-2); }
+.carte-barres { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; }
+.carte-barres > span { height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .1); overflow: hidden; position: relative; }
+.carte-barres > span > span { position: absolute; left: 0; top: 0; bottom: 0; width: 0; }
+#f1-carte-progression { font-size: 10px; color: var(--text-2); }
+#f1-carte-progression b { color: var(--text); font-weight: 400; }
+
+/* --- Phase 4 du design : feux, neutralisations, arrêt au stand, écrans de fin ------------------ */
+
+/* Feux de départ (« Feux de départ ») : 5 colonnes sous la barre, « GO ! », séquence en bas. */
+.feux { position: absolute; inset: 0; pointer-events: none; opacity: 1; transition: opacity 250ms ease-out; }
+.feux-lampes {
+  position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 10px; padding: 12px 16px; border-radius: 10px;
+  background: #0b0c0f; border: 1px solid rgba(255, 255, 255, .1); box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
+}
+.feux-colonne { width: 56px; padding: 8px 0; border-radius: 8px; background: #16181c; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.feu { width: 38px; height: 38px; border-radius: 50%; background: #2a1414; transition: box-shadow 120ms; }
+.feu.allume { background: radial-gradient(circle at 40% 35%, #ff6a5c, #e10600 55%, #8a0400); box-shadow: 0 0 18px rgba(225, 6, 0, .85); }
+/* vert : toutes les colonnes au passage au vert (départ), même halo que le rouge */
+.feu.vert { background: radial-gradient(circle at 40% 35%, #8af0b4, #2ecc71 55%, #157a3f); box-shadow: 0 0 18px rgba(46, 204, 113, .85); }
+/* puis le portique s'efface (FeuxDepart.DUREE_FONDU) */
+.feux.fondu { opacity: 0; }
+.feux-go {
+  position: absolute; top: 290px; left: 50%; transform: translateX(-50%);
+  font-size: 72px; font-weight: 700; letter-spacing: .06em; color: #fff; text-shadow: 0 4px 24px rgba(0, 0, 0, .6);
+}
+.feux-sequence { position: absolute; bottom: var(--gap); left: 50%; transform: translateX(-50%); width: 640px; padding: 12px 16px; }
+.feux-entete { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.feux-etapes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.feux-etape { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 0; border-radius: 6px; background: rgba(255, 255, 255, .03); }
+.feux-etape.courante { background: rgba(225, 6, 0, .18); box-shadow: inset 0 0 0 1px rgba(225, 6, 0, .6); }
+.feux-points { display: flex; gap: 3px; }
+.feux-point { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, .12); }
+.feux-point.rouge { background: #e10600; }
+.feux-point.vert { background: #2ecc71; }
+.feux-etape-texte { font-size: 12px; font-weight: 600; letter-spacing: .06em; color: var(--text-2); }
+.feux-etape.courante .feux-etape-texte { color: #fff; }
+@media (max-width: 1599px) { .feux-sequence { display: none; } }
+
+/* Bandeau de neutralisation (« Drapeau jaune · Safety car · VSC ») : top 64, centré, 640 × 44. */
+@keyframes neutralisation-entree { from { transform: translate(-50%, -16px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+@keyframes neutralisation-hachures { from { background-position: 0 0; } to { background-position: 40px 0; } }
+.neutralisation {
+  position: absolute; top: calc(var(--gap) * 2 + var(--bar-h)); left: 50%; transform: translateX(-50%);
+  width: 640px; height: 44px; box-sizing: border-box; border-radius: 8px; overflow: hidden;
+  display: flex; align-items: center; gap: 12px; padding: 0 16px 0 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .35); animation: neutralisation-entree var(--std) ease-out;
+  transition: opacity var(--slow);
+}
+.neutralisation-icone { width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; }
+.neutralisation-titre { font-size: 20px; font-weight: 700; letter-spacing: .1em; }
+.neutralisation-espace { flex: 1; }
+.neutralisation-detail { font-size: 14px; font-weight: 600; letter-spacing: .04em; opacity: .85; white-space: nowrap; }
+.neutralisation.jaune { background: rgba(15, 17, 21, .9); border: 1px solid #f5c518; color: #f5c518; }
+.neutralisation.jaune .neutralisation-icone { background: #f5c518; color: #0f1115; }
+.neutralisation.sc { background: #f5c518; color: #0f1115; }
+.neutralisation.sc .neutralisation-icone,
+.neutralisation.vsc .neutralisation-icone { background: #0f1115; color: #f5c518; }
+.neutralisation.vsc { color: #0f1115; background: repeating-linear-gradient(135deg, #f5c518 0 20px, #e0b000 20px 40px); animation: neutralisation-entree var(--std) ease-out, neutralisation-hachures 1.2s linear infinite; }
+.neutralisation.libre { background: rgba(15, 17, 21, .9); border: 1px solid #2ecc71; color: #2ecc71; }
+.neutralisation.libre .neutralisation-icone { background: #2ecc71; color: #0f1115; }
+.neutralisation.fondu { opacity: 0; }
+@media (max-width: 1599px) { .neutralisation { width: 560px; } }
+
+/* Tour de classement et HUD pendant un safety car / VSC : bande jaune, badge, écarts figés. */
+.tour-badge { font-size: 14px; font-weight: 700; letter-spacing: .08em; padding: 2px 8px; border-radius: 4px; background: #f5c518; color: #0f1115; }
+#f1-tour.neutralise .tour-entete .bande { background: #f5c518; }
+#f1-tour.neutralise .ecart { color: #c9d1d9; }
+#f1-hud.neutralise #f1-hud-devant { color: #f5c518; }
+
+/* Arrêt au stand (« Pit stop ») : limiteur au-dessus du HUD, panneau centré au-dessus du bandeau. */
+.stand-limiteur {
+  position: absolute; left: var(--gap); bottom: calc(var(--gap) * 2 + var(--hud-h)); width: 300px; height: 76px;
+  display: flex; align-items: center; gap: 14px; padding: 0 16px;
+}
+.stand-limiteur.sans-hud { bottom: var(--gap); }
+.stand-limite { font-size: 44px; font-weight: 700; line-height: .9; }
+.stand-limiteur-texte { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.stand-badge { align-self: flex-start; font-size: 13px; font-weight: 700; letter-spacing: .1em; padding: 2px 8px; border-radius: 4px; background: #2f80ff; color: #fff; }
+.stand-limiteur-detail { font-size: 12px; color: #a3acb6; }
+.stand-arret {
+  position: absolute; left: 50%; bottom: calc(var(--gap) * 2 + 36px); transform: translateX(-50%); width: 560px; overflow: hidden;
+  transition: left var(--std) ease-out;
+}
+.stand-arret.panneau-ouvert { left: calc(50% - var(--panel-w) / 2 - var(--gap) / 2); }
+.stand-entete { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.stand-entete-gauche { display: flex; align-items: center; gap: 10px; }
+.stand-trait { width: 4px; height: 18px; border-radius: 2px; background: var(--pit); }
+.stand-titre { font-size: 18px; font-weight: 700; letter-spacing: .08em; }
+.stand-code { font-size: 15px; font-weight: 700; }
+.stand-pneus { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #c9d1d9; }
+.stand-fleche { color: #c9d1d9; }
+.stand-corps { display: grid; grid-template-columns: 170px 1fr; column-gap: 20px; padding: 12px 16px; align-items: center; }
+.stand-chrono { font-size: 44px; font-weight: 600; line-height: 1; color: #fff; }
+.stand-record { font-size: 11px; margin-top: 4px; }
+.stand-roues { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.stand-roue { height: 46px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: rgba(255, 255, 255, .04); }
+.stand-roue.fini { background: rgba(46, 204, 113, .14); box-shadow: inset 0 0 0 1px rgba(46, 204, 113, .5); }
+.stand-roue.fini .stand-roue-temps { color: #2ecc71; }
+.stand-roue.encours { background: rgba(255, 138, 31, .14); box-shadow: inset 0 0 0 1px rgba(255, 138, 31, .6); }
+.stand-roue.encours .stand-roue-temps { color: #ffb066; }
+.stand-roue-nom { font-size: 13px; font-weight: 700; letter-spacing: .06em; }
+.stand-roue-temps { font-size: 11px; color: var(--text-2); }
+.stand-phases { display: grid; grid-template-columns: 2fr 1fr 2fr; gap: 4px; padding: 0 16px 12px; }
+.stand-phase-barre { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .12); }
+.stand-phase.faite .stand-phase-barre { background: #2ecc71; }
+.stand-phase.courante .stand-phase-barre { background: linear-gradient(90deg, var(--pit) var(--part, 30%), rgba(255, 255, 255, .12) var(--part, 30%)); }
+.stand-phase.courante .stand-phase-pied > span:first-child { color: #ffb066; }
+.stand-phase-pied { font-size: 10px; margin-top: 4px; display: flex; justify-content: space-between; }
+.stand-phase-pied .mono { color: #c9d1d9; letter-spacing: 0; }
+.stand-pied { display: flex; justify-content: space-between; padding: 8px 16px; background: rgba(0, 0, 0, .2); font-size: 12px; color: #a3acb6; }
+
+/* Podium de fin (« Podium de fin ») : plein écran, marches à gauche, classement final à droite. */
+.podium-fin { position: absolute; inset: 0; background: rgba(13, 15, 19, .94); pointer-events: auto; overflow: hidden; }
+.podium-halo { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 55% at 32% 55%, rgba(225, 6, 0, .16), transparent 70%); pointer-events: none; }
+.podium-titres { position: absolute; left: 48px; top: 40px; display: flex; flex-direction: column; gap: 4px; }
+.podium-surtitre { color: var(--accent); font-size: 14px; }
+.podium-victoire { margin: 0; font-size: 56px; font-weight: 700; letter-spacing: .02em; line-height: 1; }
+.podium-sous-titre { font-size: 14px; color: #a3acb6; }
+.podium-marches { position: absolute; left: 48px; bottom: 112px; width: 620px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 10px; align-items: end; }
+.podium-colonne { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.podium-tete { text-align: center; }
+.podium-code { font-size: 28px; font-weight: 700; letter-spacing: .04em; }
+.podium-ecurie { font-size: 12px; color: #a3acb6; }
+.podium-temps { font-size: 13px; color: #c9d1d9; margin-top: 2px; }
+.podium-temps.premier { color: #fff; }
+.podium-marche { width: 100%; border-radius: 6px 6px 0 0; display: flex; flex-direction: column; align-items: center; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); border-bottom: 0; box-sizing: border-box; }
+.podium-marche.premier { background: linear-gradient(180deg, rgba(225, 6, 0, .35), rgba(225, 6, 0, .08)); }
+.podium-bande { height: 6px; width: 100%; border-radius: 6px 6px 0 0; }
+.podium-rang { font-weight: 700; line-height: 1; margin-top: 14px; color: #fff; font-size: 64px; }
+.podium-rang.rang-1 { font-size: 88px; }
+.podium-rang.rang-3 { font-size: 56px; }
+.podium-classement { position: absolute; right: 48px; top: 40px; width: 440px; max-height: calc(100% - 80px); overflow-y: auto; }
+.podium-entete { display: flex; justify-content: space-between; align-items: center; height: 44px; padding: 0 14px; border-bottom: 1px solid var(--line); }
+.podium-entete-titre { font-size: 18px; font-weight: 700; letter-spacing: .06em; }
+.podium-meilleur { color: #c9a6ff; letter-spacing: 0; }
+.podium-ligne { display: grid; grid-template-columns: 22px 3px 44px 1fr 86px 30px; column-gap: 8px; height: 30px; align-items: center; padding: 0 14px; border-top: 1px solid rgba(255, 255, 255, .04); }
+.podium-colonnes { height: 24px; font-size: 10px; border-top: 0; }
+.podium-colonnes span:first-child, .podium-colonnes span:nth-child(5), .podium-colonnes span:nth-child(6) { text-align: right; }
+.podium-ligne.vainqueur { background: rgba(225, 6, 0, .16); box-shadow: inset 3px 0 0 var(--accent); }
+.podium-ligne.abandon { opacity: .6; }
+.podium-ligne.abandon .podium-ligne-code, .podium-ligne.abandon .podium-ligne-temps { color: var(--off); }
+.podium-pos { font-size: 15px; font-weight: 600; text-align: right; color: #c9d1d9; }
+.podium-trait { width: 3px; height: 16px; border-radius: 2px; }
+.podium-ligne-code { font-size: 16px; font-weight: 700; color: #fff; }
+.podium-ligne-ecurie { font-size: 12px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.podium-ligne-temps { font-size: 12px; text-align: right; color: #c9d1d9; }
+.podium-ligne-temps.meilleur { color: #c9a6ff; }
+.podium-points { font-size: 12px; text-align: right; color: #c9d1d9; }
+.podium-boutons { position: absolute; left: 48px; bottom: 40px; display: flex; gap: 10px; }
+.bouton-principal, .bouton-discret, .bouton-contour {
+  height: 44px; padding: 0 22px; border-radius: 6px; font-size: 16px; font-weight: 700; letter-spacing: .08em; cursor: pointer; pointer-events: auto;
+}
+.bouton-principal { border: 0; background: var(--accent); color: #fff; }
+.bouton-discret { border: 0; background: transparent; color: #a3acb6; font-weight: 600; }
+.bouton-contour { border: 1px solid rgba(255, 255, 255, .18); background: transparent; color: var(--text); font-weight: 600; }
+.bouton-principal:focus-visible, .bouton-discret:focus-visible, .bouton-contour:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 1599px) {
+  .podium-victoire { font-size: 44px; }
+  .podium-marches { width: 520px; bottom: 100px; }
+  .podium-classement { width: 400px; }
+}
+
+/* Écran REJOUER (« Écran REJOUER ») : boutons et touches sous le mot en points, bilan en bas. */
+.rejouer { position: absolute; inset: 0; pointer-events: none; }
+.rejouer-actions { position: absolute; left: 50%; top: calc(50% + 110px); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.rejouer-boutons { display: flex; gap: 10px; }
+.rejouer .bouton-principal, .rejouer .bouton-contour { height: 48px; padding: 0 28px; font-size: 18px; letter-spacing: .1em; }
+.rejouer-touches { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+.rejouer kbd {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 8px; box-sizing: border-box;
+  border-radius: 5px; background: #1d2128; border: 1px solid rgba(255, 255, 255, .14); border-bottom-width: 2px;
+  font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace; font-size: 12px; font-weight: 600; color: var(--text);
+}
+.rejouer-bilan { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 28px; padding: 10px 20px; }
+.rejouer-bloc { display: flex; flex-direction: column; align-items: center; }
+.rejouer-bloc .lbl { font-size: 10px; }
+.rejouer-valeur { font-size: 20px; font-weight: 700; }
+.rejouer-meilleur { font-size: 15px; color: #c9a6ff; margin-top: 3px; }
+.rejouer button[hidden] { display: none; }
+/* Écran de fin : les zones de course sont masquées par la classe is-hidden (voir plus bas). */
+
+/* Incident du joueur : la course continue. Compte à rebours de la remise en piste (au centre ; en
+   écran partagé, au centre de la moitié du joueur), encart « Rejouer » non bloquant juste
+   au-dessus du bandeau d'événements, confirmation et menu pause au centre (verre sombre). */
+.decompte-reprise { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 120px; font-weight: 700; line-height: 1;
+  color: #fff; text-shadow: 0 6px 32px rgba(0, 0, 0, .7); pointer-events: none; }
+.decompte-reprise.gauche { left: 25%; }
+.decompte-reprise.droite { left: 75%; }
+.encart-rejouer { position: absolute; bottom: calc(var(--gap) + 48px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px;
+  padding: 8px 10px 8px 16px; opacity: 1; transition: opacity 500ms ease-out; }
+/* écran partagé : dans la moitié du joueur, au-dessus de son HUD (.duel-hud, 168 px) */
+.encart-rejouer.gauche { left: 25%; bottom: calc(var(--gap) + 180px); }
+.encart-rejouer.droite { left: 75%; bottom: calc(var(--gap) + 180px); }
+.encart-rejouer.part { opacity: 0; }
+.encart-texte { font-size: 16px; font-weight: 700; color: var(--text); white-space: nowrap; }
+.encart-rejouer .bouton-principal { height: 34px; padding: 0 12px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+.encart-rejouer .encart-fermer { height: 34px; width: 34px; font-size: 15px; }
+.encart-rejouer kbd, .confirmation-rejouer kbd, .menu-pause kbd {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box;
+  border-radius: 4px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(255, 255, 255, .2); font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  font-size: 11px; font-weight: 600; color: #fff;
+}
+.confirmation-rejouer { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column;
+  align-items: center; gap: 12px; padding: 22px 30px; min-width: 360px; }
+.confirmation-titre { font-size: 28px; font-weight: 700; color: #fff; }
+.confirmation-detail { font-size: 13px; color: var(--text-2); }
+.confirmation-boutons { display: flex; gap: 10px; }
+.confirmation-boutons .bouton-principal, .confirmation-boutons .bouton-contour { height: 42px; padding: 0 18px; font-size: 16px; display: inline-flex; align-items: center; gap: 10px; }
+/* Pénalités du joueur à côté de son code dans la tour. */
+.penalite-badge { font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace; font-size: 9px; font-weight: 600; color: #ffd54a; white-space: nowrap;
+  background: rgba(255, 213, 74, .12); border-radius: 3px; padding: 0 3px; }
+/* HUD pendant la remise en piste : « REMISE EN PISTE » à la place des écarts. */
+#f1-hud.remise #f1-hud-devant { color: #ffd54a; font-size: 12px; letter-spacing: 0; white-space: nowrap; }
+
+/* Écran partagé (« Multijoueur local — écran partagé ») : étiquette et HUD par joueur, duel au centre. */
+.duel { position: absolute; inset: 0; pointer-events: none; }
+.duel-etiquette { position: absolute; top: calc(var(--gap) * 2 + var(--bar-h)); left: var(--gap); height: 36px; display: flex; align-items: center; overflow: hidden; }
+.duel-etiquette.droite { left: auto; right: var(--gap); flex-direction: row-reverse; }
+.duel-j { height: 100%; padding: 0 10px; display: flex; align-items: center; font-size: 16px; font-weight: 700; letter-spacing: .06em; color: #fff; }
+.duel-code { font-size: 16px; font-weight: 700; letter-spacing: .04em; padding: 0 10px; }
+.duel-touches { font-size: 11px; padding: 0 12px; }
+.duel-hud { position: absolute; bottom: var(--gap); left: var(--gap); width: 400px; height: 168px; display: flex; flex-direction: column; overflow: hidden; }
+.duel-hud.droite { left: auto; right: var(--gap); }
+.duel-hud-haut { flex: 1; display: grid; grid-template-columns: 118px 46px 1fr; column-gap: 14px; padding: 12px 14px 8px; align-items: center; }
+.duel-vitesse { font-size: 52px; font-weight: 700; line-height: .9; }
+.duel-rapport { height: 62px; border-radius: 6px; background: rgba(255, 255, 255, .05); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.duel-rapport .cond { font-size: 32px; font-weight: 700; line-height: 1; }
+.duel-rapport .lbl { font-size: 9px; }
+.duel-commandes { display: flex; flex-direction: column; gap: 8px; }
+.duel-jauge { height: 7px; border-radius: 4px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.duel-jauge > span { display: block; height: 100%; width: 0; }
+.duel-drs-ligne { display: flex; gap: 8px; align-items: center; }
+.duel-drs { font-size: 13px; font-weight: 700; letter-spacing: .1em; padding: 1px 7px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, .18); color: var(--off); }
+.duel-drs.actif { border-color: #2ecc71; color: #2ecc71; }
+.duel-usure { font-size: 10px; }
+.duel-hud-pied { height: 40px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 72px 1fr 1fr; align-items: center; background: rgba(0, 0, 0, .18); }
+.duel-hud-position { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fff; }
+.duel-bloc { padding: 0 12px; display: flex; flex-direction: column; line-height: 1.1; }
+.duel-bloc.bordure { border-left: 1px solid var(--line); }
+.duel-bloc .lbl { font-size: 9px; }
+.duel-bloc .mono { font-size: 13px; }
+.duel-panneau { position: absolute; top: calc(var(--gap) * 2 + var(--bar-h)); left: 50%; transform: translateX(-50%); width: 300px; padding: 8px 12px; }
+.duel-ligne { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+.duel-cote { display: flex; align-items: center; gap: 6px; }
+.duel-cote.droite { justify-content: flex-end; }
+.duel-badge { font-size: 12px; font-weight: 700; padding: 1px 6px; border-radius: 3px; color: #fff; }
+.duel-position { font-size: 20px; font-weight: 700; }
+.duel-ecart { font-size: 13px; color: #c9d1d9; }
+.duel-barre { display: flex; height: 4px; border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.duel-barre > span { flex: 1; }
+.duel-menes { font-size: 10px; text-align: center; margin-top: 4px; }
+#f1-ui.duel-actif #f1-tour, #f1-ui.duel-actif #f1-carte { visibility: hidden; }
+
+/* Consigne du mode pilote (« Clique sur une voiture pour la piloter ») : centrée, sous le
+   portique des feux (top 72, environ 170 px de haut) ; elle ne capte pas les clics (on clique
+   sur la scène). */
+#f1-ui > .consigne {
+  position: absolute;
+  top: 256px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  color: var(--text);
+  pointer-events: none;
+}
+
+/* Zones masquées par l'écran courant (InterfaceF1.appliquerEcran : un seul endroit décide) :
+   fondu de 200 ms, puis plus rien de visible ni de cliquable ; réaffichées sans délai. */
+.is-hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 200ms ease-out, visibility 0s linear 200ms !important;
+}
+
+/* ---- Mode jeu : bouton JOUER, menu des modes, overlay PAUSE (verre sombre, un seul à la fois) ----
+   Le voile assombrit la scène, le HUD et le classement derrière l'overlay (ils restent visibles).
+   La fenêtre d'aide (z-index 20) reste au-dessus. */
+.voile-jeu { position: absolute; inset: 0; background: rgba(5, 7, 10, .55); }
+
+/* Bouton JOUER : rouge clair, en bas à droite, hors de la mini-carte et du rail (à gauche du
+   panneau quand il est ouvert) ; visible quand aucune partie n'est en cours. */
+.bouton-jouer {
+  position: absolute; right: var(--gap); bottom: var(--gap); height: 48px; padding: 0 30px; border: 0; border-radius: 8px;
+  background: #ff5a52; color: #fff; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 18px; font-weight: 700;
+  letter-spacing: .12em; cursor: pointer; box-shadow: 0 4px 14px rgba(0, 0, 0, .3); transition: background 120ms;
+}
+.bouton-jouer:hover { background: #ff7069; }
+.bouton-jouer:active { background: #e8473f; }
+.bouton-jouer:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.bouton-jouer.panneau-ouvert { right: calc(var(--gap) * 2 + var(--panel-w)); }
+
+/* Menu des modes : centré, quatre cartes, puis circuit · tours · ambiance, puis Annuler / Lancer. */
+.menu-modes {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px); overflow-y: auto; padding: 22px 24px; display: flex; flex-direction: column; gap: 18px;
+}
+/* panneau ouvert (il passe au-dessus de l'interface) : centré dans la place qui reste à gauche */
+.menu-modes.panneau-ouvert { left: calc(50% - var(--panel-w) / 2 - var(--gap) / 2); width: min(760px, calc(100vw - var(--panel-w) - var(--gap) * 3 - 16px)); }
+.menu-modes-titre { font-size: 26px; font-weight: 700; letter-spacing: .04em; color: #fff; }
+.menu-modes-cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.carte-mode {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-height: 136px; padding: 14px; box-sizing: border-box; text-align: left;
+  border-radius: 8px; border: 1px solid rgba(255, 255, 255, .12); background: rgba(255, 255, 255, .03); color: var(--text); cursor: pointer;
+  font-family: 'Barlow', system-ui, sans-serif;
+}
+.carte-mode:hover { border-color: rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .06); }
+.carte-mode.choisie { border-color: #ff5a52; background: rgba(255, 90, 82, .14); box-shadow: inset 0 0 0 1px #ff5a52; }
+.carte-mode svg { color: #ff5a52; }
+.carte-mode-titre { font-size: 20px; font-weight: 700; letter-spacing: .04em; color: #fff; }
+.carte-mode-texte { font-size: 13px; line-height: 1.35; color: var(--text-2); }
+.menu-modes-options { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; }
+.menu-modes-champ { display: flex; flex-direction: column; gap: 6px; }
+.menu-modes-liste {
+  height: 34px; min-width: 120px; padding: 0 8px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, .18); background: #15181d;
+  color: var(--text); font-family: 'Barlow', system-ui, sans-serif; font-size: 14px;
+}
+.menu-modes-liste:disabled { opacity: .45; }
+.menu-modes-segments { display: flex; gap: 4px; padding: 3px; border-radius: 7px; background: rgba(255, 255, 255, .04); }
+.menu-modes-segments .seg { height: 28px; padding: 0 14px; }
+.menu-modes-boutons { display: flex; justify-content: flex-end; gap: 10px; }
+.menu-modes-boutons .bouton-principal, .menu-modes-boutons .bouton-contour { height: 44px; padding: 0 26px; font-size: 17px; }
+
+/* Overlay PAUSE : centré, quatre boutons l'un sous l'autre ; le bouton choisi (↑/↓) est marqué. */
+.menu-pause {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 320px; padding: 22px 24px;
+  display: flex; flex-direction: column; align-items: stretch; gap: 16px;
+}
+.menu-pause-titre { font-size: 34px; font-weight: 700; letter-spacing: .14em; text-align: center; color: #fff; }
+.menu-pause-boutons { display: flex; flex-direction: column; gap: 8px; }
+.menu-pause-boutons button { height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 17px; }
+.menu-pause-boutons button.choisi { outline: 2px solid #fff; outline-offset: 2px; }
+.menu-pause-boutons .bouton-contour.choisi { background: rgba(255, 255, 255, .08); }
+
+/* Limites de piste : compteur « Limites 1/3 » sous la ligne DRS du HUD, dès le premier
+   avertissement. */
+#f1-hud .hud-limites {
+  align-self: flex-start; margin-top: 2px; padding: 1px 8px; border-radius: 4px; background: rgba(255, 213, 74, .14);
+  border: 1px solid rgba(255, 213, 74, .6); color: #ffd54a; font-size: 13px; font-weight: 700; letter-spacing: .06em; white-space: nowrap;
+}
+#f1-hud .hud-limites[hidden] { display: none; }
+
+/* ==== IA entraînée ========================================================================
+   Badge « IA » dans le classement, onglet IA du panneau, et page d'entraînement (pageEntrainement.js) :
+   mêmes tokens que le reste de l'interface (verre sombre, Barlow Condensed, accent #e10600). */
+.ia-badge-ligne {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .06em;
+  color: #fff; background: rgba(225, 6, 0, .85); border-radius: 3px; padding: 0 3px; line-height: 13px;
+}
+.ia-badge {
+  align-self: flex-start; display: inline-block; padding: 3px 10px; border-radius: 4px;
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+}
+.ia-badge.apprentissage { color: #ffd54a; background: rgba(255, 213, 74, .12); border: 1px solid rgba(255, 213, 74, .5); }
+.ia-badge.pret { color: #fff; background: rgba(46, 204, 113, .22); border: 1px solid var(--gain); }
+.ia-onglet { display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+.ia-onglet-ligne { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px; }
+.ia-onglet-ligne b { font-size: 16px; color: #fff; text-align: right; }
+.ia-onglet .bouton-primaire { flex: none; margin-top: 6px; }
+
+/* Page d'entraînement : un calque plein écran ; seuls ses panneaux captent la souris, le centre
+   laisse voir la piste dessinée par p5. Tailles : de 1280 × 720 à 1920 × 1080 (PageEntrainement.zones). */
+.ia-page {
+  --ia-gauche: clamp(270px, calc(270px + (100vw - 1280px) * .171875), 380px);
+  --ia-droite: clamp(320px, calc(320px + (100vw - 1280px) * .1875), 440px);
+  --ia-bas: 170px;
+  position: fixed; inset: 0; z-index: 30; pointer-events: none;
+  font-family: 'Barlow', system-ui, sans-serif; color: var(--text);
+}
+@media (min-height: 900px) { .ia-page { --ia-bas: 132px; } }
+.ia-page > * { pointer-events: auto; }
+.ia-page .ia-note { margin: 0; font-size: 11px; line-height: 1.4; color: var(--text-2); }
+.ia-barre {
+  position: absolute; top: var(--gap); left: var(--gap); right: var(--gap); height: 48px;
+  display: flex; align-items: center; gap: 16px; padding: 0 12px 0 16px;
+}
+.ia-barre::before { content: ''; width: 4px; align-self: stretch; margin: 10px 0; border-radius: 2px; background: var(--accent); }
+.ia-titre { font-size: 22px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #fff; }
+.ia-etape { padding: 3px 10px; border-radius: 4px; font-size: 15px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  background: rgba(47, 211, 255, .14); border: 1px solid rgba(47, 211, 255, .55); color: #bdefff; }
+.ia-etape.trafic { background: rgba(225, 6, 0, .16); border-color: var(--accent); color: #ffd0cd; }
+.ia-niveau { font-size: 12px; color: var(--text-2); }
+.ia-statut { margin-left: auto; text-transform: none; letter-spacing: .02em; font-size: 13px; }
+.ia-barre .bouton-contour { height: 34px; padding: 0 16px; font-size: 15px; }
+.ia-panneau {
+  position: absolute; top: calc(var(--gap) * 2 + 48px); bottom: calc(var(--gap) * 2 + var(--ia-bas));
+  display: flex; flex-direction: column; gap: 8px; padding: 12px; overflow: hidden;
+}
+#ia-gauche { left: var(--gap); width: var(--ia-gauche); }
+#ia-droite { right: var(--gap); width: var(--ia-droite); overflow-y: auto; }
+.ia-panneau-titre { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex: none; }
+.ia-panneau-titre .cond { font-size: 16px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #fff; }
+#ia-reseau-svg { flex: 1; min-height: 0; width: 100%; }
+#ia-fitness-svg, #ia-poids-svg { width: 100%; flex: none; }
+#ia-fitness-svg { height: 120px; }
+#ia-poids-svg { height: 100px; }
+@media (min-height: 900px) { #ia-fitness-svg { height: 190px; } #ia-poids-svg { height: 160px; } }
+.ia-libelle { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 12px; font-weight: 600; fill: #c9d1d9; }
+.ia-axe { stroke: rgba(255, 255, 255, .25); stroke-width: 1; }
+.ia-valeur { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9px; fill: var(--text-2); }
+.ia-courbe { stroke-width: 2; vector-effect: non-scaling-stroke; }
+.ia-courbe.meilleur { stroke: var(--accent); }
+.ia-courbe.moyenne { stroke: #8b949e; stroke-dasharray: 4 3; }
+#ia-poids-svg polyline { vector-effect: non-scaling-stroke; }
+.ia-legende { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; text-transform: none; letter-spacing: .02em; }
+.ia-trait { display: inline-block; width: 12px; height: 3px; border-radius: 2px; }
+.ia-trait.meilleur { background: var(--accent); }
+.ia-trait.moyenne { background: #8b949e; }
+.ia-trait.seek { background: #2fd3ff; }
+.ia-trait.arrive { background: #ff5a52; }
+.ia-trait.wander { background: #7cff8a; }
+.ia-trait.separation { background: #ff5ad1; }
+.ia-chiffres { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; flex: none; }
+.ia-chiffres div { display: flex; flex-direction: column; }
+.ia-chiffres .lbl { font-size: 10px; }
+.ia-chiffres b { font-size: 20px; color: #fff; line-height: 1.1; }
+.ia-chiffres b.mono { font-size: 16px; }
+.ia-commandes {
+  position: absolute; left: var(--gap); right: var(--gap); bottom: var(--gap); height: var(--ia-bas); box-sizing: border-box;
+  display: flex; flex-wrap: wrap; align-content: flex-start; align-items: center; gap: 8px 14px; padding: 10px 14px; overflow-y: auto;
+}
+.ia-groupe { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.ia-commandes .bouton-primaire, .ia-commandes .bouton-secondaire { flex: none; height: 30px; padding: 0 12px; font-size: 13px; }
+.ia-curseurs { gap: 4px 12px; }
+.ia-reglage { display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 6px; width: 104px; font-size: 11px; color: var(--text-2); }
+.ia-reglage label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ia-reglage output { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: #fff; }
+.ia-reglage input[type="range"] { grid-column: 1 / -1; width: 100%; margin: 2px 0 0; accent-color: var(--accent); height: 14px; }
+.ia-case { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text); white-space: nowrap; }
+.ia-case input { accent-color: var(--accent); }
+.ia-fitness { position: relative; }
+.ia-fitness summary { cursor: pointer; font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text); }
+.ia-fitness[open] > .ia-curseurs {
+  position: absolute; bottom: calc(100% + 12px); left: -14px; width: 600px; display: flex; flex-wrap: wrap; padding: 12px 14px;
+  background: var(--bg-panel); border: 1px solid var(--line); border-radius: var(--radius); backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur)); box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+}
+.ia-modeles input[type="text"], .ia-modeles select {
+  height: 30px; box-sizing: border-box; padding: 0 8px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 6px;
+  background: #15181d; color: var(--text); font-family: 'Barlow', system-ui, sans-serif; font-size: 13px;
+}
+.ia-modeles input[type="text"] { width: 130px; }
+.ia-modeles select { max-width: 220px; }
+.ia-message {
+  position: absolute; left: 50%; bottom: calc(var(--gap) * 2 + var(--ia-bas)); transform: translateX(-50%);
+  max-width: 560px; padding: 8px 14px; font-size: 13px; text-align: center;
+}

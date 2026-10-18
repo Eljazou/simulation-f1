@@ -1,0 +1,14 @@
+{
+  "name": "simulation-f1-demo",
+  "private": true,
+  "type": "module",
+  "description": "Démonstration automatique filmée du jeu Circuit Formule 1 (Playwright)",
+  "scripts": {
+    "demo": "node demo.mjs"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
+    "playwright": "^1.64.1"
+  }
+}

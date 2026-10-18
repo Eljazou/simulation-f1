@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Composant voiture vue de dessus</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<svg role="img" aria-label="{{aria}}" width="{{W}}" height="{{H}}" viewBox="-110 -50 160 100" style="display:block;font-family:'Barlow Condensed',sans-serif">
+<defs>
+<pattern id="cs-carbon" width="2.4" height="2.4" patternUnits="userSpaceOnUse"><rect width="2.4" height="2.4" fill="#16181c"></rect><rect width="1.2" height="1.2" fill="#22252a"></rect><rect x="1.2" y="1.2" width="1.2" height="1.2" fill="#22252a"></rect></pattern>
+<linearGradient id="{{gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="{{tm.lt}}"></stop><stop offset="48%" stop-color="{{tm.p1}}"></stop><stop offset="100%" stop-color="{{tm.dk}}"></stop></linearGradient>
+<filter id="cs-b2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2"></feGaussianBlur></filter>
+<filter id="cs-b3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="cs-b5" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+<filter id="cs-b9" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="cs-grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="7" result="n"></feTurbulence><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.6 0 0 0 -.72"></feColorMatrix><feComposite in2="SourceGraphic" operator="in"></feComposite></filter>
+<filter id="cs-desat"><feColorMatrix type="saturate" values=".12"></feColorMatrix></filter>
+<linearGradient id="cs-beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fff8e6" stop-opacity=".55"></stop><stop offset="100%" stop-color="#fff8e6" stop-opacity="0"></stop></linearGradient>
+</defs>
+<rect x="-110" y="-50" width="160" height="100" fill="{{bg}}" opacity="{{bgOp}}"></rect>
+<rect x="-110" y="-50" width="160" height="100" fill="#fff" filter="url(#cs-grain)" opacity="{{grainOp}}"></rect>
+<g opacity="{{bgOp}}"><line x1="-110" y1="-46" x2="50" y2="-46" stroke="#e9ebee" stroke-width="1.5"></line><line x1="-110" y1="46" x2="50" y2="46" stroke="#e9ebee" stroke-width="1.5"></line></g>
+<sc-if value="{{follow}}" hint-placeholder-val="{{false}}">
+<circle r="40" fill="{{accent}}" opacity=".08"></circle><circle r="40" fill="none" stroke="{{accent}}" stroke-width="2"></circle>
+<circle r="40" fill="none" stroke="{{accent}}" stroke-width="2"><animate attributeName="r" values="40;56" dur="1.4s" repeatCount="indefinite"></animate><animate attributeName="opacity" values=".9;0" dur="1.4s" repeatCount="indefinite"></animate></circle>
+</sc-if>
+<g transform="translate(4 6)"><rect x="-37" y="-14.5" width="74" height="29" rx="10" fill="#000" opacity="{{shOp}}" filter="url(#cs-b3)"></rect></g>
+<g transform="{{yawT}}" filter="{{filt}}">
+<g opacity="{{f.spray}}"><ellipse cx="-80" cy="0" rx="40" ry="22" fill="#e6eef6" opacity=".35" filter="url(#cs-b9)"></ellipse><ellipse cx="-52" cy="-14" rx="26" ry="7" fill="#f1f6fb" opacity=".55" filter="url(#cs-b3)"></ellipse><ellipse cx="-52" cy="14" rx="26" ry="7" fill="#f1f6fb" opacity=".55" filter="url(#cs-b3)"></ellipse></g>
+<g opacity="{{f.slip}}" stroke="#eaf5ff" stroke-width="1.1" fill="none" stroke-dasharray="14 10" stroke-linecap="round">
+<path d="M -42 -7 C -60 -12, -80 -3, -108 -9" opacity=".8"><animate attributeName="stroke-dashoffset" from="0" to="48" dur=".45s" repeatCount="indefinite"></animate></path>
+<path d="M -42 0 C -65 4, -85 -3, -108 1" opacity=".6"><animate attributeName="stroke-dashoffset" from="12" to="60" dur=".45s" repeatCount="indefinite"></animate></path>
+<path d="M -42 7 C -60 12, -80 3, -108 9" opacity=".8"><animate attributeName="stroke-dashoffset" from="24" to="72" dur=".45s" repeatCount="indefinite"></animate></path>
+</g>
+<g transform="{{markRot}}" opacity="{{f.slide}}">
+<path d="M -24 -12 C -50 -13, -80 -8, -110 2" stroke="#0e0f11" stroke-width="4" fill="none" opacity=".55"></path>
+<path d="M -24 12 C -50 12, -80 15, -110 24" stroke="#0e0f11" stroke-width="4" fill="none" opacity=".55"></path>
+<circle cx="-42" cy="-17" r="11" fill="#eceef0" opacity=".55" filter="url(#cs-b3)"><animate attributeName="r" values="9;14;9" dur=".9s" repeatCount="indefinite"></animate></circle>
+<circle cx="-66" cy="-21" r="16" fill="#eceef0" opacity=".38" filter="url(#cs-b5)"></circle><circle cx="-92" cy="-18" r="20" fill="#eceef0" opacity=".25" filter="url(#cs-b9)"></circle>
+<circle cx="-42" cy="17" r="11" fill="#eceef0" opacity=".55" filter="url(#cs-b3)"></circle><circle cx="-68" cy="22" r="16" fill="#eceef0" opacity=".35" filter="url(#cs-b5)"></circle>
+</g>
+<g opacity="{{f.spark}}" stroke-linecap="round"><g><animate attributeName="opacity" values="1;.25;.9;.4;1" dur=".22s" repeatCount="indefinite"></animate>
+<line x1="-26" y1="-3" x2="-58" y2="-10" stroke="#ffd36e" stroke-width="1.3"></line><line x1="-26" y1="2" x2="-66" y2="4" stroke="#ffb347" stroke-width="1.1"></line><line x1="-28" y1="4" x2="-52" y2="14" stroke="#fff1b0" stroke-width="1"></line><line x1="-28" y1="-5" x2="-46" y2="-17" stroke="#ff9d2e" stroke-width="1"></line>
+<circle cx="-70" cy="-6" r="1.2" fill="#ffd36e"></circle><circle cx="-62" cy="12" r="1" fill="#ffb347"></circle><circle cx="-76" cy="3" r="1" fill="#fff1b0"></circle></g></g>
+<g opacity="{{f.smoke}}">
+<circle cx="10" cy="-18" r="5" fill="#dfe2e6" opacity=".5" filter="url(#cs-b2)"><animate attributeName="r" values="4;7;4" dur=".6s" repeatCount="indefinite"></animate></circle>
+<circle cx="-2" cy="-20" r="8" fill="#dfe2e6" opacity=".32" filter="url(#cs-b3)"></circle><circle cx="-18" cy="-21" r="11" fill="#dfe2e6" opacity=".2" filter="url(#cs-b5)"></circle>
+<circle cx="10" cy="18" r="5" fill="#dfe2e6" opacity=".5" filter="url(#cs-b2)"></circle><circle cx="-2" cy="20" r="8" fill="#dfe2e6" opacity=".32" filter="url(#cs-b3)"></circle><circle cx="-18" cy="21" r="11" fill="#dfe2e6" opacity=".2" filter="url(#cs-b5)"></circle>
+</g>
+<g opacity="{{f.beam}}"><path d="M 36 -6 L 60 -14 L 60 14 L 36 6 Z" fill="url(#cs-beam)"></path></g>
+<circle cx="-46" cy="0" r="22" fill="#ff2a1f" opacity="{{f.halo}}" filter="url(#cs-b9)"></circle>
+<rect x="-31" y="-16" width="15" height="7" rx="2.4" fill="#111215"></rect><rect x="-31" y="9" width="15" height="7" rx="2.4" fill="#111215"></rect>
+<rect x="-30" y="-16" width="13" height="1.6" fill="{{tyre}}"></rect><rect x="-30" y="14.4" width="13" height="1.6" fill="{{tyre}}"></rect>
+<rect x="-30" y="-10.6" width="13" height="1.2" fill="{{tyre}}" opacity=".75"></rect><rect x="-30" y="9.4" width="13" height="1.2" fill="{{tyre}}" opacity=".75"></rect>
+<rect x="-25.5" y="-13.7" width="4" height="2.4" rx=".6" fill="#7d838c"></rect><rect x="-25.5" y="11.3" width="4" height="2.4" rx=".6" fill="#7d838c"></rect>
+<g transform="rotate({{steer}} 19.5 -12.25)"><rect x="13" y="-15.5" width="13" height="6.5" rx="2.3" fill="#111215"></rect><rect x="14" y="-15.5" width="11" height="1.5" fill="{{tyre}}"></rect><rect x="14" y="-10.4" width="11" height="1.1" fill="{{tyre}}" opacity=".75"></rect><rect x="17.6" y="-13.3" width="3.8" height="2.2" rx=".6" fill="#7d838c"></rect></g>
+<g transform="rotate({{steer}} 19.5 12.25)"><rect x="13" y="9" width="13" height="6.5" rx="2.3" fill="#111215"></rect><rect x="14" y="14" width="11" height="1.5" fill="{{tyre}}"></rect><rect x="14" y="9.3" width="11" height="1.1" fill="{{tyre}}" opacity=".75"></rect><rect x="17.6" y="11.1" width="3.8" height="2.2" rx=".6" fill="#7d838c"></rect></g>
+<g stroke="#0c0d0f" stroke-width="1.1"><line x1="12" y1="-4" x2="18" y2="-10"></line><line x1="24" y1="-3" x2="21" y2="-10"></line><line x1="12" y1="4" x2="18" y2="10"></line><line x1="24" y1="3" x2="21" y2="10"></line><line x1="-19" y1="-6" x2="-23" y2="-10"></line><line x1="-13" y1="-6" x2="-21" y2="-10"></line><line x1="-19" y1="6" x2="-23" y2="10"></line><line x1="-13" y1="6" x2="-21" y2="10"></line></g>
+<g opacity="{{f.brake}}"><circle cx="19.5" cy="-8.6" r="2.6" fill="#ff7a1a" filter="url(#cs-b2)"></circle><circle cx="19.5" cy="8.6" r="2.6" fill="#ff7a1a" filter="url(#cs-b2)"></circle><circle cx="-23.5" cy="-8.6" r="2.6" fill="#ff7a1a" filter="url(#cs-b2)"></circle><circle cx="-23.5" cy="8.6" r="2.6" fill="#ff7a1a" filter="url(#cs-b2)"></circle></g>
+<path d="M -29 -11 L 4 -11 L 9 -7 L 9 7 L 4 11 L -29 11 Z" fill="url(#cs-carbon)"></path>
+<rect x="-39.5" y="-14" width="9" height="2" rx=".5" fill="#0d0e10"></rect><rect x="-39.5" y="12" width="9" height="2" rx=".5" fill="#0d0e10"></rect>
+<rect x="-39" y="-12.5" width="4.6" height="25" rx=".6" fill="url(#cs-carbon)"></rect>
+<rect x="-34.8" y="-12" width="2.6" height="24" rx=".5" fill="{{tm.p2}}" opacity="{{drsC}}"></rect>
+<rect x="-35.2" y="-12" width="1.4" height="24" fill="#050608" opacity="{{drsO}}"></rect><rect x="-33.6" y="-12" width="1.2" height="24" fill="{{tm.p2}}" opacity="{{drsO}}"></rect>
+<path d="M -23 -9.5 C -12 -11.6, 0 -11, 6 -8 L 7 -5 L 7 5 L 6 8 C 0 11, -12 11.6, -23 9.5 Z" fill="url(#{{gid}})"></path>
+<path d="M 3.5 -9.6 L 6.6 -8 L 6.6 -5.4 L 3.5 -6 Z" fill="#050608"></path><path d="M 3.5 9.6 L 6.6 8 L 6.6 5.4 L 3.5 6 Z" fill="#050608"></path>
+<path d="M -19 -10.4 L -6 -10.9 L -6 -8.2 L -19 -7.6 Z" fill="{{tm.p2}}"></path><path d="M -19 10.4 L -6 10.9 L -6 8.2 L -19 7.6 Z" fill="{{tm.p2}}"></path>
+<path d="M -32 -3 C -20 -3.8, -6 -5.3, 4 -5 L 10 -3.6 L 10 3.6 L 4 5 C -6 5.3, -20 3.8, -32 3 Z" fill="url(#{{gid}})"></path>
+<rect x="-30" y="-1" width="40" height="2" fill="{{tm.p3}}"></rect>
+<path d="M -18 -9.6 C -8 -10.6, 0 -10.2, 4.5 -8.4" stroke="#fff" stroke-width="1" fill="none" opacity=".35"></path>
+<path d="M -28 -2.6 C -16 -3.2, -4 -4.4, 6 -4.2" stroke="#fff" stroke-width=".8" fill="none" opacity=".3"></path>
+<text x="-15" y="2.3" text-anchor="middle" font-size="6.6" font-weight="700" fill="{{tm.num}}">{{num}}</text>
+<ellipse cx="6" cy="0" rx="2.6" ry="1.8" fill="#050608"></ellipse>
+<path d="M 9 -3.2 C 13 -3.7, 17 -3, 18.5 0 C 17 3, 13 3.7, 9 3.2 Z" fill="#07080a"></path>
+<circle cx="12.5" cy="0" r="2.6" fill="{{tm.helm}}"></circle><path d="M 13.7 -1.7 A 2.6 2.6 0 0 1 13.7 1.7" stroke="#0b0b0b" stroke-width="1.2" fill="none"></path>
+<path d="M 9.5 -3.5 C 13 -3.9, 17.5 -2.7, 19 0 C 17.5 2.7, 13 3.9, 9.5 3.5" stroke="#2b2e33" stroke-width="1.4" fill="none"></path><line x1="19" y1="0" x2="22" y2="0" stroke="#2b2e33" stroke-width="1.4"></line>
+<path d="M 18 -3.4 L 33 -1.8 Q 36.5 0 33 1.8 L 18 3.4 Z" fill="url(#{{gid}})"></path>
+<path d="M 30 -2.1 L 33 -1.8 Q 36.5 0 33 1.8 L 30 2.1 Z" fill="{{tm.p2}}"></path>
+<line x1="15.6" y1="-7.2" x2="15.4" y2="-4" stroke="#1a1b1e" stroke-width=".8"></line><line x1="15.6" y1="7.2" x2="15.4" y2="4" stroke="#1a1b1e" stroke-width=".8"></line>
+<rect x="14.4" y="-9.4" width="3.2" height="2.1" rx=".6" fill="{{tm.p1}}"></rect><rect x="14.4" y="7.3" width="3.2" height="2.1" rx=".6" fill="{{tm.p1}}"></rect>
+<rect x="30.5" y="-15.5" width="5" height="31" rx="1" fill="url(#cs-carbon)"></rect>
+<rect x="33" y="-15" width="1.8" height="30" fill="{{tm.p2}}"></rect><rect x="35" y="-14.5" width="1.3" height="29" fill="{{tm.p1}}"></rect>
+<rect x="29" y="-16.6" width="8" height="1.9" rx=".5" fill="#0d0e10"></rect><rect x="29" y="14.7" width="8" height="1.9" rx=".5" fill="#0d0e10"></rect>
+<rect x="-40.6" y="-1.5" width="1.9" height="3" rx=".4" fill="{{rl}}"></rect>
+<circle cx="-41" cy="0" r="5" fill="#ff2a1f" opacity="{{rlGlow}}" filter="url(#cs-b2)"></circle>
+<sc-for list="{{crew}}" as="m" hint-placeholder-count="0"><circle cx="{{m.x}}" cy="{{m.y}}" r="4.6" fill="{{tm.p1}}" stroke="#0b0c0f" stroke-width="1"></circle><circle cx="{{m.x}}" cy="{{m.y}}" r="2" fill="#e8e8e8"></circle></sc-for>
+</g>
+<sc-if value="{{follow}}" hint-placeholder-val="{{false}}"><g transform="translate(0 -40)"><path d="M -18 -8 H 18 V 4 H 3 L 0 7 L -3 4 H -18 Z" fill="{{accent}}"></path><text y="1.5" text-anchor="middle" font-size="9" font-weight="700" fill="#fff" letter-spacing=".6">{{code}}</text></g></sc-if>
+</svg>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"equipe":{"editor":"enum","options":["halden","corsa","velis","kestrel","ardent","moravia","aurel","novaro","sable","tessa"],"default":"corsa"},"etat":{"editor":"enum","options":["normal","freinage","glisse","drs","stand","difficulte","suivie","abandon","aspiration","pluie","nuit"],"default":"normal"},"pneu":{"editor":"enum","options":["S","M","H","I","W"],"default":"M"},"echelle":{"editor":"float","min":0.5,"max":10,"step":0.1,"default":1},"fond":{"editor":"boolean","default":true},"$preview":{"width":160,"height":100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const TEAMS = {
+      halden: { p1: '#2f7bff', p2: '#ffffff', p3: '#0d1b3d', lt: '#7bb0ff', dk: '#1846b8', num: '#ffffff', helm: '#ffffff', n: 4, code: 'KAR' },
+      corsa: { p1: '#ff8a1f', p2: '#15171b', p3: '#ffd166', lt: '#ffb46a', dk: '#cf5e08', num: '#15171b', helm: '#ffd166', n: 7, code: 'MIR' },
+      velis: { p1: '#19c3a6', p2: '#0b2a33', p3: '#e8fffb', lt: '#62e3cc', dk: '#0c8a75', num: '#0b2a33', helm: '#e8fffb', n: 16, code: 'TAV' },
+      kestrel: { p1: '#f2c200', p2: '#1b1b1b', p3: '#ffffff', lt: '#ffe066', dk: '#bf9500', num: '#1b1b1b', helm: '#1b1b1b', n: 9, code: 'LUN' },
+      ardent: { p1: '#d9dde3', p2: '#1d1f24', p3: '#00a3c7', lt: '#f6f7f9', dk: '#9aa1aa', num: '#1d1f24', helm: '#00a3c7', n: 27, code: 'SKO' },
+      moravia: { p1: '#c0186b', p2: '#ffd1e6', p3: '#2a0a1a', lt: '#e45a9f', dk: '#850d49', num: '#ffffff', helm: '#ffd1e6', n: 11, code: 'BRE' },
+      aurel: { p1: '#1f8a4c', p2: '#d4af37', p3: '#0d2b1a', lt: '#46b977', dk: '#125f33', num: '#ffffff', helm: '#d4af37', n: 63, code: 'ROW' },
+      novaro: { p1: '#1b2a5c', p2: '#ff5a36', p3: '#ffffff', lt: '#40549a', dk: '#0e1838', num: '#ffffff', helm: '#ff5a36', n: 18, code: 'FEN' },
+      sable: { p1: '#26272b', p2: '#c9a24a', p3: '#c9a24a', lt: '#4a4c52', dk: '#121316', num: '#c9a24a', helm: '#c9a24a', n: 5, code: 'ILM' },
+      tessa: { p1: '#8a4b2a', p2: '#f3e2c7', p3: '#f3e2c7', lt: '#b8714a', dk: '#5a2f17', num: '#ffffff', helm: '#f3e2c7', n: 44, code: 'YSA' }
+    };
+    const key = this.props.equipe ?? 'corsa';
+    const tm = TEAMS[key] || TEAMS.corsa;
+    const e = this.props.etat ?? 'normal';
+    const s = this.props.echelle ?? 1;
+    const fond = this.props.fond ?? true;
+    const TY = { S: '#ff3b30', M: '#f5c518', H: '#f2f2f2', I: '#34c759', W: '#2f80ff' };
+    let pneu = this.props.pneu ?? 'M';
+    if (e === 'pluie' && (pneu === 'S' || pneu === 'M' || pneu === 'H')) pneu = 'I';
+    const f = { spray: e === 'pluie' ? 1 : 0, slip: e === 'aspiration' ? 1 : 0, slide: e === 'glisse' ? 1 : 0, spark: e === 'difficulte' ? 1 : 0,
+      smoke: e === 'freinage' ? 1 : 0, brake: e === 'freinage' ? 1 : 0, beam: e === 'nuit' ? 1 : 0, halo: e === 'nuit' ? .5 : 0 };
+    const yaw = e === 'glisse' ? -18 : 0;
+    const crew = e === 'stand' ? [{ x: 19.5, y: -24 }, { x: 19.5, y: 24 }, { x: -23.5, y: -24 }, { x: -23.5, y: 24 }, { x: 11, y: -29 }, { x: -15, y: 29 }, { x: 44, y: 0 }, { x: -48, y: 0 }, { x: 28, y: -26 }, { x: -32, y: -28 }] : [];
+    const bgs = { nuit: '#24282d', pluie: '#2f3338' };
+    return {
+      W: Math.round(160 * s), H: Math.round(100 * s), tm, gid: 'cs-g-' + key + '-' + e, num: String(tm.n), code: tm.code, f, crew,
+      tyre: TY[pneu], steer: e === 'glisse' ? 14 : (e === 'freinage' ? -6 : 0), yawT: 'rotate(' + yaw + ')', markRot: 'rotate(' + (-yaw) + ')',
+      drsO: e === 'drs' ? 1 : 0, drsC: e === 'drs' ? 0 : 1,
+      rl: e === 'freinage' || e === 'pluie' ? '#ff2a1f' : '#5a1512', rlGlow: e === 'freinage' ? .9 : (e === 'pluie' ? .6 : 0),
+      filt: e === 'abandon' ? 'url(#cs-desat)' : 'none', follow: e === 'suivie', accent: '#e10600',
+      bg: bgs[e] || '#4a4e55', bgOp: fond ? 1 : 0, grainOp: fond ? .08 : 0, shOp: e === 'pluie' ? .25 : .5,
+      aria: 'Monoplace ' + key + ' vue de dessus, état ' + e
+    };
+  }
+}
+</script>
+</body>
+</html>

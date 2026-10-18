@@ -1,0 +1,36 @@
+# Dépendances
+node_modules/
+
+# Démo : médias générés (trop lourds pour le dépôt, à publier dans les Releases)
+demo/audio/
+demo/videos/
+demo/rapport/
+*.mp4
+*.webm
+*.mp3
+*.wav
+
+# Fichiers temporaires et journaux
+*.log
+npm-debug.log*
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+.cache/
+
+# Variables d'environnement
+.env
+.env.*
+
+# Fichiers système Windows et macOS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Éditeurs
+.vscode/
+.idea/

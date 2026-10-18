@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Palette et fiche technique de la scène</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:1920px;height:1700px;box-sizing:border-box;padding:36px 48px;background:#0b0d10;font-family:'Barlow',sans-serif;color:#e6edf3;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;align-items:flex-end;justify-content:space-between">
+<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#e10600">Circuit de Valmora · 4,82 km · scène vectorielle p5.js</div><h1 style="margin:4px 0 0 0;font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:700;line-height:1">Fiche technique de la scène</h1></div>
+<p style="margin:0;max-width:640px;text-align:right;font-size:13px;color:#a3acb6;line-height:1.5">Toutes les cotes sont en px dans le repère monde 1920 × 1080. Chaque calque de décor est le <b>même tracé</b> dessiné avec un trait plus ou moins large : on obtient murs, herbe, vibreurs et piste sans calcul d’offset.</p>
+</div>
+
+<div style="display:grid;grid-template-columns:900px 1fr;column-gap:40px;align-items:start">
+<div style="display:flex;flex-direction:column;gap:24px">
+
+<section style="border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);overflow:hidden">
+<div style="display:grid;grid-template-columns:220px repeat(3,minmax(0,1fr));column-gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase"><span>Palette de la scène</span><span>Jour</span><span>Nuit</span><span>Pluie</span></div>
+<sc-for list="{{pal}}" as="p" hint-placeholder-count="20">
+<div style="display:grid;grid-template-columns:220px repeat(3,minmax(0,1fr));column-gap:12px;align-items:center;height:30px;padding:0 16px;border-top:1px solid rgba(255,255,255,.04);font-size:13px">
+<span>{{p.n}}</span>
+<sc-for list="{{p.c}}" as="c" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:8px"><span style="width:34px;height:18px;border-radius:4px;background:{{c.v}};box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c9d1d9">{{c.t}}</span></span></sc-for>
+</div>
+</sc-for>
+</section>
+
+<section style="border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);overflow:hidden">
+<div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Calques dans l’ordre de dessin</div>
+<sc-for list="{{layers}}" as="l" hint-placeholder-count="20">
+<div style="display:grid;grid-template-columns:26px 190px 250px 1fr;column-gap:12px;align-items:center;min-height:28px;padding:3px 16px;border-top:1px solid rgba(255,255,255,.04);font-size:12.5px">
+<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6e7781">{{l.i}}</span><span style="font-weight:600">{{l.n}}</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#fff">{{l.v}}</span><span style="color:#a3acb6">{{l.d}}</span>
+</div>
+</sc-for>
+</section>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:24px">
+<section style="border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);padding:14px 16px;display:grid;grid-template-columns:330px 1fr;column-gap:20px">
+<div>
+<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Tracé · 17 courbes de Bézier</div>
+<svg role="img" aria-label="Tracé de Valmora avec numéros de virages" width="330" height="200" viewBox="300 60 1560 980" style="display:block;border-radius:6px;background:#14211a">
+<path d="{{trackD}}" fill="none" stroke="#4a4e55" stroke-width="100" stroke-linejoin="round"></path>
+<sc-for list="{{tlabels}}" as="t" hint-placeholder-count="10"><text x="{{t.x}}" y="{{t.y}}" font-family="Barlow Condensed" font-weight="700" font-size="58" fill="#f2f2f2" text-anchor="middle">{{t.n}}</text></sc-for>
+<rect x="796" y="104" width="10" height="112" fill="#fff"></rect>
+</svg>
+<p style="margin:8px 0 0 0;font-size:12px;color:#a3acb6;line-height:1.5">Ligne droite 970 px · T1 freinage appuyé · T2-T3 chicane G-D · T4-T5 rapides · T6 · T7 épingle · T8 · T9 grande courbe · T10. Largeur 100 px, longueur ≈ 4 330 px.</p>
+</div>
+<pre style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.55;color:#c9d1d9;white-space:pre">{{segTxt}}</pre>
+</section>
+
+<section style="border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);overflow:hidden">
+<div style="display:grid;grid-template-columns:120px repeat(5,72px) 1fr;column-gap:10px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.08);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase"><span>Livrée</span><span>p1 corps</span><span>p2 bande</span><span>p3 liseré</span><span>clair</span><span>foncé</span><span>Pilotes · numéros</span></div>
+<sc-for list="{{teams}}" as="t" hint-placeholder-count="10">
+<div style="display:grid;grid-template-columns:120px repeat(5,72px) 1fr;column-gap:10px;align-items:center;height:30px;padding:0 16px;border-top:1px solid rgba(255,255,255,.04);font-size:13px">
+<span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700">{{t.n}}</span>
+<sc-for list="{{t.c}}" as="c" hint-placeholder-count="5"><span style="display:flex;flex-direction:column;gap:1px"><span style="height:10px;border-radius:2px;background:{{c}};box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:#a3acb6">{{c}}</span></span></sc-for>
+<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#c9d1d9">{{t.d}}</span>
+</div>
+</sc-for>
+</section>
+
+<section style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);padding:14px 16px">
+<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Nuit</div>
+<sc-for list="{{night}}" as="r" hint-placeholder-count="6"><p style="margin:0 0 6px 0;font-size:12.5px;line-height:1.45;color:#c9d1d9"><b style="color:#fff">{{r.a}}</b> {{r.b}}</p></sc-for>
+</div>
+<div style="border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);padding:14px 16px">
+<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Pluie</div>
+<sc-for list="{{rain}}" as="r" hint-placeholder-count="6"><p style="margin:0 0 6px 0;font-size:12.5px;line-height:1.45;color:#c9d1d9"><b style="color:#fff">{{r.a}}</b> {{r.b}}</p></sc-for>
+</div>
+</section>
+
+<section style="border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);padding:14px 16px">
+<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Adaptation 1280 × 720</div>
+<sc-for list="{{adapt}}" as="r" hint-placeholder-count="6"><p style="margin:0 0 6px 0;font-size:12.5px;line-height:1.45;color:#c9d1d9"><b style="color:#fff">{{r.a}}</b> {{r.b}}</p></sc-for>
+</section>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const row = (n, a, b, c) => ({ n, c: [a, b, c].map(v => ({ v: v.split(' ')[0], t: v })) });
+    const pal = [
+      row('Herbe 1 (bande claire)', '#2f5634', '#13241a', '#2a4430'), row('Herbe 2 (bande foncée)', '#294d2e', '#102017', '#253d2a'),
+      row('Asphalte', '#4a4e55', '#2d3137', '#33373c'), row('Reflet / dégradé asphalte', '#5a5f66', '#3a3f46', '#4a5866'),
+      row('Ligne de course', '#33363b', '#1f2226', '#2a2d32'), row('Gomme (entrées virage)', '#25272b', '#16181b', '#2a2d31'),
+      row('Ligne blanche', '#eceef0', '#d4d7db', '#d9dcdf'), row('Vibreur rouge', '#c8202e', '#a01d27', '#a3222d'), row('Vibreur blanc', '#eef0f2', '#cfd2d6', '#d9dcdf'),
+      row('Dégagement rouge', '#a3343a', '#5e2025', '#7e2c31'), row('Dégagement bleu', '#2f5fa6', '#1f3a66', '#2a4f86'), row('Dégagement gris', '#555a61', '#33373d', '#454a51'),
+      row('Gravier', '#c9b48a', '#6e634c', '#9d8c69'), row('Béton (murs)', '#b9bbb7', '#73766f', '#9a9d9a'), row('Clôture', '#5b6066', '#2f3338', '#4d5157'),
+      row('Voie des stands', '#40444a', '#2a2e33', '#33373d'), row('Arbres', '#2b4a29', '#132514', '#25402a'), row('Arbres (reflet)', '#3e6a37', '#1d3a1e', '#325a34'),
+      row('Toits', '#5d636b', '#2e333a', '#4d535b'), row('Ombres (noir α)', '#000000 · 50 %', '#000000 · 35 %', '#000000 · 25 %')
+    ];
+    const layers = [
+      ['1', 'Herbe tondue', 'motif 96 px · bandes 48 · −18°', 'deux tons, sous tout le reste'],
+      ['2', 'Ombre des murs', 'trait 262 · flou 5 · +5, +7', 'noir 35 % jour'],
+      ['3', 'Clôture', 'trait 256 · tirets 1.5 / 4', 'poteaux à 128 px de l’axe'],
+      ['4', 'Mur béton', 'trait 249', 'bande de 4 px à 120 px de l’axe'],
+      ['5', 'Bande d’herbe', 'trait 241 · motif herbe', 'efface l’intérieur du mur'],
+      ['6', 'Dégagements colorés', 'trait 226 · tirets 22 / 22', 'T1 et T6 · rouge + bleu'],
+      ['7', 'Dégagements gris', 'trait 200 · bouts ronds', 'T7 épingle, T8'],
+      ['8', 'Bacs à gravier', 'polygone offset 64 → 114 px', 'extérieur T4-T5, T9 · points 0.8'],
+      ['9', 'Voie des stands', 'trait 38 blanc + 33 asphalte', 'muret 5 px à y 226 · 10 boxes 54 × 52'],
+      ['10', 'Décor', 'tribunes · arbres r 12–24 · bâtiments', 'ombres +7, +9 flou 3 · teinte nuit'],
+      ['11', 'Vibreurs', 'trait 122 · tirets 10 / 10', 'virages seulement (10 segments)'],
+      ['12', 'Ligne blanche', 'trait 107', '3,5 px visibles de chaque côté'],
+      ['13', 'Asphalte', 'trait 100 + reflet 60 flou 9', 'grain bruit clair 9 % + sombre 16 %'],
+      ['14', 'Ligne de course', 'trait 30 · flou 3 · 55 %', 'gomme 26 px en entrée de virage'],
+      ['15', 'Traces, joints, billes', 'traces 2.4 px · joints 3 px', 'billes Ø 2.6 hors trajectoire'],
+      ['16', 'Marquages', 'grille 9 × 30 · pas 25 · ±24', 'damier 2 × 20 carrés de 5 px · DRS 2 px'],
+      ['17', 'Bordures', 'pneus Ø 8.8 · panneaux 24 × 14', 'publicités 112 × 12 · texte 10 px'],
+      ['18', 'Voitures', 'ombre, effets, roues, carrosserie', 'voir plan « Voiture »'],
+      ['19', 'En hauteur', 'portique 7 × 190 · passerelle 24 × 212', 'dessinés après les voitures'],
+      ['20', 'Lumière globale', 'dégradé 6 % → −14 % · vignettage', 'vignettage radial 62 % → 100 %, α .5']
+    ].map(l => ({ i: l[0], n: l[1], v: l[2], d: l[3] }));
+    const Lp = (a, b) => [a, [a[0] + (b[0] - a[0]) / 3, a[1] + (b[1] - a[1]) / 3], [a[0] + 2 * (b[0] - a[0]) / 3, a[1] + 2 * (b[1] - a[1]) / 3], b];
+    const SEG = [Lp([470, 160], [1440, 160]), [[1440, 160], [1500, 160], [1545, 190], [1545, 250]], Lp([1545, 250], [1545, 470]), [[1545, 470], [1545, 520], [1615, 520], [1615, 570]], [[1615, 570], [1615, 620], [1560, 620], [1560, 670]], [[1560, 670], [1560, 740], [1760, 720], [1760, 820]], [[1760, 820], [1760, 900], [1700, 950], [1620, 950]], Lp([1620, 950], [1120, 950]), [[1120, 950], [1040, 950], [1000, 910], [1000, 840]], Lp([1000, 840], [1000, 650]), [[1000, 650], [1000, 530], [840, 530], [840, 650]], Lp([840, 650], [840, 760]), [[840, 760], [840, 830], [800, 850], [720, 850]], Lp([720, 850], [600, 850]), [[600, 850], [450, 850], [380, 770], [380, 640]], Lp([380, 640], [380, 300]), [[380, 300], [380, 200], [400, 160], [470, 160]]];
+    const r = n => Math.round(n);
+    const trackD = 'M470 160 ' + SEG.map(s => 'C' + [s[1], s[2], s[3]].map(p => r(p[0]) + ' ' + r(p[1])).join(', ')).join(' ') + ' Z';
+    const names = ['ligne droite', 'T1', '', 'T2', 'T3', 'T4', 'T5', 'droite opposée', 'T6', '', 'T7 épingle', '', 'T8', '', 'T9', '', 'T10'];
+    const segTxt = 'M 470 160\n' + SEG.map((s, i) => {
+      const isL = Math.abs(s[1][0] - (s[0][0] + (s[3][0] - s[0][0]) / 3)) < .5 && Math.abs(s[1][1] - (s[0][1] + (s[3][1] - s[0][1]) / 3)) < .5;
+      return (isL ? 'L ' + r(s[3][0]) + ' ' + r(s[3][1]) : 'C ' + [s[1], s[2], s[3]].map(p => r(p[0]) + ' ' + r(p[1])).join(', ')) + (names[i] ? '   // ' + names[i] : '');
+    }).join('\n') + '\nZ\n\nStands : M 400 520 C 430 450, 450 380, 470 330\n  C 490 285, 520 258, 600 258 L 1340 258\n  C 1420 258, 1470 290, 1485 350 L 1500 470';
+    const tlabels = [['T1', 1600, 140], ['T2', 1690, 520], ['T3', 1500, 680], ['T4', 1840, 780], ['T5', 1760, 1010], ['T6', 1060, 1040], ['T7', 920, 470], ['T8', 780, 930], ['T9', 330, 900], ['T10', 320, 180]].map(t => ({ n: t[0], x: t[1], y: t[2] }));
+    const teams = [
+      ['Halden', ['#2f7bff', '#ffffff', '#0d1b3d', '#7bb0ff', '#1846b8'], '#4 KAR · #22 ODE'], ['Corsa Nera', ['#ff8a1f', '#15171b', '#ffd166', '#ffb46a', '#cf5e08'], '#7 MIR · #31 ADE'],
+      ['Velis GP', ['#19c3a6', '#0b2a33', '#e8fffb', '#62e3cc', '#0c8a75'], '#16 TAV'], ['Kestrel', ['#f2c200', '#1b1b1b', '#ffffff', '#ffe066', '#bf9500'], '#9 LUN'],
+      ['Ardent', ['#d9dde3', '#1d1f24', '#00a3c7', '#f6f7f9', '#9aa1aa'], '#27 SKO'], ['Moravia', ['#c0186b', '#ffd1e6', '#2a0a1a', '#e45a9f', '#850d49'], '#11 BRE'],
+      ['Aurel', ['#1f8a4c', '#d4af37', '#0d2b1a', '#46b977', '#125f33'], '#63 ROW'], ['Novaro', ['#1b2a5c', '#ff5a36', '#ffffff', '#40549a', '#0e1838'], '#18 FEN'],
+      ['Sable', ['#26272b', '#c9a24a', '#c9a24a', '#4a4c52', '#121316'], '#5 ILM'], ['Tessa', ['#8a4b2a', '#f3e2c7', '#f3e2c7', '#b8714a', '#5a2f17'], '#44 YSA']
+    ].map(t => ({ n: t[0], c: t[1], d: t[2] }));
+    const night = [
+      { a: 'Teinte décor :', b: '#02050c à 35 % sur tout ce qui n’est pas la piste.' },
+      { a: 'Projecteurs :', b: '14 halos r 190 px sur l’axe, dégradé #fff2d2 34 % → 0, mode « screen » ; mâts Ø 7 à ±118 px.' },
+      { a: 'Phares :', b: 'cône 134 × 96 px devant le nez, #fff8e6 55 % → 0.' },
+      { a: 'Freinage :', b: 'halo rouge r 26 flou 9 à 55 % derrière la voiture, en plus du feu.' },
+      { a: 'Interface :', b: 'verre 92 %, filet 16 %, accent #ff2a1f (plus lumineux).' }
+    ];
+    const rain = [
+      { a: 'Piste brillante :', b: 'reflet #bcd6ee trait 40 flou 9 à 24 % + flaques ellipses #9fc0dc 28 %.' },
+      { a: 'Gerbes :', b: 'ellipse 132 × 48 + deux 64 × 16 derrière les roues AR, flou 3–9.' },
+      { a: 'Gouttes :', b: 'motif 24 × 48 de deux traits 1 px, défilement (−24, +48) en 320 ms.' },
+      { a: 'Reflets voitures :', b: 'copie floue (9) couleur p1 à 35 %, décalée de +16 px.' },
+      { a: 'Pneus :', b: 'I vert ou W bleu ; feu AR allumé en permanence ; DRS désactivé.' }
+    ];
+    const adapt = [
+      { a: 'Échelle monde :', b: 's = min(W / 1920, H / 1080) → 0,667 à 1280 × 720 : piste 67 px, voiture 51 px. Toutes les épaisseurs suivent s.' },
+      { a: 'Plancher :', b: 'traits fins (traces, joints, liserés) jamais sous 1 px ; textes au sol (DRS, numéros de grille) masqués si s < 0,75.' },
+      { a: 'Caméra :', b: 'vue circuit complet par défaut ; si W < 1600, option caméra suiveuse ×1,4 centrée sur la voiture suivie (lerp 0,1).' },
+      { a: 'Interface :', b: 'tailles « M » du design system (classement 210, HUD 400 × 184, mini-carte 240 × 172). Les marges restent 12 px.' },
+      { a: 'Coût :', b: 'décor statique dessiné une fois dans un p5.Graphics, seules voitures et effets sont redessinés à 60 i/s.' }
+    ];
+    return { pal, layers, trackD, segTxt, tlabels, teams, night, rain, adapt };
+  }
+}
+</script>
+</body>
+</html>

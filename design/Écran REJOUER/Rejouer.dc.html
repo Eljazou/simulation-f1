@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Écran Rejouer</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.cond{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
+@keyframes pop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.25);opacity:1}100%{transform:scale(1);opacity:1}}
+.dot{width:14px;height:14px;border-radius:50%}
+.lit{animation:pop .25s ease-out both}
+kbd{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 8px;box-sizing:border-box;border-radius:5px;background:#1d2128;border:1px solid rgba(255,255,255,.14);border-bottom-width:2px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:#e6edf3}
+</style>
+</helmet>
+<div style="width:1280px;height:720px;position:relative;overflow:hidden;font-family:'Barlow',sans-serif;color:#e6edf3;background:#0b0d10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px">
+<div aria-hidden="true" style="position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.05) 1.2px,transparent 1.2px);background-size:20px 20px"></div>
+<h1 role="img" aria-label="Rejouer" style="margin:0;position:relative;display:flex;gap:20px">
+<sc-for list="{{letters}}" as="L" hint-placeholder-count="7">
+<span style="display:grid;grid-template-columns:repeat(5,14px);gap:6px">
+<sc-for list="{{L.dots}}" as="d" hint-placeholder-count="35"><span class="{{d.cls}}" style="{{d.s}}"></span></sc-for>
+</span>
+</sc-for>
+</h1>
+<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:18px">
+<div style="display:flex;gap:10px">
+<button class="cond" style="height:48px;padding:0 28px;border-radius:6px;border:0;background:{{accent}};color:#fff;font-size:18px;font-weight:700;letter-spacing:.1em;cursor:pointer">NOUVELLE COURSE</button>
+<button class="cond" style="height:48px;padding:0 22px;border-radius:6px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#e6edf3;font-size:18px;font-weight:600;letter-spacing:.1em;cursor:pointer">CHANGER DE SCÉNARIO</button>
+</div>
+<span style="display:flex;align-items:center;gap:8px;font-size:13px;color:#8b949e"><kbd>Entrée</kbd> rejouer · <kbd>Échap</kbd> menu</span>
+</div>
+<div style="position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:28px;padding:10px 20px;border-radius:8px;background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08)">
+<span style="display:flex;flex-direction:column;align-items:center"><span class="lbl" style="font-size:10px">Dernier résultat</span><span class="cond" style="font-size:20px;font-weight:700">P1 · MIR</span></span>
+<span style="display:flex;flex-direction:column;align-items:center"><span class="lbl" style="font-size:10px">Meilleur tour</span><span class="mono" style="font-size:15px;color:#c9a6ff;margin-top:3px">1:32.006</span></span>
+<span style="display:flex;flex-direction:column;align-items:center"><span class="lbl" style="font-size:10px">Dépassements</span><span class="cond" style="font-size:20px;font-weight:700">2</span></span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#e10600"},"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const accent = this.props.accent ?? '#e10600';
+    const G = {
+      R: ['11110','10001','10001','11110','10100','10010','10001'],
+      E: ['11111','10000','10000','11110','10000','10000','11111'],
+      J: ['00111','00010','00010','00010','00010','10010','01100'],
+      O: ['01110','10001','10001','10001','10001','10001','01110'],
+      U: ['10001','10001','10001','10001','10001','10001','01110']
+    };
+    const word = 'REJOUER'.split('');
+    const letters = word.map((ch, li) => {
+      const dots = [];
+      for (let r = 0; r < 7; r++) for (let c = 0; c < 5; c++) {
+        const on = G[ch][r][c] === '1';
+        const delay = ((li * 5 + c) * 22 + r * 10);
+        dots.push(on ? { cls: 'dot lit', s: 'background:' + (li === 0 ? accent : '#f2f4f7') + ';box-shadow:0 0 10px ' + (li === 0 ? accent + '99' : 'rgba(255,255,255,.35)') + ';animation-delay:' + delay + 'ms' }
+                     : { cls: 'dot', s: 'background:rgba(255,255,255,.06)' });
+      }
+      return { dots };
+    });
+    return { letters, accent };
+  }
+}
+</script>
+</body>
+</html>

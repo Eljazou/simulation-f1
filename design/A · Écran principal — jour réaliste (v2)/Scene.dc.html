@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Scène de course — calque canvas</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width:1920px;height:1080px;position:relative;overflow:hidden;background:{{T.grassA}};font-family:'Barlow Condensed',sans-serif">
+<svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position:absolute;inset:0;display:block">
+<defs>
+<pattern id="sc-grass" width="96" height="96" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)"><rect width="96" height="96" fill="{{T.grassA}}"></rect><rect width="48" height="96" fill="{{T.grassB}}"></rect></pattern>
+<pattern id="sc-crowd" width="7" height="7" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="{{T.standBase}}"></rect><circle cx="1.8" cy="1.8" r="1.4" fill="{{T.c1}}"></circle><circle cx="5.3" cy="2.4" r="1.4" fill="{{T.c2}}"></circle><circle cx="2.6" cy="5.4" r="1.4" fill="{{T.c3}}"></circle><circle cx="5.9" cy="5.8" r="1.3" fill="{{T.c4}}"></circle></pattern>
+<pattern id="sc-gravel" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="{{T.gravel}}"></rect><circle cx="1.5" cy="1.5" r=".8" fill="{{T.gravelDot}}"></circle><circle cx="4.5" cy="4" r=".7" fill="{{T.gravelDot}}"></circle></pattern>
+<pattern id="sc-roof" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="{{T.roof}}"></rect><rect width="8" height="1.2" fill="#000" opacity=".18"></rect></pattern>
+<pattern id="sc-carbon" width="2.4" height="2.4" patternUnits="userSpaceOnUse"><rect width="2.4" height="2.4" fill="#16181c"></rect><rect width="1.2" height="1.2" fill="#22252a"></rect><rect x="1.2" y="1.2" width="1.2" height="1.2" fill="#22252a"></rect></pattern>
+<pattern id="sc-rain" width="24" height="48" patternUnits="userSpaceOnUse"><line x1="20" y1="0" x2="12" y2="18" stroke="#dbe8f5" stroke-width="1" opacity=".35"></line><line x1="8" y1="26" x2="2" y2="40" stroke="#dbe8f5" stroke-width="1" opacity=".25"></line></pattern>
+<filter id="sc-grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="7" result="n"></feTurbulence><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.6 0 0 0 -.72"></feColorMatrix><feComposite in2="SourceGraphic" operator="in"></feComposite></filter>
+<filter id="sc-grainD" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="21" result="n"></feTurbulence><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.6 0 0 0 -.7"></feColorMatrix><feComposite in2="SourceGraphic" operator="in"></feComposite></filter>
+<filter id="sc-b2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2"></feGaussianBlur></filter>
+<filter id="sc-b3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="sc-b5" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+<filter id="sc-b9" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="sc-desat"><feColorMatrix type="saturate" values=".12"></feColorMatrix><feComponentTransfer><feFuncR type="linear" slope=".7"></feFuncR><feFuncG type="linear" slope=".7"></feFuncG><feFuncB type="linear" slope=".7"></feFuncB></feComponentTransfer></filter>
+<radialGradient id="sc-pool"><stop offset="0%" stop-color="#fff2d2" stop-opacity=".34"></stop><stop offset="60%" stop-color="#ffe9b8" stop-opacity=".12"></stop><stop offset="100%" stop-color="#ffe9b8" stop-opacity="0"></stop></radialGradient>
+<linearGradient id="sc-beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fff8e6" stop-opacity=".55"></stop><stop offset="100%" stop-color="#fff8e6" stop-opacity="0"></stop></linearGradient>
+<linearGradient id="sc-light" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffffff" stop-opacity="{{T.lightTop}}"></stop><stop offset="100%" stop-color="#000000" stop-opacity="{{T.lightBot}}"></stop></linearGradient>
+<radialGradient id="sc-vig" cx="50%" cy="50%" r="72%"><stop offset="62%" stop-color="#000" stop-opacity="0"></stop><stop offset="100%" stop-color="#000" stop-opacity="{{T.vig}}"></stop></radialGradient>
+<sc-for list="{{teams}}" as="g" hint-placeholder-count="10">
+<linearGradient id="{{g.gid}}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="{{g.lt}}"></stop><stop offset="48%" stop-color="{{g.p1}}"></stop><stop offset="100%" stop-color="{{g.dk}}"></stop></linearGradient>
+</sc-for>
+</defs>
+
+<!-- 1. herbe tondue -->
+<rect width="1920" height="1080" fill="url(#sc-grass)"></rect>
+
+<!-- 2. clôture, mur béton, bande d'herbe intérieure (offset 120 px de l'axe) -->
+<g fill="none" stroke-linejoin="round">
+<path d="{{trackD}}" stroke="#000" stroke-width="262" opacity="{{T.wallShadow}}" filter="url(#sc-b5)" transform="translate(5 7)"></path>
+<path d="{{trackD}}" stroke="{{T.fence}}" stroke-width="256" stroke-dasharray="1.5 4"></path>
+<path d="{{trackD}}" stroke="{{T.wall}}" stroke-width="249"></path>
+<path d="{{trackD}}" stroke="url(#sc-grass)" stroke-width="241"></path>
+</g>
+
+<!-- 3. dégagements : asphalte coloré rouge/bleu, asphalte gris, bacs à gravier -->
+<g fill="none">
+<sc-for list="{{runColor}}" as="r" hint-placeholder-count="2">
+<path d="{{r.d}}" stroke="{{T.runA}}" stroke-width="226"></path>
+<path d="{{r.d}}" stroke="{{T.runB}}" stroke-width="226" stroke-dasharray="22 22"></path>
+</sc-for>
+<sc-for list="{{runGrey}}" as="r" hint-placeholder-count="2"><path d="{{r.d}}" stroke="{{T.runGrey}}" stroke-width="200" stroke-linecap="round"></path></sc-for>
+</g>
+<sc-for list="{{gravel}}" as="g" hint-placeholder-count="3"><path d="{{g.d}}" fill="url(#sc-gravel)" stroke="{{T.gravelDot}}" stroke-width="1.5"></path></sc-for>
+<sc-for list="{{puddles}}" as="p" hint-placeholder-count="4"><ellipse cx="{{p.x}}" cy="{{p.y}}" rx="{{p.rx}}" ry="{{p.ry}}" fill="#9fc0dc" opacity="{{T.puddleOp}}"></ellipse></sc-for>
+
+<!-- 4. voie des stands, muret, garages, bâtiment -->
+<g fill="none" stroke-linejoin="round">
+<path d="{{pitD}}" stroke="{{T.white}}" stroke-width="38"></path>
+<path d="{{pitD}}" stroke="{{T.pit}}" stroke-width="33"></path>
+<path d="{{pitD}}" stroke="#fff" stroke-width="33" filter="url(#sc-grain)" opacity=".07"></path>
+</g>
+<line x1="600" y1="226" x2="1342" y2="226" stroke="#000" stroke-width="6" opacity=".3" transform="translate(2 3)"></line>
+<line x1="600" y1="226" x2="1342" y2="226" stroke="{{T.wall}}" stroke-width="5"></line>
+<text x="640" y="263" font-size="13" font-weight="700" fill="#fff" opacity=".55" letter-spacing="1">80</text>
+<rect x="680" y="334" width="660" height="60" fill="#000" opacity=".35" filter="url(#sc-b5)" transform="translate(8 10)"></rect>
+<rect x="680" y="332" width="660" height="60" rx="2" fill="url(#sc-roof)"></rect>
+<rect x="680" y="332" width="660" height="4" fill="#fff" opacity=".12"></rect>
+<sc-for list="{{garages}}" as="g" hint-placeholder-count="10">
+<rect x="{{g.x}}" y="280" width="54" height="52" fill="{{T.garage}}"></rect>
+<rect x="{{g.x}}" y="280" width="54" height="6" fill="{{g.c}}"></rect>
+<rect x="{{g.mx}}" y="242" width="50" height="31" fill="{{g.c}}" opacity=".14" stroke="#fff" stroke-opacity=".45" stroke-width="1"></rect>
+<circle cx="{{g.c1}}" cy="304" r="3.2" fill="{{g.c}}"></circle><circle cx="{{g.c2}}" cy="312" r="3.2" fill="{{g.c}}"></circle><circle cx="{{g.c3}}" cy="300" r="3.2" fill="{{g.c}}"></circle>
+<text x="{{g.tx}}" y="326" text-anchor="middle" font-size="9" font-weight="700" fill="#fff" opacity=".45">{{g.n}}</text>
+</sc-for>
+<rect x="612" y="292" width="50" height="62" fill="#000" opacity=".35" filter="url(#sc-b3)" transform="translate(7 9)"></rect>
+<rect x="612" y="292" width="50" height="62" rx="3" fill="{{T.bldg}}"></rect>
+<rect x="618" y="298" width="38" height="14" fill="#9fc7e6" opacity="{{T.glassOp}}"></rect>
+<g transform="translate(1352 236)"><rect x="-5" y="-9" width="10" height="18" rx="2" fill="#111"></rect><circle cx="0" cy="-4" r="3" fill="#2ecc71"></circle><circle cx="0" cy="4" r="3" fill="#3a1414"></circle></g>
+
+<!-- 5. bâtiments, paddock, tribunes, arbres -->
+<sc-for list="{{blds}}" as="b" hint-placeholder-count="6">
+<rect x="{{b.x}}" y="{{b.y}}" width="{{b.w}}" height="{{b.h}}" fill="#000" opacity=".35" filter="url(#sc-b3)" transform="translate(7 9)"></rect>
+<rect x="{{b.x}}" y="{{b.y}}" width="{{b.w}}" height="{{b.h}}" rx="2" fill="{{b.c}}"></rect>
+</sc-for>
+<sc-for list="{{stands}}" as="s" hint-placeholder-count="5">
+<rect x="{{s.x}}" y="{{s.y}}" width="{{s.w}}" height="{{s.h}}" fill="#000" opacity=".4" filter="url(#sc-b5)" transform="translate(9 11)"></rect>
+<rect x="{{s.x}}" y="{{s.y}}" width="{{s.w}}" height="{{s.h}}" fill="url(#sc-crowd)"></rect>
+<rect x="{{s.rx}}" y="{{s.ry}}" width="{{s.rw}}" height="{{s.rh}}" fill="url(#sc-roof)"></rect>
+<rect x="{{s.x}}" y="{{s.y}}" width="{{s.w}}" height="{{s.h}}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="1.5"></rect>
+</sc-for>
+<sc-for list="{{trees}}" as="t" hint-placeholder-count="20">
+<circle cx="{{t.sx}}" cy="{{t.sy}}" r="{{t.r}}" fill="#000" opacity=".38" filter="url(#sc-b3)"></circle>
+<circle cx="{{t.x}}" cy="{{t.y}}" r="{{t.r}}" fill="{{T.tree}}"></circle>
+<circle cx="{{t.hx}}" cy="{{t.hy}}" r="{{t.hr}}" fill="{{T.treeHi}}" opacity=".85"></circle>
+</sc-for>
+<rect width="1920" height="1080" fill="{{T.nightTint}}" opacity="{{T.nightOp}}"></rect>
+
+<!-- 6. piste : vibreurs (virages seulement), ligne blanche, asphalte + grain -->
+<g fill="none">
+<sc-for list="{{kerbs}}" as="k" hint-placeholder-count="10">
+<path d="{{k.d}}" stroke="{{T.kerbW}}" stroke-width="122"></path>
+<path d="{{k.d}}" stroke="{{T.kerbR}}" stroke-width="122" stroke-dasharray="10 10"></path>
+</sc-for>
+<path d="{{trackD}}" stroke="{{T.white}}" stroke-width="107" stroke-linejoin="round"></path>
+<path d="{{trackD}}" stroke="{{T.asph}}" stroke-width="100" stroke-linejoin="round"></path>
+<path d="{{trackD}}" stroke="{{T.asphHi}}" stroke-width="60" stroke-linejoin="round" opacity=".5" filter="url(#sc-b9)"></path>
+<path d="{{trackD}}" stroke="#fff" stroke-width="100" stroke-linejoin="round" filter="url(#sc-grain)" opacity=".09"></path>
+<path d="{{trackD}}" stroke="#000" stroke-width="100" stroke-linejoin="round" filter="url(#sc-grainD)" opacity=".16"></path>
+<path d="{{trackD}}" stroke="{{T.race}}" stroke-width="30" stroke-linejoin="round" opacity=".55" filter="url(#sc-b3)"></path>
+<sc-for list="{{rubber}}" as="r" hint-placeholder-count="6"><path d="{{r.d}}" stroke="{{T.rubber}}" stroke-width="26" stroke-linecap="round" opacity=".45" filter="url(#sc-b3)"></path></sc-for>
+<sc-for list="{{skids}}" as="s" hint-placeholder-count="12"><path d="{{s.d}}" stroke="#0e0f11" stroke-width="2.4" stroke-linecap="round" opacity="{{s.o}}"></path></sc-for>
+<path d="{{trackD}}" stroke="#bcd6ee" stroke-width="40" stroke-linejoin="round" opacity="{{T.sheenOp}}" filter="url(#sc-b9)"></path>
+</g>
+<g fill="{{T.patch}}" opacity=".6"><rect x="1000" y="111" width="3" height="98"></rect><rect x="1182" y="122" width="58" height="40"></rect><rect x="1388" y="901" width="3" height="98"></rect><rect x="1001" y="700" width="40" height="52"></rect></g>
+<sc-for list="{{marbles}}" as="m" hint-placeholder-count="30"><circle cx="{{m.x}}" cy="{{m.y}}" r="1.3" fill="#141518" opacity=".75"></circle></sc-for>
+
+<!-- 7. marquages : grille, ligne d'arrivée à damier, DRS -->
+<sc-for list="{{grid}}" as="g" hint-placeholder-count="12">
+<path d="{{g.d}}" stroke="#fff" stroke-width="2.4" fill="none" opacity=".85"></path>
+<text x="{{g.tx}}" y="{{g.ty}}" font-size="10" font-weight="700" fill="#fff" opacity=".6" text-anchor="middle">{{g.n}}</text>
+</sc-for>
+<g transform="translate(800 110)"><sc-for list="{{checker}}" as="q" hint-placeholder-count="40"><rect x="{{q.x}}" y="{{q.y}}" width="5" height="5" fill="{{q.c}}"></rect></sc-for></g>
+<line x1="560" y1="111" x2="560" y2="209" stroke="#fff" stroke-width="2" opacity=".55" stroke-dasharray="6 4"></line>
+<text x="588" y="203" font-size="20" font-weight="700" fill="#fff" opacity=".42" letter-spacing="3">DRS</text>
+<line x1="331" y1="430" x2="429" y2="430" stroke="#fff" stroke-width="2" opacity=".55" stroke-dasharray="6 4"></line>
+<text x="440" y="434" font-size="10" font-weight="700" fill="#fff" opacity=".6">DÉTECTION DRS</text>
+<line x1="1580" y1="901" x2="1580" y2="999" stroke="#fff" stroke-width="2" opacity=".55" stroke-dasharray="6 4"></line>
+<text x="1540" y="993" font-size="20" font-weight="700" fill="#fff" opacity=".42" letter-spacing="3" transform="rotate(180 1563 986)">DRS</text>
+
+<!-- 8. bordure : pneus empilés, panneaux de freinage, publicités, projecteurs -->
+<sc-for list="{{tyres}}" as="p" hint-placeholder-count="40"><circle cx="{{p.x}}" cy="{{p.y}}" r="4.4" fill="#16171a" stroke="#4a4d52" stroke-width="1.6"></circle></sc-for>
+<sc-for list="{{boards}}" as="b" hint-placeholder-count="9">
+<g transform="{{b.tf}}"><rect x="-12" y="-7" width="24" height="14" rx="1.5" fill="#f2f2f2" stroke="#1a1a1a" stroke-width="1"></rect><text x="0" y="3.6" text-anchor="middle" font-size="10" font-weight="700" fill="#111">{{b.t}}</text></g>
+</sc-for>
+<sc-for list="{{ads}}" as="a" hint-placeholder-count="6">
+<g transform="{{a.tf}}"><rect x="-56" y="-6" width="112" height="12" fill="{{a.bg}}"></rect><text x="0" y="4" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="2.5" fill="{{a.fg}}">{{a.t}}</text></g>
+</sc-for>
+
+<!-- 9. halos des projecteurs (nuit) -->
+<g opacity="{{T.poolOp}}" style="mix-blend-mode:screen">
+<sc-for list="{{lights}}" as="l" hint-placeholder-count="14"><circle cx="{{l.x}}" cy="{{l.y}}" r="190" fill="url(#sc-pool)"></circle></sc-for>
+</g>
+<g opacity="{{T.poolOp}}"><sc-for list="{{posts}}" as="l" hint-placeholder-count="14"><circle cx="{{l.x}}" cy="{{l.y}}" r="9" fill="#fff3d6" opacity=".35" filter="url(#sc-b3)"></circle><circle cx="{{l.x}}" cy="{{l.y}}" r="3.5" fill="#fffaf0"></circle></sc-for></g>
+
+<!-- 10. reflets sous voitures (pluie) + ombres portées -->
+<sc-for list="{{cars}}" as="c" hint-placeholder-count="12">
+<g transform="{{c.tfR}}" opacity="{{T.reflOp}}"><rect x="-38" y="-14" width="76" height="28" rx="10" fill="{{c.p1}}" filter="url(#sc-b9)"></rect></g>
+<g transform="{{c.tfS}}"><rect x="-37" y="-14.5" width="74" height="29" rx="10" fill="#000" opacity="{{T.carShadow}}" filter="url(#sc-b3)"></rect></g>
+</sc-for>
+
+<!-- 11. voitures : effets arrière, roues, carrosserie -->
+<sc-for list="{{cars}}" as="c" hint-placeholder-count="12">
+<g transform="{{c.tf}}" filter="{{c.filt}}">
+<g opacity="{{c.sprayOp}}"><ellipse cx="-92" cy="0" rx="66" ry="24" fill="#e6eef6" opacity=".32" filter="url(#sc-b9)"></ellipse><ellipse cx="-56" cy="-14" rx="32" ry="8" fill="#f1f6fb" opacity=".5" filter="url(#sc-b3)"></ellipse><ellipse cx="-56" cy="14" rx="32" ry="8" fill="#f1f6fb" opacity=".5" filter="url(#sc-b3)"></ellipse></g>
+<g opacity="{{c.speedOp}}" stroke="#ffffff" stroke-width="1" fill="none" stroke-dasharray="34 26" stroke-linecap="round">
+<line x1="-46" y1="-12" x2="-170" y2="-12" opacity=".3"><animate attributeName="stroke-dashoffset" from="0" to="60" dur=".3s" repeatCount="indefinite"></animate></line>
+<line x1="-46" y1="12" x2="-150" y2="12" opacity=".3"><animate attributeName="stroke-dashoffset" from="20" to="80" dur=".3s" repeatCount="indefinite"></animate></line>
+<line x1="-30" y1="-24" x2="-120" y2="-26" opacity=".18"><animate attributeName="stroke-dashoffset" from="10" to="70" dur=".3s" repeatCount="indefinite"></animate></line>
+<line x1="-30" y1="24" x2="-130" y2="26" opacity=".18"><animate attributeName="stroke-dashoffset" from="40" to="100" dur=".3s" repeatCount="indefinite"></animate></line>
+</g>
+<g opacity="{{c.slipOp}}" stroke="#eaf5ff" stroke-width="1.1" fill="none" stroke-dasharray="14 10" stroke-linecap="round">
+<path d="M -42 -7 C -70 -12, -100 -3, -140 -9" opacity=".7"><animate attributeName="stroke-dashoffset" from="0" to="48" dur=".45s" repeatCount="indefinite"></animate></path>
+<path d="M -42 0 C -75 4, -110 -3, -150 1" opacity=".55"><animate attributeName="stroke-dashoffset" from="12" to="60" dur=".45s" repeatCount="indefinite"></animate></path>
+<path d="M -42 7 C -70 12, -100 3, -140 9" opacity=".7"><animate attributeName="stroke-dashoffset" from="24" to="72" dur=".45s" repeatCount="indefinite"></animate></path>
+</g>
+<g transform="{{c.markRot}}" opacity="{{c.slideOp}}">
+<path d="M -24 -12 C -60 -13, -100 -8, -160 4" stroke="#0e0f11" stroke-width="4" fill="none" opacity=".5"></path>
+<path d="M -24 12 C -60 12, -100 15, -160 24" stroke="#0e0f11" stroke-width="4" fill="none" opacity=".5"></path>
+<circle cx="-42" cy="-17" r="11" fill="#eceef0" opacity=".5" filter="url(#sc-b3)"><animate attributeName="r" values="9;14;9" dur=".9s" repeatCount="indefinite"></animate></circle>
+<circle cx="-66" cy="-21" r="17" fill="#eceef0" opacity=".35" filter="url(#sc-b5)"></circle>
+<circle cx="-96" cy="-19" r="24" fill="#eceef0" opacity=".22" filter="url(#sc-b9)"></circle>
+<circle cx="-42" cy="17" r="11" fill="#eceef0" opacity=".5" filter="url(#sc-b3)"><animate attributeName="r" values="12;8;12" dur=".9s" repeatCount="indefinite"></animate></circle>
+<circle cx="-68" cy="22" r="18" fill="#eceef0" opacity=".33" filter="url(#sc-b5)"></circle>
+</g>
+<g opacity="{{c.sparkOp}}" stroke-linecap="round">
+<g><animate attributeName="opacity" values="1;.25;.9;.4;1" dur=".22s" repeatCount="indefinite"></animate>
+<line x1="-26" y1="-3" x2="-58" y2="-10" stroke="#ffd36e" stroke-width="1.3"></line><line x1="-26" y1="2" x2="-66" y2="4" stroke="#ffb347" stroke-width="1.1"></line><line x1="-28" y1="4" x2="-52" y2="14" stroke="#fff1b0" stroke-width="1"></line><line x1="-28" y1="-5" x2="-46" y2="-17" stroke="#ff9d2e" stroke-width="1"></line>
+<circle cx="-70" cy="-6" r="1.2" fill="#ffd36e"></circle><circle cx="-62" cy="12" r="1" fill="#ffb347"></circle><circle cx="-76" cy="3" r="1" fill="#fff1b0"></circle>
+</g>
+</g>
+<g opacity="{{c.smokeOp}}">
+<circle cx="10" cy="-18" r="5" fill="#dfe2e6" opacity=".45" filter="url(#sc-b2)"><animate attributeName="r" values="4;7;4" dur=".6s" repeatCount="indefinite"></animate></circle>
+<circle cx="-2" cy="-20" r="8" fill="#dfe2e6" opacity=".3" filter="url(#sc-b3)"></circle><circle cx="-18" cy="-21" r="11" fill="#dfe2e6" opacity=".18" filter="url(#sc-b5)"></circle>
+<circle cx="10" cy="18" r="5" fill="#dfe2e6" opacity=".45" filter="url(#sc-b2)"><animate attributeName="r" values="6;4;6" dur=".6s" repeatCount="indefinite"></animate></circle>
+<circle cx="-2" cy="20" r="8" fill="#dfe2e6" opacity=".3" filter="url(#sc-b3)"></circle><circle cx="-18" cy="21" r="11" fill="#dfe2e6" opacity=".18" filter="url(#sc-b5)"></circle>
+</g>
+<g opacity="{{c.beamOp}}"><path d="M 36 -6 L 170 -48 L 170 48 L 36 6 Z" fill="url(#sc-beam)"></path></g>
+<circle cx="-46" cy="0" r="26" fill="#ff2a1f" opacity="{{c.haloOp}}" filter="url(#sc-b9)"></circle>
+
+<rect x="-31" y="-16" width="15" height="7" rx="2.4" fill="#111215"></rect><rect x="-31" y="9" width="15" height="7" rx="2.4" fill="#111215"></rect>
+<rect x="-30" y="-16" width="13" height="1.6" fill="{{c.tyre}}"></rect><rect x="-30" y="14.4" width="13" height="1.6" fill="{{c.tyre}}"></rect>
+<rect x="-30" y="-10.6" width="13" height="1.2" fill="{{c.tyre}}" opacity=".75"></rect><rect x="-30" y="9.4" width="13" height="1.2" fill="{{c.tyre}}" opacity=".75"></rect>
+<rect x="-25.5" y="-13.7" width="4" height="2.4" rx=".6" fill="#7d838c"></rect><rect x="-25.5" y="11.3" width="4" height="2.4" rx=".6" fill="#7d838c"></rect>
+<g transform="rotate({{c.steer}} 19.5 -12.25)"><rect x="13" y="-15.5" width="13" height="6.5" rx="2.3" fill="#111215"></rect><rect x="14" y="-15.5" width="11" height="1.5" fill="{{c.tyre}}"></rect><rect x="14" y="-10.4" width="11" height="1.1" fill="{{c.tyre}}" opacity=".75"></rect><rect x="17.6" y="-13.3" width="3.8" height="2.2" rx=".6" fill="#7d838c"></rect></g>
+<g transform="rotate({{c.steer}} 19.5 12.25)"><rect x="13" y="9" width="13" height="6.5" rx="2.3" fill="#111215"></rect><rect x="14" y="14" width="11" height="1.5" fill="{{c.tyre}}"></rect><rect x="14" y="9.3" width="11" height="1.1" fill="{{c.tyre}}" opacity=".75"></rect><rect x="17.6" y="11.1" width="3.8" height="2.2" rx=".6" fill="#7d838c"></rect></g>
+<g stroke="#0c0d0f" stroke-width="1.1"><line x1="12" y1="-4" x2="18" y2="-10"></line><line x1="24" y1="-3" x2="21" y2="-10"></line><line x1="12" y1="4" x2="18" y2="10"></line><line x1="24" y1="3" x2="21" y2="10"></line><line x1="-19" y1="-6" x2="-23" y2="-10"></line><line x1="-13" y1="-6" x2="-21" y2="-10"></line><line x1="-19" y1="6" x2="-23" y2="10"></line><line x1="-13" y1="6" x2="-21" y2="10"></line></g>
+<circle cx="19.5" cy="-8.6" r="2.6" fill="#ff7a1a" opacity="{{c.brakeOp}}" filter="url(#sc-b2)"></circle><circle cx="19.5" cy="8.6" r="2.6" fill="#ff7a1a" opacity="{{c.brakeOp}}" filter="url(#sc-b2)"></circle><circle cx="-23.5" cy="-8.6" r="2.6" fill="#ff7a1a" opacity="{{c.brakeOp}}" filter="url(#sc-b2)"></circle><circle cx="-23.5" cy="8.6" r="2.6" fill="#ff7a1a" opacity="{{c.brakeOp}}" filter="url(#sc-b2)"></circle>
+<path d="M -29 -11 L 4 -11 L 9 -7 L 9 7 L 4 11 L -29 11 Z" fill="url(#sc-carbon)"></path>
+<rect x="-39.5" y="-14" width="9" height="2" rx=".5" fill="#0d0e10"></rect><rect x="-39.5" y="12" width="9" height="2" rx=".5" fill="#0d0e10"></rect>
+<rect x="-39" y="-12.5" width="4.6" height="25" rx=".6" fill="url(#sc-carbon)"></rect>
+<rect x="-34.8" y="-12" width="2.6" height="24" rx=".5" fill="{{c.p2}}" opacity="{{c.drsC}}"></rect>
+<rect x="-35.2" y="-12" width="1.4" height="24" fill="#050608" opacity="{{c.drsO}}"></rect><rect x="-33.6" y="-12" width="1.2" height="24" fill="{{c.p2}}" opacity="{{c.drsO}}"></rect>
+<path d="M -23 -9.5 C -12 -11.6, 0 -11, 6 -8 L 7 -5 L 7 5 L 6 8 C 0 11, -12 11.6, -23 9.5 Z" fill="url(#{{c.gid}})"></path>
+<path d="M 3.5 -9.6 L 6.6 -8 L 6.6 -5.4 L 3.5 -6 Z" fill="#050608"></path><path d="M 3.5 9.6 L 6.6 8 L 6.6 5.4 L 3.5 6 Z" fill="#050608"></path>
+<path d="M -19 -10.4 L -6 -10.9 L -6 -8.2 L -19 -7.6 Z" fill="{{c.p2}}"></path><path d="M -19 10.4 L -6 10.9 L -6 8.2 L -19 7.6 Z" fill="{{c.p2}}"></path>
+<path d="M -32 -3 C -20 -3.8, -6 -5.3, 4 -5 L 10 -3.6 L 10 3.6 L 4 5 C -6 5.3, -20 3.8, -32 3 Z" fill="url(#{{c.gid}})"></path>
+<rect x="-30" y="-1" width="40" height="2" fill="{{c.p3}}"></rect>
+<path d="M -18 -9.6 C -8 -10.6, 0 -10.2, 4.5 -8.4" stroke="#fff" stroke-width="1" fill="none" opacity=".35"></path>
+<path d="M -28 -2.6 C -16 -3.2, -4 -4.4, 6 -4.2" stroke="#fff" stroke-width=".8" fill="none" opacity=".3"></path>
+<text x="-15" y="2.3" text-anchor="middle" font-size="6.6" font-weight="700" fill="{{c.numC}}">{{c.num}}</text>
+<ellipse cx="6" cy="0" rx="2.6" ry="1.8" fill="#050608"></ellipse>
+<path d="M 9 -3.2 C 13 -3.7, 17 -3, 18.5 0 C 17 3, 13 3.7, 9 3.2 Z" fill="#07080a"></path>
+<circle cx="12.5" cy="0" r="2.6" fill="{{c.helm}}"></circle><path d="M 13.7 -1.7 A 2.6 2.6 0 0 1 13.7 1.7" stroke="#0b0b0b" stroke-width="1.2" fill="none"></path>
+<path d="M 9.5 -3.5 C 13 -3.9, 17.5 -2.7, 19 0 C 17.5 2.7, 13 3.9, 9.5 3.5" stroke="#2b2e33" stroke-width="1.4" fill="none"></path><line x1="19" y1="0" x2="22" y2="0" stroke="#2b2e33" stroke-width="1.4"></line>
+<path d="M 18 -3.4 L 33 -1.8 Q 36.5 0 33 1.8 L 18 3.4 Z" fill="url(#{{c.gid}})"></path>
+<path d="M 30 -2.1 L 33 -1.8 Q 36.5 0 33 1.8 L 30 2.1 Z" fill="{{c.p2}}"></path>
+<line x1="15.6" y1="-7.2" x2="15.4" y2="-4" stroke="#1a1b1e" stroke-width=".8"></line><line x1="15.6" y1="7.2" x2="15.4" y2="4" stroke="#1a1b1e" stroke-width=".8"></line>
+<rect x="14.4" y="-9.4" width="3.2" height="2.1" rx=".6" fill="{{c.p1}}"></rect><rect x="14.4" y="7.3" width="3.2" height="2.1" rx=".6" fill="{{c.p1}}"></rect>
+<rect x="30.5" y="-15.5" width="5" height="31" rx="1" fill="url(#sc-carbon)"></rect>
+<rect x="33" y="-15" width="1.8" height="30" fill="{{c.p2}}"></rect><rect x="35" y="-14.5" width="1.3" height="29" fill="{{c.p1}}"></rect>
+<rect x="29" y="-16.6" width="8" height="1.9" rx=".5" fill="#0d0e10"></rect><rect x="29" y="14.7" width="8" height="1.9" rx=".5" fill="#0d0e10"></rect>
+<rect x="-40.6" y="-1.5" width="1.9" height="3" rx=".4" fill="{{c.rl}}"></rect>
+<circle cx="-41" cy="0" r="5" fill="#ff2a1f" opacity="{{c.rlGlow}}" filter="url(#sc-b2)"></circle>
+<g opacity="{{c.crewOp}}">
+<sc-for list="{{c.crew}}" as="m" hint-placeholder-count="0"><circle cx="{{m.x}}" cy="{{m.y}}" r="4.6" fill="{{c.p1}}" stroke="#0b0c0f" stroke-width="1"></circle><circle cx="{{m.x}}" cy="{{m.y}}" r="2" fill="#e8e8e8"></circle></sc-for>
+</g>
+</g>
+</sc-for>
+
+<!-- 12. éléments en hauteur : portique des feux, passerelle -->
+<rect x="815" y="70" width="6" height="190" fill="#000" opacity=".3" filter="url(#sc-b2)"></rect>
+<rect x="808" y="64" width="7" height="190" rx="1" fill="#24272c"></rect>
+<g fill="#3a1212"><circle cx="811.5" cy="130" r="2.4"></circle><circle cx="811.5" cy="142" r="2.4"></circle><circle cx="811.5" cy="154" r="2.4"></circle><circle cx="811.5" cy="166" r="2.4"></circle><circle cx="811.5" cy="178" r="2.4"></circle></g>
+<rect x="608" y="64" width="26" height="210" fill="#000" opacity=".32" filter="url(#sc-b5)"></rect>
+<rect x="596" y="56" width="24" height="212" rx="2" fill="{{T.bridge}}"></rect>
+<rect x="596" y="56" width="3" height="212" fill="#fff" opacity=".25"></rect><rect x="617" y="56" width="3" height="212" fill="#000" opacity=".25"></rect>
+<text x="608" y="160" text-anchor="middle" font-size="11" font-weight="700" letter-spacing="3" fill="#1b1d21" transform="rotate(90 608 160)">VALMORA</text>
+
+<!-- 13. voiture suivie : halo + étiquette -->
+<g transform="{{fol.tp}}">
+<circle r="46" fill="none" stroke="{{accent}}" stroke-width="2.5" opacity=".9"><animate attributeName="r" values="44;76" dur="1.4s" repeatCount="indefinite"></animate><animate attributeName="opacity" values=".9;0" dur="1.4s" repeatCount="indefinite"></animate></circle>
+<circle r="44" fill="none" stroke="{{accent}}" stroke-width="2"></circle>
+<circle r="44" fill="{{accent}}" opacity=".08"></circle>
+</g>
+<g transform="{{fol.tl}}">
+<path d="M -34 -14 H 34 V 8 H 6 L 0 14 L -6 8 H -34 Z" fill="{{accent}}"></path>
+<text x="-8" y="2" text-anchor="middle" font-size="16" font-weight="700" fill="#fff" letter-spacing="1">MIR</text>
+<text x="20" y="2" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" opacity=".8">P2</text>
+</g>
+
+<!-- 14. pluie, lumière globale, vignettage -->
+<rect x="-48" y="-96" width="2040" height="1240" fill="url(#sc-rain)" opacity="{{T.rainOp}}"><animateTransform attributeName="transform" type="translate" from="0 0" to="-24 48" dur=".32s" repeatCount="indefinite"></animateTransform></rect>
+<rect width="1920" height="1080" fill="#162434" opacity="{{T.rainTint}}"></rect>
+<rect width="1920" height="1080" fill="url(#sc-light)"></rect>
+<rect width="1920" height="1080" fill="url(#sc-vig)"></rect>
+</svg>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambiance":{"editor":"enum","options":["jour","nuit","pluie"],"default":"jour"},"accent":{"editor":"color","default":"#e10600"},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const amb = this.props.ambiance ?? 'jour';
+    const accent = this.props.accent ?? '#e10600';
+    const TH = {
+      jour: { grassA: '#2f5634', grassB: '#294d2e', fence: '#5b6066', wall: '#b9bbb7', wallShadow: .35, runA: '#a3343a', runB: '#2f5fa6', runGrey: '#555a61', gravel: '#c9b48a', gravelDot: '#a8936a',
+        white: '#eceef0', asph: '#4a4e55', asphHi: '#5a5f66', race: '#33363b', rubber: '#25272b', patch: '#3e4248', kerbR: '#c8202e', kerbW: '#eef0f2', pit: '#40444a', garage: '#1c1e22', bldg: '#7c838c', roof: '#5d636b', glassOp: .6,
+        tree: '#2b4a29', treeHi: '#3e6a37', standBase: '#3b3f45', c1: '#e8e8e8', c2: '#d04a3a', c3: '#3a6fd0', c4: '#f2c94c', bridge: '#9aa0a6',
+        nightTint: '#02050c', nightOp: 0, poolOp: 0, sheenOp: 0, puddleOp: 0, reflOp: 0, rainOp: 0, rainTint: 0, carShadow: .5, lightTop: .06, lightBot: .14, vig: .5 },
+      nuit: { grassA: '#13241a', grassB: '#102017', fence: '#2f3338', wall: '#73766f', wallShadow: .5, runA: '#5e2025', runB: '#1f3a66', runGrey: '#33373d', gravel: '#6e634c', gravelDot: '#574e3b',
+        white: '#d4d7db', asph: '#2d3137', asphHi: '#3a3f46', race: '#1f2226', rubber: '#16181b', patch: '#272a2f', kerbR: '#a01d27', kerbW: '#cfd2d6', pit: '#2a2e33', garage: '#3a3020', bldg: '#3d434b', roof: '#2e333a', glassOp: .9,
+        tree: '#132514', treeHi: '#1d3a1e', standBase: '#22252a', c1: '#bfc3c8', c2: '#a83a2e', c3: '#2f5aa8', c4: '#c9a640', bridge: '#5d6268',
+        nightTint: '#02050c', nightOp: .35, poolOp: 1, sheenOp: .05, puddleOp: 0, reflOp: .18, rainOp: 0, rainTint: 0, carShadow: .35, lightTop: 0, lightBot: .2, vig: .65 },
+      pluie: { grassA: '#2a4430', grassB: '#253d2a', fence: '#4d5157', wall: '#9a9d9a', wallShadow: .25, runA: '#7e2c31', runB: '#2a4f86', runGrey: '#454a51', gravel: '#9d8c69', gravelDot: '#80714f',
+        white: '#d9dcdf', asph: '#33373c', asphHi: '#4a5866', race: '#2a2d32', rubber: '#2a2d31', patch: '#2b2f34', kerbR: '#a3222d', kerbW: '#d9dcdf', pit: '#33373d', garage: '#1c1e22', bldg: '#646b74', roof: '#4d535b', glassOp: .5,
+        tree: '#25402a', treeHi: '#325a34', standBase: '#33373d', c1: '#d5d9de', c2: '#3a6fd0', c3: '#c9cdd2', c4: '#e0b84a', bridge: '#858b92',
+        nightTint: '#0b141c', nightOp: .18, poolOp: 0, sheenOp: .24, puddleOp: .28, reflOp: .35, rainOp: 1, rainTint: .1, carShadow: .25, lightTop: .02, lightBot: .18, vig: .55 }
+    };
+    const T = TH[amb] || TH.jour;
+    const f = n => Math.round(n * 10) / 10;
+    const Lp = (a, b) => [a, [a[0] + (b[0] - a[0]) / 3, a[1] + (b[1] - a[1]) / 3], [a[0] + 2 * (b[0] - a[0]) / 3, a[1] + 2 * (b[1] - a[1]) / 3], b];
+    const SEG = [
+      Lp([470, 160], [1440, 160]),
+      [[1440, 160], [1500, 160], [1545, 190], [1545, 250]],
+      Lp([1545, 250], [1545, 470]),
+      [[1545, 470], [1545, 520], [1615, 520], [1615, 570]],
+      [[1615, 570], [1615, 620], [1560, 620], [1560, 670]],
+      [[1560, 670], [1560, 740], [1760, 720], [1760, 820]],
+      [[1760, 820], [1760, 900], [1700, 950], [1620, 950]],
+      Lp([1620, 950], [1120, 950]),
+      [[1120, 950], [1040, 950], [1000, 910], [1000, 840]],
+      Lp([1000, 840], [1000, 650]),
+      [[1000, 650], [1000, 530], [840, 530], [840, 650]],
+      Lp([840, 650], [840, 760]),
+      [[840, 760], [840, 830], [800, 850], [720, 850]],
+      Lp([720, 850], [600, 850]),
+      [[600, 850], [450, 850], [380, 770], [380, 640]],
+      Lp([380, 640], [380, 300]),
+      [[380, 300], [380, 200], [400, 160], [470, 160]]
+    ];
+    const P = p => f(p[0]) + ' ' + f(p[1]);
+    const segD = s => 'M' + P(s[0]) + ' C' + P(s[1]) + ', ' + P(s[2]) + ', ' + P(s[3]);
+    const trackD = 'M470 160 ' + SEG.map(s => 'C' + P(s[1]) + ', ' + P(s[2]) + ', ' + P(s[3])).join(' ') + ' Z';
+    const bez = (s, t) => {
+      const u = 1 - t;
+      const x = u * u * u * s[0][0] + 3 * u * u * t * s[1][0] + 3 * u * t * t * s[2][0] + t * t * t * s[3][0];
+      const y = u * u * u * s[0][1] + 3 * u * u * t * s[1][1] + 3 * u * t * t * s[2][1] + t * t * t * s[3][1];
+      const dx = 3 * u * u * (s[1][0] - s[0][0]) + 6 * u * t * (s[2][0] - s[1][0]) + 3 * t * t * (s[3][0] - s[2][0]);
+      const dy = 3 * u * u * (s[1][1] - s[0][1]) + 6 * u * t * (s[2][1] - s[1][1]) + 3 * t * t * (s[3][1] - s[2][1]);
+      return { x, y, a: Math.atan2(dy, dx) * 180 / Math.PI };
+    };
+    const at = (i, t, lat) => { const p = bez(SEG[i], t); const r = p.a * Math.PI / 180; return { x: p.x - Math.sin(r) * lat, y: p.y + Math.cos(r) * lat, a: p.a }; };
+    const offPath = (i, t0, t1, d0, d1, n) => { let s = ''; for (let k = 0; k <= n; k++) { const t = t0 + (t1 - t0) * k / n; const p = at(i, t, d0 + (d1 - d0) * k / n); s += (k ? ' L' : 'M') + f(p.x) + ' ' + f(p.y); } return s; };
+    const pts = []; let tot = 0;
+    SEG.forEach(s => { for (let k = 0; k < 40; k++) { const p = bez(s, k / 40); if (pts.length) { const q = pts[pts.length - 1]; tot += Math.hypot(p.x - q.x, p.y - q.y); } pts.push({ x: p.x, y: p.y, a: p.a, s: tot }); } });
+    const atS = (s, lat) => { s = ((s % tot) + tot) % tot; let k = 0; while (k < pts.length - 1 && pts[k + 1].s < s) k++; const p = pts[k]; const r = p.a * Math.PI / 180; return { x: p.x - Math.sin(r) * lat, y: p.y + Math.cos(r) * lat, a: p.a }; };
+
+    const corners = [1, 3, 4, 5, 6, 8, 10, 12, 14, 16];
+    const kerbs = corners.map(i => ({ d: segD(SEG[i]) }));
+    const runColor = [1, 8].map(i => ({ d: segD(SEG[i]) }));
+    const runGrey = [10, 12].map(i => ({ d: segD(SEG[i]) }));
+    const blob = (i, t0, t1, a, b) => offPath(i, t0, t1, a, a, 16) + ' L' + offPath(i, t1, t0, b, b, 16).slice(1) + ' Z';
+    const gravel = [{ d: blob(6, .05, .95, -64, -114) }, { d: blob(5, .35, 1, -64, -112) }, { d: blob(14, .1, .9, -64, -112) }];
+    const puddles = [{ x: 1600, y: 104, rx: 40, ry: 9 }, { x: 1082, y: 1010, rx: 46, ry: 8 }, { x: 905, y: 492, rx: 30, ry: 7 }, { x: 1820, y: 860, rx: 18, ry: 30 }];
+    const rubber = [1, 8, 10, 12, 3, 14].map(i => ({ d: offPath(i, 0, .55, 0, 0, 12) }));
+    const skids = [];
+    [[1, -1], [8, -1], [10, 1], [3, 1], [12, 1]].forEach(([i, sg], j) => { for (let k = 0; k < 3; k++) skids.push({ d: offPath(i, .02 + k * .04, .42 + k * .05, sg * (14 + k * 7), sg * (4 - k * 6), 10), o: .22 + k * .06 }); });
+    let seed = 11; const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    const marbles = [];
+    [[1, -1], [8, -1], [10, 1], [12, 1], [4, -1]].forEach(([i, sg]) => { for (let k = 0; k < 9; k++) { const p = at(i, .5 + rnd() * .5, sg * (36 + rnd() * 12)); marbles.push({ x: f(p.x), y: f(p.y) }); } });
+    const grid = Array.from({ length: 12 }, (_, k) => { const x = 770 - k * 25, y = 160 + (k % 2 ? 24 : -24); return { d: 'M' + (x - 9) + ' ' + (y - 15) + ' L' + x + ' ' + (y - 15) + ' L' + x + ' ' + (y + 15) + ' L' + (x - 9) + ' ' + (y + 15), tx: x - 16, ty: y + 4, n: String(k + 1) }; });
+    const checker = []; for (let c = 0; c < 2; c++) for (let r = 0; r < 20; r++) checker.push({ x: c * 5, y: r * 5, c: (r + c) % 2 ? '#111' : '#fff' });
+    const tyres = [];
+    [[1, -1, .05, 1], [8, -1, .05, 1], [10, 1, .1, .9], [3, 1, .2, .9], [6, -1, .1, .5]].forEach(([i, sg, a, b]) => { for (let t = a; t <= b; t += .07) { [112, 103].forEach(d => { const p = at(i, t, sg * d); tyres.push({ x: f(p.x), y: f(p.y) }); }); } });
+    const boards = [];
+    [[1250, '150'], [1310, '100'], [1370, '50']].forEach(([x, t]) => boards.push({ tf: 'translate(' + x + ' 88)', t }));
+    [[1210, '50'], [1260, '100'], [1310, '150']].forEach(([x, t]) => boards.push({ tf: 'translate(' + x + ' 878)', t }));
+    [[690, '50'], [740, '100'], [790, '150']].forEach(([y, t]) => boards.push({ tf: 'translate(1074 ' + y + ')', t }));
+    const ads = [
+      { tf: 'translate(720 66)', t: 'KALIX', bg: '#e8e8e8', fg: '#111' }, { tf: 'translate(850 66)', t: 'NORDA', bg: '#1a3d7c', fg: '#fff' },
+      { tf: 'translate(980 66)', t: 'VELTRA', bg: '#111', fg: '#f2c200' }, { tf: 'translate(1110 66)', t: 'ORBIS', bg: '#e8e8e8', fg: '#c8202e' },
+      { tf: 'translate(1648 360) rotate(90)', t: 'MERAN', bg: '#111', fg: '#e8e8e8' }, { tf: 'translate(1340 1024)', t: 'KALIX', bg: '#e8e8e8', fg: '#111' }
+    ];
+    const lights = [], posts = [];
+    for (let k = 0; k < 14; k++) { const p = atS(k * tot / 14 + 60, 0); lights.push({ x: f(p.x), y: f(p.y) }); const q = atS(k * tot / 14 + 60, (k % 2 ? 1 : -1) * 118); posts.push({ x: f(q.x), y: f(q.y) }); }
+
+    const TEAMS = {
+      halden: { p1: '#2f7bff', p2: '#ffffff', p3: '#0d1b3d', lt: '#7bb0ff', dk: '#1846b8', num: '#ffffff', helm: '#ffffff', ui: '#2f7bff' },
+      corsa: { p1: '#ff8a1f', p2: '#15171b', p3: '#ffd166', lt: '#ffb46a', dk: '#cf5e08', num: '#15171b', helm: '#ffd166', ui: '#ff8a1f' },
+      velis: { p1: '#19c3a6', p2: '#0b2a33', p3: '#e8fffb', lt: '#62e3cc', dk: '#0c8a75', num: '#0b2a33', helm: '#e8fffb', ui: '#19c3a6' },
+      kestrel: { p1: '#f2c200', p2: '#1b1b1b', p3: '#ffffff', lt: '#ffe066', dk: '#bf9500', num: '#1b1b1b', helm: '#1b1b1b', ui: '#f2c200' },
+      ardent: { p1: '#d9dde3', p2: '#1d1f24', p3: '#00a3c7', lt: '#f6f7f9', dk: '#9aa1aa', num: '#1d1f24', helm: '#00a3c7', ui: '#d9dde3' },
+      moravia: { p1: '#c0186b', p2: '#ffd1e6', p3: '#2a0a1a', lt: '#e45a9f', dk: '#850d49', num: '#ffffff', helm: '#ffd1e6', ui: '#c0186b' },
+      aurel: { p1: '#1f8a4c', p2: '#d4af37', p3: '#0d2b1a', lt: '#46b977', dk: '#125f33', num: '#ffffff', helm: '#d4af37', ui: '#2fb36a' },
+      novaro: { p1: '#1b2a5c', p2: '#ff5a36', p3: '#ffffff', lt: '#40549a', dk: '#0e1838', num: '#ffffff', helm: '#ff5a36', ui: '#8fa6ff' },
+      sable: { p1: '#26272b', p2: '#c9a24a', p3: '#c9a24a', lt: '#4a4c52', dk: '#121316', num: '#c9a24a', helm: '#c9a24a', ui: '#c9a24a' },
+      tessa: { p1: '#8a4b2a', p2: '#f3e2c7', p3: '#f3e2c7', lt: '#b8714a', dk: '#5a2f17', num: '#ffffff', helm: '#f3e2c7', ui: '#c9773f' }
+    };
+    const teams = Object.keys(TEAMS).map(k => Object.assign({ gid: 'sc-g-' + k }, TEAMS[k]));
+    const TY = { S: '#ff3b30', M: '#f5c518', H: '#f2f2f2', I: '#34c759', W: '#2f80ff' };
+    const wet = amb === 'pluie', night = amb === 'nuit';
+    const D = [
+      ['KAR', 'halden', 4, 'M', { seg: 0, t: .86, lat: 0 }, { spark: 1, slip: 1, speed: 1 }],
+      ['MIR', 'corsa', 7, 'M', { seg: 0, t: .735, lat: 0 }, { slip: 1, speed: 1, follow: 1 }],
+      ['TAV', 'velis', 16, 'S', { seg: 0, t: .645, lat: 28 }, { drs: 1, speed: 1 }],
+      ['ODE', 'halden', 22, 'M', { seg: 7, t: .80, lat: 0 }, { brake: 1 }],
+      ['LUN', 'kestrel', 9, 'H', { seg: 7, t: .60, lat: 0 }, { speed: 1, slip: 1 }],
+      ['SKO', 'ardent', 27, 'M', { seg: 7, t: .42, lat: -4 }, { speed: 1 }],
+      ['BRE', 'moravia', 11, 'S', { seg: 7, t: .25, lat: -28 }, { drs: 1, speed: 1 }],
+      ['ADE', 'corsa', 31, 'M', { seg: 10, t: .60, lat: -24 }, {}],
+      ['ROW', 'aurel', 63, 'S', { seg: 10, t: .565, lat: 26 }, { slide: 1 }],
+      ['FEN', 'novaro', 18, 'H', { x: 1147, y: 258, a: 0 }, { pit: 1 }],
+      ['ILM', 'sable', 5, 'M', { x: 1489, y: 392, a: 84 }, {}],
+      ['YSA', 'tessa', 44, 'S', { x: 1798, y: 978, a: 152 }, { dnf: 1 }]
+    ];
+    const wetTyre = ['I', 'I', 'W', 'I', 'I', 'W', 'I', 'I', 'W', 'W', 'I', 'I'];
+    let fol = { tp: '', tl: '' };
+    const crew = [{ x: 19.5, y: -24 }, { x: 19.5, y: 24 }, { x: -23.5, y: -24 }, { x: -23.5, y: 24 }, { x: 11, y: -28 }, { x: -15, y: 28 }, { x: 46, y: 0 }, { x: -50, y: 0 }, { x: 28, y: -26 }, { x: -32, y: -27 }];
+    const cars = D.map((d, idx) => {
+      const tm = TEAMS[d[1]], fl = d[5], pl = d[4];
+      let x, y, a, steer = 0;
+      if (pl.seg !== undefined) {
+        const p = at(pl.seg, pl.t, pl.lat); x = p.x; y = p.y; a = p.a;
+        let df = bez(SEG[pl.seg], Math.min(pl.t + .05, 1)).a - p.a; df = ((df + 540) % 360) - 180;
+        steer = Math.max(-22, Math.min(22, df * 1.3));
+      } else { x = pl.x; y = pl.y; a = pl.a; }
+      const yaw = fl.slide ? -20 : 0;
+      if (fl.slide) steer = 14;
+      const moving = !fl.pit && !fl.dnf;
+      if (fl.follow) fol = { tp: 'translate(' + f(x) + ' ' + f(y) + ')', tl: 'translate(' + f(x) + ' ' + f(y - 62) + ')' };
+      const braking = !!fl.brake;
+      return {
+        code: d[0], gid: 'sc-g-' + d[1], p1: tm.p1, p2: tm.p2, p3: tm.p3, numC: tm.num, helm: tm.helm, num: String(d[2]),
+        tyre: TY[wet ? wetTyre[idx] : d[3]],
+        tf: 'translate(' + f(x) + ' ' + f(y) + ') rotate(' + f(a + yaw) + ')',
+        tfS: 'translate(' + f(x + 5) + ' ' + f(y + 7) + ') rotate(' + f(a + yaw) + ')',
+        tfR: 'translate(' + f(x + 2) + ' ' + f(y + 16) + ') rotate(' + f(a + yaw) + ')',
+        steer: f(steer), markRot: 'rotate(' + (-yaw) + ')',
+        filt: fl.dnf ? 'url(#sc-desat)' : 'none',
+        speedOp: fl.speed && !wet ? .9 : (fl.speed ? .4 : 0), slipOp: fl.slip && !wet ? 1 : 0, slideOp: fl.slide ? 1 : 0,
+        sparkOp: fl.spark ? 1 : 0, smokeOp: braking && !wet ? 1 : 0, brakeOp: braking ? 1 : 0,
+        rl: braking || wet ? '#ff2a1f' : '#5a1512', rlGlow: braking ? .9 : (wet ? .55 : 0), haloOp: braking && night ? .55 : 0,
+        drsO: fl.drs ? 1 : 0, drsC: fl.drs ? 0 : 1,
+        sprayOp: wet && moving ? 1 : 0, beamOp: night && moving ? 1 : 0, crewOp: fl.pit ? 1 : 0, crew: fl.pit ? crew : []
+      };
+    });
+    const order = ['halden', 'corsa', 'velis', 'kestrel', 'ardent', 'moravia', 'aurel', 'novaro', 'sable', 'tessa'];
+    const garages = order.map((k, i) => { const x = 700 + i * 60; return { x, mx: x + 2, tx: x + 27, n: String(i + 1), c: TEAMS[k].ui, c1: x + 12, c2: x + 40, c3: x + 27 }; });
+    const blds = [
+      { x: 520, y: 600, w: 120, h: 76, c: T.bldg }, { x: 1140, y: 540, w: 62, h: 18, c: '#d0d4d9' }, { x: 1212, y: 540, w: 62, h: 18, c: '#d0d4d9' },
+      { x: 1284, y: 540, w: 62, h: 18, c: '#c9cdd3' }, { x: 1356, y: 540, w: 52, h: 18, c: '#d0d4d9' }, { x: 1140, y: 566, w: 62, h: 18, c: '#c9cdd3' },
+      { x: 1212, y: 566, w: 62, h: 18, c: '#d0d4d9' }, { x: 1284, y: 566, w: 62, h: 18, c: '#d0d4d9' }
+    ];
+    const stand = (x, y, w, h, side) => {
+      const r = side === 'top' ? { rx: x, ry: y, rw: w, rh: h * .3 } : side === 'bottom' ? { rx: x, ry: y + h * .7, rw: w, rh: h * .3 } : side === 'right' ? { rx: x + w * .7, ry: y, rw: w * .3, rh: h } : { rx: x, ry: y, rw: w * .3, rh: h };
+      return Object.assign({ x, y, w, h }, r);
+    };
+    const stands = [stand(1682, 292, 96, 176, 'right'), stand(760, 398, 330, 36, 'top'), stand(1132, 790, 296, 38, 'top'), stand(474, 978, 226, 64, 'bottom'), stand(1690, 1048, 180, 30, 'bottom')];
+    const TR = [[540, 470, 18], [600, 452, 13], [690, 480, 16], [702, 565, 15], [690, 655, 17], [545, 720, 19], [622, 722, 15], [700, 728, 13], [1150, 660, 18], [1190, 702, 22], [1242, 650, 16], [1312, 710, 24], [1372, 668, 18], [1402, 742, 15], [1262, 764, 13], [1160, 764, 15], [1404, 622, 13], [1332, 624, 12], [790, 1018, 20], [852, 1046, 18], [742, 1050, 14], [1880, 560, 16], [1892, 640, 13]];
+    const trees = TR.map(([x, y, r]) => ({ x, y, r, sx: x + 7, sy: y + 9, hx: f(x - r * .28), hy: f(y - r * .28), hr: f(r * .55) }));
+    return { T, accent, trackD, pitD: 'M 400 520 C 430 450, 450 380, 470 330 C 490 285, 520 258, 600 258 L 1340 258 C 1420 258, 1470 290, 1485 350 L 1500 470',
+      kerbs, runColor, runGrey, gravel, puddles, rubber, skids, marbles, grid, checker, tyres, boards, ads, lights, posts, teams, cars, fol, garages, blds, stands, trees };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Design system — simulateur F1</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.cond{font-family:'Barlow Condensed',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8b949e}
+.h2{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin:0;display:flex;align-items:center;gap:12px}
+.h2::before{content:'';width:4px;height:24px;border-radius:2px;background:#e10600}
+.card{background:rgba(15,17,21,.85);border:1px solid rgba(255,255,255,.08);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.cap{font-size:12px;color:#a3acb6;line-height:1.45}
+.rng{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;margin:0;background:linear-gradient(90deg,#e10600 0 var(--v),rgba(255,255,255,.14) var(--v) 100%)}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(225,6,0,.35)}
+.rng.hov::-webkit-slider-thumb{box-shadow:0 0 0 6px rgba(225,6,0,.35)}
+.rng.drag::-webkit-slider-thumb{transform:scale(1.15);box-shadow:0 0 0 8px rgba(225,6,0,.3)}
+.rng.dis{background:rgba(255,255,255,.1);opacity:.5}
+.rng.dis::-webkit-slider-thumb{background:#8b949e;box-shadow:none}
+.sw{-webkit-appearance:none;appearance:none;width:32px;height:18px;border-radius:9px;background:rgba(255,255,255,.18);position:relative;margin:0}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw:checked{background:#e10600}.sw:checked::after{transform:translateX(14px)}
+.sw.fo{outline:2px solid #fff;outline-offset:2px}.sw.dis{opacity:.4}
+pre{margin:0;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:#c9d1d9;white-space:pre}
+</style>
+</helmet>
+<div style="width:1920px;height:2700px;box-sizing:border-box;padding:64px 80px;background:#0b0d10;font-family:'Barlow',sans-serif;color:#e6edf3;display:flex;flex-direction:column;gap:56px">
+
+<div style="display:flex;justify-content:space-between;align-items:flex-end">
+<div><div class="lbl" style="color:#e10600;font-size:14px">Simulateur F1 · interface de course</div><h1 class="cond" style="margin:4px 0 0 0;font-size:64px;font-weight:700;letter-spacing:.01em;line-height:1">Design system</h1></div>
+<div class="cap" style="max-width:560px;text-align:right">HTML/CSS superposé au canvas p5.js, sans framework. Tous les tokens existent en variables CSS (bloc « Implémentation »). Direction A — TV officielle sobre.</div>
+</div>
+
+<!-- COULEURS -->
+<section style="display:flex;flex-direction:column;gap:20px">
+<h2 class="h2">Couleurs</h2>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px">
+<sc-for list="{{palettes}}" as="p" hint-placeholder-count="4">
+<div style="display:flex;flex-direction:column;gap:8px">
+<span class="lbl">{{p.name}}</span>
+<sc-for list="{{p.items}}" as="c" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:44px 1fr auto;column-gap:12px;align-items:center;height:44px">
+<span style="width:44px;height:36px;border-radius:6px;background:{{c.v}};box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)"></span>
+<span style="display:flex;flex-direction:column;line-height:1.25"><span class="mono" style="font-size:12px;color:#fff">{{c.t}}</span><span style="font-size:12px;color:#8b949e">{{c.u}}</span></span>
+<span class="mono" style="font-size:11px;color:#a3acb6">{{c.h}}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:28px;align-items:center;padding-top:6px">
+<span class="lbl">Écuries fictives</span>
+<sc-for list="{{teams}}" as="t" hint-placeholder-count="6"><span style="display:flex;align-items:center;gap:8px"><span style="width:4px;height:20px;border-radius:2px;background:{{t.c}}"></span><span style="font-size:14px">{{t.n}}</span><span class="mono" style="font-size:11px;color:#8b949e">{{t.c}}</span></span></sc-for>
+</div>
+</section>
+
+<!-- TYPO + ESPACEMENTS -->
+<section style="display:grid;grid-template-columns:1.25fr 1fr;column-gap:64px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<h2 class="h2">Typographie</h2>
+<div class="card" style="overflow:hidden">
+<sc-for list="{{type}}" as="t" hint-placeholder-count="8">
+<div style="display:grid;grid-template-columns:150px 1fr 230px;column-gap:20px;align-items:center;min-height:56px;padding:6px 20px;border-top:1px solid rgba(255,255,255,.05)">
+<span class="lbl">{{t.name}}</span>
+<span style="{{t.s}}">{{t.ex}}</span>
+<span class="mono" style="font-size:11px;color:#8b949e">{{t.spec}}</span>
+</div>
+</sc-for>
+</div>
+<p class="cap" style="margin:0">Chiffres toujours en <b>tabular-nums</b> (aucune vibration quand ils changent). Plancher absolu : 11 px à 1280×720, jamais en dessous. Libellés en capitales seulement en Barlow Condensed avec interlettrage +0,08 em.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:20px">
+<h2 class="h2">Espacements, forme, mouvement</h2>
+<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;gap:20px;align-items:flex-end">
+<sc-for list="{{space}}" as="s" hint-placeholder-count="6"><span style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:{{s.px}};height:{{s.px}};background:#e10600;border-radius:2px"></span><span class="mono" style="font-size:11px">{{s.n}}</span><span style="font-size:11px;color:#8b949e">{{s.u}}</span></span></sc-for>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+<span style="height:64px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:flex-end;padding:6px 8px;box-sizing:border-box" class="mono"><span style="font-size:11px">8 · panneau</span></span>
+<span style="height:64px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:flex-end;padding:6px 8px;box-sizing:border-box" class="mono"><span style="font-size:11px">6 · bouton</span></span>
+<span style="height:64px;border-radius:4px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:flex-end;padding:6px 8px;box-sizing:border-box" class="mono"><span style="font-size:11px">4 · badge</span></span>
+<span style="height:64px;border-radius:32px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:flex-end;justify-content:center;padding:6px 8px;box-sizing:border-box" class="mono"><span style="font-size:11px">50 % · pastille</span></span>
+</div>
+<div style="display:grid;grid-template-columns:120px 1fr;row-gap:8px;font-size:13px">
+<span class="lbl">Ombre</span><span class="mono" style="font-size:12px">0 8px 24px rgba(0,0,0,.35)</span>
+<span class="lbl">Verre</span><span class="mono" style="font-size:12px">rgba(15,17,21,.85) + blur(14px) + filet blanc 8 %</span>
+<span class="lbl">Rapide</span><span class="mono" style="font-size:12px">150 ms ease-out · survols, interrupteurs</span>
+<span class="lbl">Standard</span><span class="mono" style="font-size:12px">200 ms ease-out · panneau, onglets, bandeau</span>
+<span class="lbl">Lent</span><span class="mono" style="font-size:12px">250 ms ease-in-out · fondus d’événement, flèches ±</span>
+<span class="lbl">Réduit</span><span style="font-size:12px;color:#c9d1d9">prefers-reduced-motion : pas de clignotement DRS (pastille fixe + icône), pas de confettis</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- COMPOSANTS -->
+<section style="display:flex;flex-direction:column;gap:20px">
+<h2 class="h2">Composants et états</h2>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px">
+
+<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+<span class="lbl" style="color:#fff">Boutons · h 36 (32 dans la barre du haut)</span>
+<div style="display:grid;grid-template-columns:90px repeat(4,minmax(0,1fr));gap:10px;align-items:center">
+<span></span><span class="lbl" style="font-size:10px">Repos</span><span class="lbl" style="font-size:10px">Survol</span><span class="lbl" style="font-size:10px">Focus</span><span class="lbl" style="font-size:10px">Désactivé</span>
+<sc-for list="{{buttons}}" as="b" hint-placeholder-count="3">
+<span style="font-size:12px;color:#a3acb6">{{b.name}}</span>
+<sc-for list="{{b.st}}" as="s" hint-placeholder-count="4"><button class="cond" style="{{s}}">{{b.t}}</button></sc-for>
+</sc-for>
+<span style="font-size:12px;color:#a3acb6">Icône</span>
+<sc-for list="{{icons}}" as="s" hint-placeholder-count="4"><button aria-label="Pause" style="{{s}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button></sc-for>
+</div>
+</div>
+
+<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+<span class="lbl" style="color:#fff">Curseur · piste 4 px, poignée 14 px, valeur à droite</span>
+<sc-for list="{{sliders}}" as="s" hint-placeholder-count="4">
+<label style="display:flex;flex-direction:column;gap:6px;opacity:{{s.op}}">
+<span style="display:flex;justify-content:space-between;font-size:13px"><span>{{s.name}}</span><span class="mono" style="font-size:12px;background:rgba(255,255,255,.06);padding:0 6px;border-radius:3px">{{s.val}}</span></span>
+<input type="range" class="{{s.cls}}" value="{{s.v}}" min="0" max="100" style="--v:{{s.v}}%">
+</label>
+</sc-for>
+<span class="lbl" style="color:#fff;margin-top:4px">Interrupteur · 32×18</span>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px">
+<label style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:12px;color:#a3acb6"><input type="checkbox" role="switch" class="sw">Off</label>
+<label style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:12px;color:#a3acb6"><input type="checkbox" role="switch" class="sw" checked="">On</label>
+<label style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:12px;color:#a3acb6"><input type="checkbox" role="switch" class="sw fo" checked="">Focus</label>
+<label style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:12px;color:#a3acb6"><input type="checkbox" role="switch" class="sw dis" disabled="">Désactivé</label>
+</div>
+</div>
+
+<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+<span class="lbl" style="color:#fff">Onglets · h 40, filet actif 2 px</span>
+<div role="tablist" style="display:flex">
+<button role="tab" class="cond" style="flex:1;height:40px;border:0;background:transparent;color:#8b949e;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)">Repos</button>
+<button role="tab" class="cond" style="flex:1;height:40px;border:0;background:rgba(255,255,255,.04);color:#e6edf3;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;box-shadow:inset 0 -1px 0 rgba(255,255,255,.2)">Survol</button>
+<button role="tab" aria-selected="true" class="cond" style="flex:1;height:40px;border:0;background:transparent;color:#fff;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;box-shadow:inset 0 -2px 0 #e10600">Actif</button>
+<button role="tab" class="cond" style="flex:1;height:40px;border:0;background:transparent;color:#8b949e;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;box-shadow:inset 0 -1px 0 rgba(255,255,255,.08);outline:2px solid #fff;outline-offset:-2px;border-radius:4px">Focus</button>
+</div>
+<span class="lbl" style="color:#fff;margin-top:6px">Barres de jauge · h 8</span>
+<sc-for list="{{gauges}}" as="g" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:96px 1fr 40px;align-items:center;gap:10px"><span style="font-size:12px;color:#a3acb6">{{g.n}}</span><span style="height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden"><span style="display:block;height:100%;width:{{g.w}};background:{{g.c}};border-radius:4px"></span></span><span class="mono" style="font-size:11px;text-align:right">{{g.v}}</span></div>
+</sc-for>
+</div>
+
+<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+<span class="lbl" style="color:#fff">Pastilles de pneus · 18 px (16 en 720p)</span>
+<div style="display:flex;gap:18px">
+<sc-for list="{{tyres}}" as="t" hint-placeholder-count="5">
+<span style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:36px;height:36px;border-radius:50%;box-sizing:border-box;border:4px solid {{t.c}};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-size:20px;font-weight:700;color:{{t.c}}">{{t.l}}</span><span style="font-size:12px">{{t.n}}</span><span class="mono" style="font-size:10px;color:#8b949e">{{t.c}}</span></span>
+</sc-for>
+</div>
+<p class="cap" style="margin:0">Contour + lettre (jamais la couleur seule) : lisible en daltonisme et sur fond mouillé.</p>
+</div>
+
+<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+<span class="lbl" style="color:#fff">Badges</span>
+<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+<span class="mono" style="font-size:11px;font-weight:600;color:#0f1115;background:#ff8a1f;padding:1px 6px;border-radius:3px">PIT</span>
+<span class="mono" style="font-size:11px;font-weight:600;color:#ffb066;border:1px solid rgba(255,138,31,.6);padding:0 5px;border-radius:3px">OUT</span>
+<span class="mono" style="font-size:11px;color:#6e7781;border:1px solid rgba(255,255,255,.12);padding:0 5px;border-radius:3px">ABD</span>
+<span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:4px;border:1px solid rgba(255,255,255,.18);color:#6e7781">DRS</span>
+<span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:4px;border:1px solid #2ecc71;color:#2ecc71">DRS</span>
+<span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.1em;padding:2px 8px;border-radius:4px;background:#2ecc71;color:#0f1115">DRS</span>
+<span class="cond" style="font-size:14px;font-weight:700;letter-spacing:.08em;padding:2px 8px;border-radius:4px;background:#f5c518;color:#0f1115">SC</span>
+<span class="mono" style="font-size:12px;color:#c9a6ff">1:31.874</span>
+</div>
+<div class="cap" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 10px"><span>DRS éteint</span><span>DRS disponible (clignote 2 Hz)</span><span>DRS actif</span></div>
+<span class="lbl" style="color:#fff;margin-top:4px">Écarts</span>
+<div style="display:flex;gap:16px" class="mono"><span style="font-size:14px;color:#2ecc71">+1.284 ▾</span><span style="font-size:14px;color:#e74c3c">−0.747 ▾</span><span style="font-size:14px;color:#c9d1d9">+4.556</span><span style="font-size:14px;color:#c9a6ff">1:31.874</span></div>
+<p class="cap" style="margin:0">Vert = on reprend du temps, rouge = on en perd, neutre = stable sur 3 tours, violet = meilleur temps.</p>
+</div>
+
+<div class="card" style="padding:20px;display:flex;flex-direction:column;gap:10px">
+<span class="lbl" style="color:#fff">Ligne de classement · 230 × 26</span>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:110px 230px;column-gap:14px;align-items:center">
+<span style="font-size:12px;color:#a3acb6">{{r.name}}</span>
+<div style="{{r.rs}}">
+<span class="cond" style="text-align:right;font-size:15px;font-weight:600;color:#c9d1d9">{{r.pos}}</span><span></span>
+<span style="width:3px;height:16px;border-radius:2px;background:{{r.color}}"></span>
+<span class="cond" style="font-size:16px;font-weight:600;color:{{r.cc}}">{{r.code}}</span>
+<span style="display:flex;justify-content:flex-end"><span class="mono" style="{{r.gs}}">{{r.gap}}</span></span>
+<span style="width:18px;height:18px;border-radius:50%;box-sizing:border-box;border:2px solid {{r.tc}};display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed';font-size:11px;font-weight:700;color:{{r.tc}}">{{r.t}}</span>
+</div>
+</div>
+</sc-for>
+<p class="cap" style="margin:0">Détail complet des états sur le plan « Tour de classement ».</p>
+</div>
+
+</div>
+</section>
+
+<!-- MISE EN PAGE -->
+<section style="display:flex;flex-direction:column;gap:20px">
+<h2 class="h2">Zones, ancrages et adaptation 1280 → 1920</h2>
+<div style="display:grid;grid-template-columns:768px 768px 1fr;column-gap:40px;align-items:start">
+<sc-for list="{{schemas}}" as="sc" hint-placeholder-count="2">
+<div style="display:flex;flex-direction:column;gap:8px">
+<span class="lbl">{{sc.t}}</span>
+<div style="position:relative;width:768px;height:432px;border-radius:6px;background:#17261c;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)">
+<div style="position:absolute;left:30%;top:28%;width:40%;height:44%;border:1px dashed rgba(255,255,255,.35);border-radius:6px;display:flex;align-items:center;justify-content:center"><span class="lbl" style="color:#c9d1d9">Zone libre · circuit</span></div>
+<sc-for list="{{sc.z}}" as="z" hint-placeholder-count="6"><div style="{{z.s}}"><span class="cond" style="font-size:12px;font-weight:700;letter-spacing:.04em">{{z.n}}</span></div></sc-for>
+</div>
+</div>
+</sc-for>
+<div class="cap" style="font-size:13px;line-height:1.6;color:#c9d1d9">
+<p style="margin:0 0 10px 0"><b>Grille :</b> marge de 12 px sur tous les bords et entre panneaux, partout et à toutes les résolutions.</p>
+<p style="margin:0 0 10px 0"><b>Zone libre :</b> rectangle central 40 % × 44 % jamais recouvert (hors écrans spéciaux plein écran).</p>
+<p style="margin:0 0 10px 0"><b>Panneau ouvert :</b> glisse depuis la droite en 200 ms ; la mini-carte se décale à gauche du panneau ; le rail d’onglets disparaît.</p>
+<p style="margin:0"><b>Sous 1600 px de large</b> on passe en taille « M » (colonne de droite du tableau). Aucune mise à l’échelle globale : les tailles de texte restent nettes.</p>
+</div>
+</div>
+
+<div class="card" style="overflow:hidden">
+<div class="lbl" style="display:grid;grid-template-columns:200px 180px 300px 260px 260px 1fr;column-gap:20px;height:40px;align-items:center;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.08)"><span>Zone</span><span>Ancrage</span><span>Position</span><span>Taille L · ≥ 1600 px</span><span>Taille M · 1280–1599 px</span><span>Visibilité</span></div>
+<sc-for list="{{zones}}" as="z" hint-placeholder-count="8">
+<div style="display:grid;grid-template-columns:200px 180px 300px 260px 260px 1fr;column-gap:20px;min-height:40px;align-items:center;padding:0 20px;border-top:1px solid rgba(255,255,255,.05);font-size:13px">
+<span class="cond" style="font-size:15px;font-weight:700">{{z.n}}</span><span>{{z.a}}</span><span class="mono" style="font-size:12px">{{z.p}}</span><span class="mono" style="font-size:12px">{{z.l}}</span><span class="mono" style="font-size:12px">{{z.m}}</span><span style="color:#a3acb6">{{z.v}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<!-- IMPLÉMENTATION -->
+<section style="display:flex;flex-direction:column;gap:20px">
+<h2 class="h2">Implémentation</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+<div class="card" style="padding:20px 24px">
+<div class="lbl" style="margin-bottom:10px">tokens.css</div>
+<pre>{{css}}</pre>
+</div>
+<div class="card" style="padding:20px 24px">
+<div class="lbl" style="margin-bottom:10px">Structure DOM au-dessus du canvas p5.js</div>
+<pre>{{dom}}</pre>
+</div>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":2700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const palettes = [
+      { name: 'Surfaces et texte', items: [
+        { t: '--bg-panel', u: 'Verre des panneaux', h: '#0f1115 · 85 %', v: 'rgba(15,17,21,.85)' },
+        { t: '--bg-raised', u: 'Cellules, champs', h: 'blanc · 6 %', v: 'rgba(255,255,255,.06)' },
+        { t: '--line', u: 'Filets et séparateurs', h: 'blanc · 8 %', v: 'rgba(255,255,255,.08)' },
+        { t: '--text', u: 'Texte principal', h: '#e6edf3', v: '#e6edf3' },
+        { t: '--text-2', u: 'Libellés (≥ 4.5:1)', h: '#8b949e', v: '#8b949e' } ] },
+      { name: 'Accents', items: [
+        { t: '--accent', u: 'Titres, sélection, P', h: '#e10600', v: '#e10600' },
+        { t: '--gain', u: 'On gagne du temps', h: '#2ecc71', v: '#2ecc71' },
+        { t: '--loss', u: 'On perd du temps', h: '#e74c3c', v: '#e74c3c' },
+        { t: '--best', u: 'Meilleur temps', h: '#9b59ff', v: '#9b59ff' },
+        { t: '--pit', u: 'Stand, PIT / OUT', h: '#ff8a1f', v: '#ff8a1f' } ] },
+      { name: 'Signalisation', items: [
+        { t: '--flag-yellow', u: 'Jaune, SC, VSC', h: '#f5c518', v: '#f5c518' },
+        { t: '--flag-green', u: 'Piste libre', h: '#2ecc71', v: '#2ecc71' },
+        { t: '--flag-red', u: 'Course suspendue', h: '#e10600', v: '#e10600' },
+        { t: '--radio', u: 'Messages radio', h: '#5aa9ff', v: '#5aa9ff' },
+        { t: '--off', u: 'Abandon, inactif', h: '#6e7781', v: '#6e7781' } ] },
+      { name: 'Pneus', items: [
+        { t: '--tyre-s', u: 'Tendre', h: '#ff3b30', v: '#ff3b30' },
+        { t: '--tyre-m', u: 'Medium', h: '#f5c518', v: '#f5c518' },
+        { t: '--tyre-h', u: 'Dur', h: '#f2f2f2', v: '#f2f2f2' },
+        { t: '--tyre-i', u: 'Intermédiaire', h: '#34c759', v: '#34c759' },
+        { t: '--tyre-w', u: 'Pluie', h: '#2f80ff', v: '#2f80ff' } ] }
+    ];
+    const teams = [['Halden Motorsport', '#2f7bff'], ['Corsa Nera', '#ff8a1f'], ['Velis GP', '#19c3a6'], ['Kestrel', '#f2c200'], ['Ardent Racing', '#d9dde3'], ['Moravia', '#c0186b']].map(t => ({ n: t[0], c: t[1] }));
+    const type = [
+      { name: 'Vitesse', ex: '287', s: "font-family:'Barlow Condensed';font-size:56px;font-weight:700;line-height:1", spec: 'Barlow Cond. 56/700 · 48 en M' },
+      { name: 'Affichage', ex: 'P2/12', s: "font-family:'Barlow Condensed';font-size:24px;font-weight:700", spec: 'Barlow Cond. 24/700' },
+      { name: 'Titre', ex: 'CLASSEMENT FINAL', s: "font-family:'Barlow Condensed';font-size:18px;font-weight:700;letter-spacing:.06em", spec: 'Barlow Cond. 18/700 · +0,06 em' },
+      { name: 'Code pilote', ex: 'MIR  KAR  TAV', s: "font-family:'Barlow Condensed';font-size:16px;font-weight:600;letter-spacing:.04em", spec: 'Barlow Cond. 16/600' },
+      { name: 'Texte', ex: 'FEN entre au stand et chausse des durs', s: "font-family:'Barlow';font-size:14px", spec: 'Barlow 14/400–500' },
+      { name: 'Détail / libellé', ex: 'GAZ · FREIN · RAPPORT', s: "font-family:'Barlow Condensed';font-size:12px;font-weight:600;letter-spacing:.08em;color:#8b949e", spec: 'Barlow Cond. 12/600 · +0,08 em' },
+      { name: 'Chrono', ex: '1:32.418   +1.284', s: "font-family:'JetBrains Mono';font-size:14px;font-variant-numeric:tabular-nums", spec: 'JetBrains Mono 12–15 · tabulaire' }
+    ];
+    const space = [['4', 'xs'], ['8', 's'], ['12', 'm · marge'], ['16', 'l'], ['24', 'xl'], ['40', 'barre']].map(s => ({ n: s[0], u: s[1], px: s[0] + 'px' }));
+    const B = "height:36px;padding:0 14px;border-radius:6px;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;";
+    const buttons = [
+      { name: 'Primaire', t: 'Relancer', st: [B + 'border:0;background:#e10600;color:#fff', B + 'border:0;background:#ff1f14;color:#fff;box-shadow:0 0 0 3px rgba(225,6,0,.25)', B + 'border:0;background:#e10600;color:#fff;outline:2px solid #fff;outline-offset:2px', B + 'border:0;background:#3a2020;color:#8b6e6e'] },
+      { name: 'Secondaire', t: 'Réinit.', st: [B + 'border:1px solid rgba(255,255,255,.16);background:transparent;color:#e6edf3', B + 'border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.06);color:#fff', B + 'border:1px solid rgba(255,255,255,.16);background:transparent;color:#e6edf3;outline:2px solid #fff;outline-offset:2px', B + 'border:1px solid rgba(255,255,255,.08);background:transparent;color:#5b636d'] },
+      { name: 'Fantôme', t: 'Menu', st: [B + 'border:0;background:transparent;color:#a3acb6', B + 'border:0;background:rgba(255,255,255,.06);color:#fff', B + 'border:0;background:transparent;color:#a3acb6;outline:2px solid #fff;outline-offset:2px', B + 'border:0;background:transparent;color:#4a525c'] }
+    ];
+    const I = 'width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;padding:0;';
+    const icons = [I + 'border:0;background:transparent;color:#c9d1d9', I + 'border:0;background:rgba(255,255,255,.08);color:#fff', I + 'border:0;background:transparent;color:#c9d1d9;outline:2px solid #fff;outline-offset:2px', I + 'border:0;background:transparent;color:#4a525c'];
+    const sliders = [
+      { name: 'Repos', val: '0,85', v: 85, cls: 'rng', op: 1 }, { name: 'Survol', val: '0,85', v: 85, cls: 'rng hov', op: 1 },
+      { name: 'En glissement', val: '0,62', v: 62, cls: 'rng drag', op: 1 }, { name: 'Désactivé', val: '—', v: 40, cls: 'rng dis', op: .6 }
+    ];
+    const gauges = [
+      { n: 'Gaz', w: '100%', c: '#2ecc71', v: '100' }, { n: 'Frein', w: '82%', c: '#e74c3c', v: '82' },
+      { n: 'Usure OK', w: '82%', c: '#2ecc71', v: '18 %' }, { n: 'Usure alerte', w: '39%', c: '#ff8a1f', v: '61 %' }, { n: 'Usure critique', w: '24%', c: '#e74c3c', v: '76 %' }
+    ];
+    const tyres = [['S', 'Tendre', '#ff3b30'], ['M', 'Medium', '#f5c518'], ['H', 'Dur', '#f2f2f2'], ['I', 'Inter', '#34c759'], ['W', 'Pluie', '#2f80ff']].map(t => ({ l: t[0], n: t[1], c: t[2] }));
+    const R = 'display:grid;grid-template-columns:20px 0 3px 1fr 64px 18px;column-gap:6px;align-items:center;height:26px;padding:0 8px;border-radius:4px;background:rgba(15,17,21,.6);';
+    const rows = [
+      { name: 'Normal', pos: '6', code: 'SKO', color: '#d9dde3', gap: '+7.890', t: 'M', tc: '#f5c518', cc: '#e6edf3', gs: 'font-size:12px;color:#c9d1d9', rs: R },
+      { name: 'Sélectionnée', pos: '2', code: 'MIR', color: '#ff8a1f', gap: '+1.284', t: 'M', tc: '#f5c518', cc: '#fff', gs: 'font-size:12px;color:#fff;font-weight:600', rs: R + 'background:linear-gradient(90deg,rgba(225,6,0,.25),rgba(225,6,0,.08));box-shadow:inset 3px 0 0 #e10600' },
+      { name: 'Meilleur tour', pos: '7', code: 'BRE', color: '#c0186b', gap: '+9.415', t: 'S', tc: '#ff3b30', cc: '#e6edf3', gs: 'font-size:12px;color:#c9a6ff', rs: R + 'box-shadow:inset 3px 0 0 #9b59ff' },
+      { name: 'Au stand', pos: '10', code: 'FEN', color: '#19c3a6', gap: 'PIT', t: 'H', tc: '#f2f2f2', cc: '#e6edf3', gs: 'font-size:11px;font-weight:600;color:#0f1115;background:#ff8a1f;padding:1px 6px;border-radius:3px', rs: R },
+      { name: 'Abandon', pos: '—', code: 'YSA', color: '#c0186b', gap: 'ABD', t: 'S', tc: '#ff3b30', cc: '#6e7781', gs: 'font-size:11px;color:#6e7781', rs: R + 'opacity:.55' }
+    ];
+    const Z = (l, t, w, h, n, extra) => ({ n, s: 'position:absolute;box-sizing:border-box;border-radius:4px;background:rgba(15,17,21,.85);border:1px solid rgba(225,6,0,.6);display:flex;align-items:center;justify-content:center;' + 'left:' + l + ';top:' + t + ';width:' + w + ';height:' + h + ';' + (extra || '') });
+    const schemas = [
+      { t: 'Panneau fermé (défaut) · échelle 0,4', z: [Z('4.8px', '4.8px', '758.4px', '16px', 'Barre du haut'), Z('4.8px', '25.6px', '92px', '170px', 'Classement'), Z('4.8px', '342px', '184px', '85px', 'HUD'), Z('683.2px', '25.6px', '80px', '56px', 'Carte'), Z('747.2px', '86.4px', '16px', '66px', ''), Z('288px', '412.8px', '192px', '14.4px', 'Événement')] },
+      { t: 'Panneau ouvert · échelle 0,4', z: [Z('4.8px', '4.8px', '758.4px', '16px', 'Barre du haut'), Z('4.8px', '25.6px', '92px', '170px', 'Classement'), Z('4.8px', '342px', '184px', '85px', 'HUD'), Z('635.2px', '25.6px', '128px', '401.6px', 'Panneau 320', 'border-color:#e10600;background:rgba(225,6,0,.12)'), Z('550.4px', '25.6px', '80px', '56px', 'Carte'), Z('240px', '412.8px', '192px', '14.4px', 'Événement')] }
+    ];
+    const zones = [
+      { n: 'Barre du haut', a: 'haut, pleine largeur', p: 'top 12 · left 12 · right 12', l: 'h 40', m: 'h 40', v: 'Toujours' },
+      { n: 'Classement', a: 'haut-gauche', p: 'top 64 · left 12', l: '230 × (48 + 22 + 12×26 + 42)', m: '210 × (40 + 12×24)', v: 'Toujours · H pour masquer l’UI' },
+      { n: 'HUD pilote', a: 'bas-gauche', p: 'bottom 12 · left 12', l: '460 × 212', m: '400 × 184', v: 'Toujours en course' },
+      { n: 'Mini-carte', a: 'haut-droite', p: 'top 64 · right 12 (344 si panneau)', l: '200 × 140', m: '180 × 126', v: 'Toujours' },
+      { n: 'Rail d’onglets', a: 'droite', p: 'top 216 · right 12', l: '40 × 152', m: '36 × 136', v: 'Panneau fermé seulement' },
+      { n: 'Panneau latéral', a: 'droite, collé au bord', p: 'top 64 · right 12 · bottom 12', l: 'w 320', m: 'w 300', v: 'Fermé par défaut · Tab' },
+      { n: 'Bandeau événement', a: 'bas-centre', p: 'bottom 12 · centré (décalé si panneau)', l: 'max 480 × 36', m: 'max 420 × 36', v: '1 message, 4 s, fondu 250 ms' },
+      { n: 'Neutralisation', a: 'haut-centre', p: 'top 64 · centré', l: '640 × 44', m: '520 × 40', v: 'Pendant drapeau / SC / VSC' }
+    ];
+    const css = [
+      ':root{',
+      '  --bg-panel: rgba(15,17,21,.85);  --blur: 14px;',
+      '  --line: rgba(255,255,255,.08);   --text:#e6edf3; --text-2:#8b949e;',
+      '  --accent:#e10600; --gain:#2ecc71; --loss:#e74c3c; --best:#9b59ff;',
+      '  --pit:#ff8a1f; --flag-yellow:#f5c518; --radio:#5aa9ff;',
+      '  --tyre-s:#ff3b30; --tyre-m:#f5c518; --tyre-h:#f2f2f2;',
+      '  --tyre-i:#34c759; --tyre-w:#2f80ff;',
+      '  --gap:12px; --radius:8px; --bar-h:40px;',
+      '  --tower-w:230px; --row-h:26px; --hud-w:460px; --hud-h:212px;',
+      '  --map-w:200px; --map-h:140px; --panel-w:320px; --speed:56px;',
+      '  --fast:150ms; --std:200ms; --slow:250ms;',
+      '}',
+      '@media (max-width:1599px){ :root{',
+      '  --tower-w:210px; --row-h:24px; --hud-w:400px; --hud-h:184px;',
+      '  --map-w:180px; --map-h:126px; --panel-w:300px; --speed:48px; } }',
+      '.glass{ background:var(--bg-panel); border:1px solid var(--line);',
+      '  border-radius:var(--radius); backdrop-filter:blur(var(--blur));',
+      '  box-shadow:0 8px 24px rgba(0,0,0,.35); }',
+      '.theme-night{ --bg-panel:rgba(9,11,14,.92); --line:rgba(255,255,255,.16);',
+      '  --accent:#ff2a1f; }',
+      '.theme-rain{ --bg-panel:rgba(13,16,20,.90); --blur:18px; }'
+    ].join('\n');
+    const dom = [
+      '<body>',
+      '  <main id="stage"> <!-- p5 createCanvas(windowWidth, windowHeight) -->',
+      '  </main>',
+      '  <div id="ui"> <!-- position:fixed; inset:0; pointer-events:none -->',
+      '    <header id="topbar" class="glass">…</header>',
+      '    <section id="tower"  class="glass">…</section>',
+      '    <section id="minimap" class="glass"><canvas></canvas></section>',
+      '    <nav id="rail" class="glass">…</nav>',
+      '    <aside id="panel" class="glass" hidden>  <!-- 4 tabpanels -->',
+      '    <section id="hud" class="glass">…</section>',
+      '    <div id="neutral" role="status"></div>',
+      '    <div id="event" role="status" aria-live="polite"></div>',
+      '    <div id="overlay"></div>  <!-- feux, pit, podium, aide -->',
+      '  </div>',
+      '</body>',
+      '',
+      '/* #ui > * { pointer-events:auto }  z : canvas 0 · ui 10 · overlay 20',
+      '   Mise à jour : 1 seule fonction updateUI(state) appelée à 10 Hz',
+      '   (texte), 30 Hz pour HUD et mini-carte ; jamais de reflow à 60 Hz.',
+      '   Le panneau ouvert ajoute .panel-open sur #ui → la mini-carte',
+      '   passe à right: calc(var(--gap)*2 + var(--panel-w)). */'
+    ].join('\n');
+    return { palettes, teams, type, space, buttons, icons, sliders, gauges, tyres, rows, schemas, zones, css, dom };
+  }
+}
+</script>
+</body>
+</html>

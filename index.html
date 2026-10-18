@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Circuit Formule 1</title>
+
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- polices du design (design/ : Design system) ; sans réseau, les polices de repli du CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="interfaceF1.css">
+
+    <script src="libraries/p5.min.js"></script>
+    <!-- vehicle.js avant toutes ses sous-classes -->
+    <script src="vehicle.js"></script>
+    <!-- outil de calcul (voisinage des voitures), sans dépendance -->
+    <script src="grilleSpatiale.js"></script>
+    <!-- la piste du circuit : calculs sans dépendance, avant les voitures qui la lisent -->
+    <script src="circuit.js"></script>
+    <!-- données du circuit : personnalités des pilotes, types de pneus -->
+    <script src="personnalites.js"></script>
+    <script src="pneus.js"></script>
+    <!-- IA entraînée : le réseau de neurones et les capteurs (calcul, ne bougent rien) -->
+    <script src="reseauNeuronal.js"></script>
+    <script src="capteursVoiture.js"></script>
+    <!-- Particule : l'encre de l'écran REJOUER (PointRejouer l'étend) ; VoitureF1, BilleGomme et
+         DroneCamera lui empruntent flee et garderDansFenetre. Perturbation : souffle d'un accident -->
+    <script src="particule.js"></script>
+    <script src="perturbation.js"></script>
+    <!-- circuit Formule 1 : véhicules (VoitureF1 emprunte des méthodes à Particule, SafetyCar étend VoitureF1) -->
+    <script src="voitureF1.js"></script>
+    <script src="voiturePilote.js"></script>
+    <script src="voitureNeuronale.js"></script>
+    <script src="incidentJoueur.js"></script>
+    <script src="safetyCar.js"></script>
+    <script src="fumee.js"></script>
+    <script src="etincelle.js"></script>
+    <script src="gerbeEau.js"></script>
+    <script src="gerbePoussiere.js"></script>
+    <script src="debris.js"></script>
+    <script src="billeGomme.js"></script>
+    <script src="drone.js"></script>
+    <!-- copie d'une image avec une opacité, sans la copie intermédiaire de tint() -->
+    <script src="imageAlpha.js"></script>
+    <script src="livrees.js"></script>
+    <script src="spriteVoiture.js"></script>
+    <script src="mecanicien.js"></script>
+    <script src="commissaire.js"></script>
+    <!-- gestionnaires, décor, habillage, réglages et jeu : après les classes qu'ils utilisent -->
+    <script src="affectation.js"></script>
+    <script src="pointRejouer.js"></script>
+    <script src="ecranFin.js"></script>
+    <script src="decorCircuit.js"></script>
+    <script src="tracesPneus.js"></script>
+    <script src="foule.js"></script>
+    <script src="ambiance.js"></script>
+    <script src="effetsVitesse.js"></script>
+    <script src="meteo.js"></script>
+    <script src="strategie.js"></script>
+    <script src="glisse.js"></script>
+    <script src="surfaces.js"></script>
+    <script src="chronometrage.js"></script>
+    <script src="ordresEquipe.js"></script>
+    <script src="incidents.js"></script>
+    <script src="equipeDeStand.js"></script>
+    <script src="voieDesStands.js"></script>
+    <script src="classement.js"></script>
+    <script src="hudPilote.js"></script>
+    <script src="telemetrie.js"></script>
+    <script src="carteChaleur.js"></script>
+    <script src="bullesRadio.js"></script>
+    <script src="prediction.js"></script>
+    <script src="historiquePositions.js"></script>
+    <script src="miniCarte.js"></script>
+    <script src="camera.js"></script>
+    <script src="manager.js"></script>
+    <script src="defis.js"></script>
+    <script src="championnat.js"></script>
+    <script src="confetti.js"></script>
+    <script src="podium.js"></script>
+    <script src="ecranPartage.js"></script>
+    <script src="course.js"></script>
+    <!-- entraînement (neuroévolution) et modèles sauvegardés ; modèle fourni avec le jeu -->
+    <script src="entraineur.js"></script>
+    <script src="modelesIA.js"></script>
+    <script src="models/piloteDefaut.js"></script>
+    <script src="reglages.js"></script>
+    <script src="reglagesF1.js"></script>
+    <script src="scenarios.js"></script>
+    <!-- interface HTML du circuit (lit la course, ne bouge rien) : avant sketch.js, qui la crée -->
+    <script src="domF1.js"></script>
+    <script src="barreHaut.js"></script>
+    <script src="tourClassement.js"></script>
+    <script src="hudCourse.js"></script>
+    <script src="bandeauEvenements.js"></script>
+    <script src="ongletTelemetrie.js"></script>
+    <script src="ongletPrediction.js"></script>
+    <script src="ongletHistorique.js"></script>
+    <script src="panneauLateral.js"></script>
+    <script src="carteCircuit.js"></script>
+    <script src="fenetreAide.js"></script>
+    <script src="feuxDepart.js"></script>
+    <script src="bandeauNeutralisation.js"></script>
+    <script src="panneauStand.js"></script>
+    <script src="podiumFin.js"></script>
+    <script src="ecranRejouer.js"></script>
+    <script src="decompteReprise.js"></script>
+    <script src="encartRejouer.js"></script>
+    <script src="menuPause.js"></script>
+    <script src="menuModes.js"></script>
+    <script src="hudDuel.js"></script>
+    <script src="consignePilote.js"></script>
+    <script src="ongletIA.js"></script>
+    <script src="interfaceF1.js"></script>
+    <!-- page d'entraînement IA (bouton « Entraînement IA ») -->
+    <script src="pageEntrainement.js"></script>
+    <!-- diagnostic de performance (?debug=perf ou F9) : avant sketch.js, qui le crée -->
+    <script src="diagnosticPerf.js"></script>
+    <script src="sketch.js"></script>
+  </head>
+  <body>
+    <!-- Circuit Formule 1 : l'interface (HTML/CSS) par-dessus le canvas, d'après le dossier design/.
+         Elle lit la course et ne bouge rien. -->
+    <div id="f1-ui">
+      <header id="f1-barre" class="glass">
+        <div class="barre-gauche">
+          <button id="f1-bouton-entrainement" class="bouton-entrainement" type="button" aria-label="Entraînement IA">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="6" r="2"></circle><circle cx="5" cy="18" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="7" r="2"></circle><circle cx="19" cy="17" r="2"></circle><path d="M7 6.6 10 11M7 17.4l3-4.4M14 11.4 17 8M14 12.6l3 3.6"></path></svg>
+            Entraînement IA
+          </button>
+        </div>
+        <div class="statut">
+          <span id="f1-statut-pastille" class="pastille"></span>
+          <span id="f1-statut-etat">Course</span><span class="point">·</span>
+          <span>Tour <b id="f1-statut-tour">0</b>/<span id="f1-statut-tours">5</span></span><span class="point">·</span>
+          <span id="f1-statut-meteo" class="meteo"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path id="f1-statut-meteo-icone" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg><span id="f1-statut-meteo-texte">Sec</span></span>
+          <output id="etat-f1" class="sr-only" role="status"></output>
+        </div>
+        <div class="barre-droite">
+          <button id="f1-bouton-pause" class="ib" type="button" aria-label="Pause"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg></button>
+          <button id="f1-bouton-camera" class="ib" type="button" aria-label="Caméra"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 8h3l2-3h8l2 3h3v11H3z"></path><circle cx="12" cy="13" r="3.5"></circle></svg></button>
+          <button id="f1-bouton-panneau" class="ib" type="button" aria-label="Afficher le panneau latéral"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M15 4v16"></path></svg></button>
+          <button id="f1-bouton-aide" class="ib" type="button" aria-label="Aide"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.6V14"></path><circle cx="12" cy="17.3" r=".6" fill="currentColor"></circle></svg></button>
+        </div>
+      </header>
+
+      <section id="f1-tour" class="glass" aria-label="Classement">
+        <div class="tour-entete">
+          <div class="bande"></div>
+          <div class="contenu">
+            <div class="titre"><div class="petit">TOUR</div><div class="grand"><span id="f1-tour-numero">0</span><span class="sur">/<span id="f1-tour-total">5</span></span></div></div>
+            <span id="f1-tour-neutralisation" class="tour-badge cond" hidden>SC</span>
+            <div id="f1-tour-temps" class="temps mono">0:00.000</div>
+          </div>
+        </div>
+        <div class="ligne-tour tour-colonnes lbl"><span>P</span><span></span><span></span><span>Pilote</span><span id="f1-tour-colonne">Leader</span><span></span></div>
+        <div id="f1-tour-lignes" class="tour-lignes"></div>
+        <div class="segments">
+          <button id="f1-ecart-leader" class="seg on" type="button">Écart leader</button>
+          <button id="f1-ecart-intervalle" class="seg" type="button">Intervalle</button>
+        </div>
+      </section>
+
+      <section id="f1-carte" class="glass" aria-label="Mini-carte du circuit">
+        <div class="carte-entete">
+          <span class="carte-nom"><span id="f1-carte-nom">VALMORA</span> <span class="point">·</span> <span id="f1-carte-longueur" class="longueur">4,82 KM</span></span>
+          <span class="carte-boutons">
+            <span role="group" aria-label="Mode de la carte" class="carte-modes">
+              <button id="f1-carte-complet" type="button" aria-label="Circuit complet" aria-pressed="true" class="on"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M5 7c3-3 9-3 12 0s3 8-1 10-5-1-8 0-5-1-5-4 0-4 2-6z"></path></svg></button>
+              <button id="f1-carte-zoom" type="button" aria-label="Zoom sur ma voiture" aria-pressed="false"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="6"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path></svg></button>
+            </span>
+            <button id="f1-carte-agrandir" type="button" class="carte-agrandir" aria-label="Agrandir la carte" aria-pressed="false"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"></path></svg></button>
+          </span>
+        </div>
+        <svg id="f1-carte-svg" role="img" aria-label="Carte du circuit" width="280" height="146" viewBox="0 0 1800 1100" preserveAspectRatio="xMidYMid meet"></svg>
+        <div id="f1-carte-infobulle" class="carte-infobulle" role="tooltip" hidden></div>
+        <div id="f1-carte-badge" class="carte-badge" hidden></div>
+        <div class="carte-pied">
+          <span id="f1-carte-tour" class="cond">T<span id="f1-carte-tour-n">0</span><span class="sur">/<span id="f1-carte-tour-total">5</span></span></span>
+          <span class="carte-barres" id="f1-carte-barres" aria-label="Progression du tour"><span><span id="f1-carte-barre-0"></span></span><span><span id="f1-carte-barre-1"></span></span><span><span id="f1-carte-barre-2"></span></span></span>
+          <span id="f1-carte-progression" class="mono">S<span id="f1-carte-secteur">1</span> <b id="f1-carte-pct">0 %</b></span>
+        </div>
+      </section>
+      <nav id="f1-rail" class="glass" aria-label="Panneau latéral (fermé)" hidden>
+        <button id="f1-rail-telemetrie" class="ib" type="button" aria-label="Télémétrie"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 3 5-8 4 5"></path></svg></button>
+        <button id="f1-rail-prediction" class="ib" type="button" aria-label="Prédiction"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h12M4 12h16M4 18h8"></path></svg></button>
+        <button id="f1-rail-historique" class="ib" type="button" aria-label="Historique"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></button>
+        <button id="f1-rail-ia" class="ib" type="button" aria-label="IA entraînée"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="6" r="2"></circle><circle cx="5" cy="18" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle><path d="M7 7l3 4M7 17l3-4M14 12h3"></path></svg></button>
+        <button id="f1-rail-reglages" class="ib" type="button" aria-label="Réglages"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg></button>
+      </nav>
+
+      <section id="f1-hud" class="glass" aria-label="HUD pilote" hidden>
+        <div class="hud-haut">
+          <div class="hud-vitesse">
+            <div id="f1-hud-vitesse" class="valeur cond">0</div>
+            <div class="lbl" style="margin-top:4px">km/h</div>
+          </div>
+          <div class="hud-rapport">
+            <div id="f1-hud-rapport" class="valeur cond">1</div>
+            <div class="lbl" style="font-size:10px">Rapport</div>
+          </div>
+          <div class="hud-commandes">
+            <div class="jauge gaz"><span class="lbl" style="font-size:11px">Gaz</span><span class="piste"><span id="f1-hud-gaz" class="barre"></span></span><span id="f1-hud-gaz-valeur" class="nombre mono">0</span></div>
+            <div class="jauge frein"><span class="lbl" style="font-size:11px">Frein</span><span class="piste"><span id="f1-hud-frein" class="barre"></span></span><span id="f1-hud-frein-valeur" class="nombre mono">0</span></div>
+            <div id="f1-hud-drs-ligne" class="drs-ligne"><span id="f1-hud-drs" class="drs cond">DRS</span><span id="f1-hud-drs-libelle" class="lbl">Indisponible</span></div>
+            <div id="f1-hud-limites" class="hud-limites cond" hidden>Limites 1/3</div>
+          </div>
+          <div class="hud-pneus" aria-label="Pneus : usure et température">
+            <div id="f1-hud-pneu" class="cellule-pneu">
+              <span class="usure"><span id="f1-hud-pneu-usure"></span></span>
+              <span class="infos"><span id="f1-hud-pneu-type" class="pneu M">M</span><span id="f1-hud-pneu-temp" class="temp mono">70°</span><span id="f1-hud-pneu-pct" class="pct mono">0%</span></span>
+            </div>
+          </div>
+        </div>
+        <div id="f1-hud-alerte" class="hud-alerte cond" hidden><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3 2 20h20z"></path><path d="M12 10v4M12 17v.5"></path></svg><span id="f1-hud-alerte-texte">PNEUS USÉS · BOX CONSEILLÉ</span></div>
+        <div class="hud-bas">
+          <div class="position cond"><span id="f1-hud-position" style="font-size:24px;opacity:1">P1</span><span>/<span id="f1-hud-total">12</span></span></div>
+          <div class="bloc"><span class="lbl">Tour</span><span id="f1-hud-tour" class="mono">0:00.000</span></div>
+          <div class="bloc"><span id="f1-hud-devant-libelle" class="lbl">Devant</span><span id="f1-hud-devant" class="mono">—</span></div>
+          <div class="bloc"><span id="f1-hud-derriere-libelle" class="lbl">Derrière</span><span id="f1-hud-derriere" class="mono">—</span></div>
+        </div>
+      </section>
+
+      <div id="f1-evenement" class="glass" role="status" aria-live="polite">
+        <span id="f1-ev-icone" class="icone"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path id="f1-ev-chemin" d=""></path></svg></span>
+        <span id="f1-ev-type" class="type"></span>
+        <span class="texte"><b id="f1-ev-qui"></b> <span id="f1-ev-texte"></span></span>
+      </div>
+
+      <div id="f1-aide" role="dialog" aria-modal="true" aria-labelledby="f1-aide-titre" hidden>
+        <div class="dialogue">
+          <div class="entete">
+            <div class="titre"><h2 id="f1-aide-titre" class="cond">Commandes et raccourcis</h2></div>
+            <div class="fermer"><span class="lbl" style="font-size:11px;text-transform:none;letter-spacing:.02em">Fermer</span><kbd>Échap</kbd>
+              <button id="f1-aide-fermer" class="ib" type="button" aria-label="Fermer l'aide"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+          </div>
+          <div id="f1-aide-groupes" class="groupes"></div>
+          <div class="pied"><span>Multijoueur : J1 = WASD + Espace · J2 = flèches + Entrée</span><span style="display:flex;gap:6px;align-items:center">Rouvrir cette aide <kbd>?</kbd> <kbd>H</kbd></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panneau latéral du circuit : onglets Télémétrie, Prédiction, Historique, Réglages (les
+         réglages existants, repliables, avec recherche). Touche s ou bouton : ouvert / fermé. -->
+    <aside id="panneau-f1">
+      <div id="f1-contenu" class="glass" aria-label="Panneau latéral">
+        <div class="onglets">
+          <div role="tablist" aria-label="Onglets du panneau">
+            <button id="f1-onglet-telemetrie" role="tab" aria-selected="false" class="tab" type="button">Télém.</button>
+            <button id="f1-onglet-prediction" role="tab" aria-selected="false" class="tab" type="button">Prédic.</button>
+            <button id="f1-onglet-historique" role="tab" aria-selected="false" class="tab" type="button">Histo.</button>
+            <button id="f1-onglet-reglages" role="tab" aria-selected="true" class="tab on" type="button">Réglages</button>
+            <button id="f1-onglet-ia" role="tab" aria-selected="false" class="tab" type="button">IA</button>
+          </div>
+          <button id="f1-replier" type="button" aria-label="Fermer le panneau">Replier ▸</button>
+        </div>
+
+        <section id="f1-page-telemetrie" class="page-onglet" role="tabpanel" aria-labelledby="f1-onglet-telemetrie" hidden>
+          <div class="tele-entete">
+            <div class="tele-pilotes">
+              <span class="pilote cond"><span id="f1-tele-trait-a" class="trait-a"></span><span id="f1-tele-code-a">—</span></span>
+              <span class="lbl" style="font-size:11px">vs</span>
+              <span class="pilote cond"><span id="f1-tele-trait-b" class="trait-b"></span><span id="f1-tele-code-b">—</span>
+                <button id="f1-tele-comparer" type="button" aria-label="Changer le pilote comparé"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg></button></span>
+            </div>
+            <span class="lbl badge-fenetre" style="font-size:11px">Fenêtre 30 s</span>
+          </div>
+          <div id="f1-tele-graphes" class="tele-graphes"></div>
+          <p id="f1-tele-note" class="note">L'enregistrement démarre au départ de la course. Les 30 dernières secondes défilent de droite à gauche.</p>
+        </section>
+
+        <section id="f1-page-prediction" class="page-onglet" role="tabpanel" aria-labelledby="f1-onglet-prediction" hidden>
+          <div class="pred-haut">
+            <div class="segments-boite">
+              <button id="f1-pred-victoire" class="seg on" type="button">Victoire</button>
+              <button id="f1-pred-podium" class="seg" type="button">Podium</button>
+              <button id="f1-pred-top5" class="seg" type="button">Top 5</button>
+            </div>
+            <div class="pred-titres"><span id="f1-pred-titre" class="lbl">Probabilité de victoire</span><span id="f1-pred-tour" class="lbl">Avant le départ</span></div>
+          </div>
+          <div id="f1-pred-lignes" class="pred-lignes"></div>
+          <div class="pred-axe"><span></span><span></span><span></span><span class="graduations mono"><span>0</span><span id="f1-pred-milieu">20</span><span id="f1-pred-max">40 %</span></span><span></span><span class="lbl">Δ tour</span></div>
+          <p class="note">Total = 100 %. Recalculé à chaque passage de ligne ; la barre du pilote suivi est en rouge. Modèle : score = exp(−retard projeté / T), retard projeté = écart + rythme × tours restants + stand à faire + 0,3 s par place (position en piste), T = 0,5 + 0,5 × √(tours restants + 1) ; podium et top 5 par tirages de Plackett-Luce (graine fixe).</p>
+        </section>
+
+        <section id="f1-page-historique" class="page-onglet" role="tabpanel" aria-labelledby="f1-onglet-historique" hidden>
+          <div class="histo-titre"><span class="cond">Positions par tour</span><span class="lbl" style="font-size:11px">Survol = isoler</span></div>
+          <svg id="f1-histo-svg" role="img" aria-label="Évolution des positions, de la grille au tour en cours" width="320" height="360" viewBox="0 0 320 360"></svg>
+          <div class="histo-faits">
+            <span class="lbl" style="font-size:11px">Faits marquants</span>
+            <div id="f1-histo-faits" class="liste"></div>
+          </div>
+        </section>
+
+        <section id="f1-page-ia" class="page-onglet" role="tabpanel" aria-labelledby="f1-onglet-ia" hidden>
+          <div class="ia-onglet">
+            <div class="ia-onglet-ligne"><span class="lbl">Adversaires</span><b id="f1-ia-adversaires" class="cond">Classiques</b></div>
+            <div class="ia-onglet-ligne"><span class="lbl">Modèle actif</span><b id="f1-ia-modele" class="cond">—</b></div>
+            <div class="ia-onglet-ligne"><span class="lbl">Note de qualité</span><b id="f1-ia-note" class="mono">—</b></div>
+            <div id="f1-ia-badge" class="ia-badge apprentissage">En apprentissage</div>
+            <div class="ia-onglet-ligne"><span class="lbl">Voitures IA en course</span><b id="f1-ia-nombre" class="mono">0</b></div>
+            <div class="ia-onglet-ligne"><span class="lbl">Poids de la voiture suivie</span><span id="f1-ia-poids" class="mono">—</span></div>
+            <button id="f1-ia-entrainement" class="bouton-primaire" type="button">Ouvrir l'entraînement IA</button>
+          </div>
+          <p class="note">IA entraînée : un petit réseau de neurones dose, à chaque image, les poids de seek, arrive, wander et séparation de chaque adversaire. Le stand, la safety car, le VSC et la relance restent gérés par la conduite classique. Le choix se fait dans Réglages, section Adversaires, ou dans le menu JOUER.</p>
+        </section>
+
+        <section id="f1-page-reglages" class="page-onglet" role="tabpanel" aria-labelledby="f1-onglet-reglages">
+          <div class="recherche-boite">
+            <label class="recherche">
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+              <span class="sr-only">Rechercher un réglage</span>
+              <input id="f1-recherche" type="search" placeholder="Rechercher un réglage…" autocomplete="off" spellcheck="false">
+              <kbd>/</kbd>
+            </label>
+          </div>
+          <div id="f1-reglages">
+        <details open>
+          <summary>Course</summary>
+          <label class="ligne">Circuit
+            <select id="f1-profil">
+              <option value="classique" selected>Classique</option>
+              <option value="rapide">Rapide</option>
+              <option value="technique">Technique</option>
+            </select>
+          </label>
+          <span class="reglage ligne">
+            <label for="f1-nombre-voitures">Voitures</label>
+            <input id="f1-nombre-voitures" type="range" min="2" max="20" step="1" value="12">
+            <output id="f1-nombre-voitures-valeur" for="f1-nombre-voitures">12</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-nombre-tours">Tours</label>
+            <input id="f1-nombre-tours" type="range" min="1" max="20" step="1" value="5">
+            <output id="f1-nombre-tours-valeur" for="f1-nombre-tours">5</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-ecuries">Écuries</label>
+            <input id="f1-ecuries" type="range" min="1" max="10" step="1" value="6">
+            <output id="f1-ecuries-valeur" for="f1-ecuries">6</output>
+          </span>
+          <label class="ligne"><input id="f1-incidents" type="checkbox" checked> Incidents (safety car)</label>
+          <span class="boutons">
+            <button id="f1-nouvelle-course" type="button">Nouvelle course</button>
+            <button id="f1-safety-car" type="button">Safety car</button>
+            <button id="f1-pause" type="button">Pause</button>
+            <button id="f1-ecarts" type="button">Écarts : leader</button>
+          </span>
+        </details>
+        <details id="f1-section-adversaires" open>
+          <summary>Adversaires</summary>
+          <label class="ligne">Adversaires
+            <select id="f1-adversaires">
+              <option value="classiques" selected>Classiques</option>
+              <option value="ia">IA entraînée</option>
+            </select>
+          </label>
+          <label class="ligne">Modèle
+            <select id="f1-modele-ia"></select>
+          </label>
+          <span class="reglage ligne">
+            <label for="f1-variation-poids">Variation des poids par voiture</label>
+            <input id="f1-variation-poids" type="range" min="0" max="0.3" step="0.01" value="0.1">
+            <output id="f1-variation-poids-valeur" for="f1-variation-poids">0.10</output>
+          </span>
+          <p class="ligne">Classiques : les poids fixes du panneau. IA entraînée : le modèle choisi dose seek, arrive, wander et séparation (0 = toutes les voitures identiques).</p>
+        </details>
+        <details open>
+          <summary>SEEK</summary>
+          <span class="reglage ligne">
+            <label for="f1-poids-seek">Poids</label>
+            <input id="f1-poids-seek" type="range" min="0" max="3" step="0.1" value="1">
+            <output id="f1-poids-seek-valeur" for="f1-poids-seek">1.0</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-anticipation-seek">Anticipation</label>
+            <input id="f1-anticipation-seek" type="range" min="10" max="150" step="5" value="40">
+            <output id="f1-anticipation-seek-valeur" for="f1-anticipation-seek">40 px</output>
+          </span>
+        </details>
+        <details open>
+          <summary>ARRIVE</summary>
+          <span class="reglage ligne">
+            <label for="f1-poids-arrive">Poids</label>
+            <input id="f1-poids-arrive" type="range" min="0" max="4" step="0.1" value="1.5">
+            <output id="f1-poids-arrive-valeur" for="f1-poids-arrive">1.5</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-rayon-freinage">Rayon de freinage</label>
+            <input id="f1-rayon-freinage" type="range" min="40" max="400" step="10" value="160">
+            <output id="f1-rayon-freinage-valeur" for="f1-rayon-freinage">160 px</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-distance-a-garder">Écart à garder</label>
+            <input id="f1-distance-a-garder" type="range" min="28" max="120" step="2" value="34">
+            <output id="f1-distance-a-garder-valeur" for="f1-distance-a-garder">34 px</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-distance-arret-stand">Arrêt au stand</label>
+            <input id="f1-distance-arret-stand" type="range" min="20" max="150" step="5" value="60">
+            <output id="f1-distance-arret-stand-valeur" for="f1-distance-arret-stand">60 px</output>
+          </span>
+        </details>
+        <details>
+          <summary>WANDER</summary>
+          <span class="reglage ligne">
+            <label for="f1-poids-wander">Poids</label>
+            <input id="f1-poids-wander" type="range" min="0" max="2" step="0.05" value="0.25">
+            <output id="f1-poids-wander-valeur" for="f1-poids-wander">0.25</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-distance-cercle">distanceCercle</label>
+            <input id="f1-distance-cercle" type="range" min="10" max="200" step="5" value="60">
+            <output id="f1-distance-cercle-valeur" for="f1-distance-cercle">60 px</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-wander-radius">wanderRadius</label>
+            <input id="f1-wander-radius" type="range" min="0" max="80" step="1" value="20">
+            <output id="f1-wander-radius-valeur" for="f1-wander-radius">20 px</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-displace-range">displaceRange</label>
+            <input id="f1-displace-range" type="range" min="0" max="1" step="0.01" value="0.15">
+            <output id="f1-displace-range-valeur" for="f1-displace-range">0.15</output>
+          </span>
+        </details>
+        <details>
+          <summary>Évitement</summary>
+          <span class="reglage ligne">
+            <label for="f1-poids-separation">Séparation</label>
+            <input id="f1-poids-separation" type="range" min="0" max="5" step="0.1" value="2">
+            <output id="f1-poids-separation-valeur" for="f1-poids-separation">2.0</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-distance-securite">Distance de sécurité</label>
+            <input id="f1-distance-securite" type="range" min="26" max="80" step="1" value="40">
+            <output id="f1-distance-securite-valeur" for="f1-distance-securite">40 px</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-portee-evitement">Anticipation</label>
+            <input id="f1-portee-evitement" type="range" min="40" max="200" step="5" value="100">
+            <output id="f1-portee-evitement-valeur" for="f1-portee-evitement">100 px</output>
+          </span>
+        </details>
+        <details>
+          <summary>Voitures</summary>
+          <span class="reglage ligne">
+            <label for="f1-vitesse-max">maxSpeed</label>
+            <input id="f1-vitesse-max" type="range" min="1" max="10" step="0.1" value="5">
+            <output id="f1-vitesse-max-valeur" for="f1-vitesse-max">5.0</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-force-max">maxForce</label>
+            <input id="f1-force-max" type="range" min="0.05" max="1" step="0.01" value="0.3">
+            <output id="f1-force-max-valeur" for="f1-force-max">0.30</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-usure-pneus">Usure des pneus</label>
+            <input id="f1-usure-pneus" type="range" min="0" max="0.1" step="0.002" value="0.012">
+            <output id="f1-usure-pneus-valeur" for="f1-usure-pneus">0.012 /s</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-seuil-stand">Pit stop sous</label>
+            <input id="f1-seuil-stand" type="range" min="0" max="0.8" step="0.05" value="0.35">
+            <output id="f1-seuil-stand-valeur" for="f1-seuil-stand">0.35</output>
+          </span>
+        </details>
+        <details>
+          <summary>Affichage</summary>
+          <label class="ligne">Caméra
+            <select id="f1-camera">
+              <option value="circuit" selected>Circuit entier</option>
+              <option value="suivi">Suivre la voiture choisie</option>
+              <option value="drone">Drone (groupe de tête)</option>
+              <option value="embarquee">Caméra embarquée</option>
+              <option value="tv">Réalisation TV</option>
+            </select>
+          </label>
+          <label class="ligne"><input id="f1-decor" type="checkbox" checked> Décor</label>
+          <label class="ligne"><input id="f1-classement" type="checkbox" checked> Classement</label>
+          <label class="ligne"><input id="f1-gomme" type="checkbox" checked> Traces de gomme</label>
+          <label class="ligne"><input id="f1-fumee" type="checkbox" checked> Fumée de freinage</label>
+          <label class="ligne"><input id="f1-ombres" type="checkbox" checked> Ombres</label>
+          <label class="ligne"><input id="f1-drone" type="checkbox" checked> Drone</label>
+          <label class="ligne"><input id="f1-debug" type="checkbox"> Debug (ou touche d)</label>
+        </details>
+        <details open>
+          <summary>Course avancée</summary>
+          <label class="ligne"><input id="f1-ia-avancee" type="checkbox" checked> IA avancée (aspiration, duels, défense, erreurs)</label>
+          <span class="reglage ligne">
+            <label for="f1-bonus-aspiration">Bonus d'aspiration</label>
+            <input id="f1-bonus-aspiration" type="range" min="0" max="0.15" step="0.01" value="0.06">
+            <output id="f1-bonus-aspiration-valeur" for="f1-bonus-aspiration">0.06</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-distance-aspiration">Distance d'aspiration</label>
+            <input id="f1-distance-aspiration" type="range" min="40" max="250" step="5" value="130">
+            <output id="f1-distance-aspiration-valeur" for="f1-distance-aspiration">130 px</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-agressivite-depassement">Agressivité</label>
+            <input id="f1-agressivite-depassement" type="range" min="0" max="2" step="0.1" value="1">
+            <output id="f1-agressivite-depassement-valeur" for="f1-agressivite-depassement">1.0</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-frequence-erreurs">Erreurs (par virage)</label>
+            <input id="f1-frequence-erreurs" type="range" min="0" max="1" step="0.01" value="0.03">
+            <output id="f1-frequence-erreurs-valeur" for="f1-frequence-erreurs">0.03</output>
+          </span>
+          <label class="ligne">Personnalités
+            <select id="f1-personnalites">
+              <option value="aleatoire" selected>Aléatoire</option>
+              <option value="agressif">Agressif</option>
+              <option value="prudent">Prudent</option>
+              <option value="regulier">Régulier</option>
+              <option value="imprevisible">Imprévisible</option>
+            </select>
+          </label>
+          <label class="ligne">Voiture choisie
+            <select id="f1-profil-voiture">
+              <option value="agressif">Agressif</option>
+              <option value="prudent">Prudent</option>
+              <option value="regulier" selected>Régulier</option>
+              <option value="imprevisible">Imprévisible</option>
+            </select>
+          </label>
+        </details>
+        <details>
+          <summary>Météo</summary>
+          <label class="ligne">Mode
+            <select id="f1-mode-meteo">
+              <option value="sec" selected>Sec (désactivée)</option>
+              <option value="manuel">Manuel</option>
+              <option value="automatique">Automatique</option>
+              <option value="aleatoire">Aléatoire</option>
+            </select>
+          </label>
+          <span class="reglage ligne">
+            <label for="f1-intensite-pluie">Intensité (manuel)</label>
+            <input id="f1-intensite-pluie" type="range" min="0" max="1" step="0.05" value="0.6">
+            <output id="f1-intensite-pluie-valeur" for="f1-intensite-pluie">0.60</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-effet-adherence">Effet sur l'adhérence</label>
+            <input id="f1-effet-adherence" type="range" min="0" max="1" step="0.05" value="1">
+            <output id="f1-effet-adherence-valeur" for="f1-effet-adherence">1.00</output>
+          </span>
+          <label class="ligne"><input id="f1-gerbes" type="checkbox" checked> Gerbes d'eau</label>
+          <span class="reglage ligne">
+            <label for="f1-quantite-gerbes">Quantité de gerbes</label>
+            <input id="f1-quantite-gerbes" type="range" min="0" max="500" step="10" value="220">
+            <output id="f1-quantite-gerbes-valeur" for="f1-quantite-gerbes">220</output>
+          </span>
+          <label class="ligne">Pneus de départ
+            <select id="f1-pneus-depart">
+              <option value="TENDRE">Tendre</option>
+              <option value="MEDIUM" selected>Medium</option>
+              <option value="DUR">Dur</option>
+              <option value="INTER">Intermédiaire</option>
+              <option value="PLUIE">Pluie</option>
+            </select>
+          </label>
+        </details>
+        <details id="f1-section-mode" open>
+          <summary>Mode</summary>
+          <label class="ligne">Mode de jeu
+            <select id="f1-mode">
+              <option value="course" selected>Course libre</option>
+              <option value="manager">Manager d'écurie</option>
+              <option value="defi">Défis</option>
+              <option value="championnat">Championnat (3 circuits)</option>
+              <option value="multijoueur">Multijoueur (écran partagé)</option>
+            </select>
+          </label>
+          <div class="ligne" data-mode="manager">
+            <label>Écurie <select id="f1-manager-ecurie"></select></label>
+            <label>Voiture
+              <select id="f1-manager-voiture">
+                <option value="0" selected>1re</option>
+                <option value="1">2e</option>
+              </select>
+            </label>
+          </div>
+          <div class="ligne" data-mode="manager">
+            <label>Pneus <select id="f1-manager-pneus"></select></label>
+            <button id="f1-manager-box" type="button">Box !</button>
+          </div>
+          <div class="ligne" data-mode="manager">
+            <label>Consigne
+              <select id="f1-manager-consigne">
+                <option value="attaque">Attaque</option>
+                <option value="normal" selected>Normal</option>
+                <option value="economie">Économie</option>
+              </select>
+            </label>
+            <button id="f1-manager-inverser" type="button">Ordre d'équipe</button>
+          </div>
+          <div class="ligne" data-mode="defi">
+            <label>Défi <select id="f1-defi"></select></label>
+            <button id="f1-defi-lancer" type="button">Lancer</button>
+          </div>
+          <output id="f1-defi-etoiles" class="ligne" data-mode="defi"></output>
+          <div class="ligne" data-mode="championnat">
+            <button id="f1-manche-suivante" type="button">Manche suivante</button>
+            <output id="f1-championnat-etat"></output>
+          </div>
+          <p class="ligne" data-mode="multijoueur">J1 : W A S D, Espace DRS, Q stand, E pneus · J2 : flèches, Entrée DRS, / stand, . pneus</p>
+        </details>
+        <details>
+          <summary>Joueur</summary>
+          <label class="ligne"><input id="f1-mode-pilote" type="checkbox"> Mode pilote (W A S D ou flèches)</label>
+          <span class="reglage ligne">
+            <label for="f1-distance-point-cible">Point-cible</label>
+            <input id="f1-distance-point-cible" type="range" min="20" max="150" step="5" value="70">
+            <output id="f1-distance-point-cible-valeur" for="f1-distance-point-cible">70 px</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-regime-croisiere">Régime de croisière</label>
+            <input id="f1-regime-croisiere" type="range" min="0.3" max="1" step="0.05" value="0.6">
+            <output id="f1-regime-croisiere-valeur" for="f1-regime-croisiere">0.60</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-bonus-d-r-s">Bonus DRS</label>
+            <input id="f1-bonus-d-r-s" type="range" min="0" max="0.2" step="0.01" value="0.08">
+            <output id="f1-bonus-d-r-s-valeur" for="f1-bonus-d-r-s">0.08</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-tolerance-collision">Tolérance de collision</label>
+            <input id="f1-tolerance-collision" type="range" min="0.5" max="1.2" step="0.05" value="1">
+            <output id="f1-tolerance-collision-valeur" for="f1-tolerance-collision">1.00</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-tolerance-limites">Limites de piste : temps toléré</label>
+            <input id="f1-tolerance-limites" type="range" min="100" max="2000" step="50" value="500">
+            <output id="f1-tolerance-limites-valeur" for="f1-tolerance-limites">500 ms</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-avertissements-limites">Avertissements avant pénalité</label>
+            <input id="f1-avertissements-limites" type="range" min="0" max="5" step="1" value="2">
+            <output id="f1-avertissements-limites-valeur" for="f1-avertissements-limites">2</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-penalite-limites">Pénalité limites de piste (0 = aucune)</label>
+            <input id="f1-penalite-limites" type="range" min="0" max="30" step="1" value="5">
+            <output id="f1-penalite-limites-valeur" for="f1-penalite-limites">5 s</output>
+          </span>
+          <label class="ligne"><input id="f1-limites-strictes" type="checkbox"> Limites de piste strictes (le vibreur ne compte pas)</label>
+          <span class="reglage ligne">
+            <label for="f1-vitesse-impact">Accident : vitesse d'impact minimale</label>
+            <input id="f1-vitesse-impact" type="range" min="0" max="150" step="5" value="40">
+            <output id="f1-vitesse-impact-valeur" for="f1-vitesse-impact">40 km/h</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-penalite-accident">Pénalité accident (0 = aucune)</label>
+            <input id="f1-penalite-accident" type="range" min="0" max="30" step="1" value="10">
+            <output id="f1-penalite-accident-valeur" for="f1-penalite-accident">10 s</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-distance-mur">Mur (sans rail du décor)</label>
+            <input id="f1-distance-mur" type="range" min="20" max="80" step="1" value="71">
+            <output id="f1-distance-mur-valeur" for="f1-distance-mur">71 px</output>
+          </span>
+          <label class="ligne"><input id="f1-penalites" type="checkbox" checked> Pénalités</label>
+          <span class="boutons">
+            <button id="f1-choisir-voiture" type="button">Choisir une autre voiture</button>
+            <button id="f1-nouvelle-course-joueur" type="button">Nouvelle course</button>
+          </span>
+          <span class="aide">Espace : DRS · P : stand · 1 à 5 : pneus · Échap : pause · R : rejouer</span>
+        </details>
+        <details id="f1-section-glisse">
+          <summary>Glisse</summary>
+          <label class="ligne"><input id="f1-glisse-realiste" type="checkbox" checked> Glisse réaliste (cercle d'adhérence, dérive)</label>
+          <span class="reglage ligne">
+            <label for="f1-adherence-globale">Adhérence globale</label>
+            <input id="f1-adherence-globale" type="range" min="0.3" max="1.5" step="0.05" value="1">
+            <output id="f1-adherence-globale-valeur" for="f1-adherence-globale">1.00</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-seuil-glisse">Seuil de glisse</label>
+            <input id="f1-seuil-glisse" type="range" min="0.02" max="0.3" step="0.01" value="0.08">
+            <output id="f1-seuil-glisse-valeur" for="f1-seuil-glisse">0.08 rad</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-sous-virage">Sous-virage</label>
+            <input id="f1-sous-virage" type="range" min="0" max="2" step="0.1" value="1">
+            <output id="f1-sous-virage-valeur" for="f1-sous-virage">1.0</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-survirage">Survirage</label>
+            <input id="f1-survirage" type="range" min="0" max="2" step="0.1" value="1">
+            <output id="f1-survirage-valeur" for="f1-survirage">1.0</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-frottement-glissement">Frottement de glissement</label>
+            <input id="f1-frottement-glissement" type="range" min="0" max="2" step="0.1" value="1">
+            <output id="f1-frottement-glissement-valeur" for="f1-frottement-glissement">1.0</output>
+          </span>
+        </details>
+        <details id="f1-section-effets">
+          <summary>Effets</summary>
+          <label class="ligne"><input id="f1-etincelles" type="checkbox" checked> Étincelles du fond plat</label>
+          <label class="ligne"><input id="f1-traces" type="checkbox" checked> Traces de pneus</label>
+          <label class="ligne"><input id="f1-poussiere" type="checkbox" checked> Poussière (herbe, gravier)</label>
+          <label class="ligne"><input id="f1-billes" type="checkbox" checked> Billes de gomme</label>
+          <label class="ligne"><input id="f1-lignes-vitesse" type="checkbox" checked> Lignes de vitesse</label>
+          <label class="ligne">Qualité
+            <select id="f1-qualite">
+              <option value="bas">Basse</option>
+              <option value="moyen" selected>Moyenne</option>
+              <option value="eleve">Élevée</option>
+            </select>
+          </label>
+        </details>
+        <details id="f1-section-ambiance">
+          <summary>Ambiance</summary>
+          <label class="ligne">Moment
+            <select id="f1-moment">
+              <option value="jour" selected>Jour</option>
+              <option value="crepuscule">Crépuscule</option>
+              <option value="nuit">Nuit</option>
+              <option value="cycle">Cycle jour / nuit</option>
+            </select>
+          </label>
+          <span class="reglage ligne">
+            <label for="f1-duree-cycle">Durée du cycle</label>
+            <input id="f1-duree-cycle" type="range" min="20" max="600" step="10" value="120">
+            <output id="f1-duree-cycle-valeur" for="f1-duree-cycle">120 s</output>
+          </span>
+          <label class="ligne"><input id="f1-foule" type="checkbox" checked> Foule animée</label>
+        </details>
+        <details id="f1-section-incidents">
+          <summary>VSC et incidents</summary>
+          <label class="ligne"><input id="f1-vsc" type="checkbox" checked> VSC pour les incidents mineurs</label>
+          <span class="reglage ligne">
+            <label for="f1-facteur-v-s-c">Vitesse sous VSC</label>
+            <input id="f1-facteur-v-s-c" type="range" min="0.3" max="0.9" step="0.05" value="0.55">
+            <output id="f1-facteur-v-s-c-valeur" for="f1-facteur-v-s-c">0.55</output>
+          </span>
+          <label class="ligne"><input id="f1-relance-accordeon" type="checkbox" checked> Relance en accordéon</label>
+          <label class="ligne"><input id="f1-evitement-danger" type="checkbox" checked> Zones de danger, drapeaux jaunes</label>
+          <label class="ligne"><input id="f1-depanneuse" type="checkbox" checked> Dépanneuse</label>
+          <label class="ligne"><input id="f1-plongeon" type="checkbox" checked> Doublage au freinage</label>
+          <span class="reglage ligne">
+            <label for="f1-risque-plongeon">Risque de partir large</label>
+            <input id="f1-risque-plongeon" type="range" min="0" max="1" step="0.05" value="0.15">
+            <output id="f1-risque-plongeon-valeur" for="f1-risque-plongeon">0.15</output>
+          </span>
+          <label class="ligne"><input id="f1-fatigue" type="checkbox" checked> Fatigue des pilotes</label>
+          <span class="reglage ligne">
+            <label for="f1-taux-fatigue">Fatigue par tour</label>
+            <input id="f1-taux-fatigue" type="range" min="0" max="0.5" step="0.01" value="0.12">
+            <output id="f1-taux-fatigue-valeur" for="f1-taux-fatigue">0.12</output>
+          </span>
+          <label class="ligne"><input id="f1-ordres-equipe" type="checkbox" checked> Ordres d'équipe</label>
+          <label class="ligne"><input id="f1-pannes" type="checkbox" checked> Pannes moteur (avec Incidents)</label>
+          <span class="reglage ligne">
+            <label for="f1-proba-panne">Probabilité de panne</label>
+            <input id="f1-proba-panne" type="range" min="0" max="0.005" step="0.0001" value="0.0004">
+            <output id="f1-proba-panne-valeur" for="f1-proba-panne">0.0004 /s</output>
+          </span>
+          <span class="boutons">
+            <button id="f1-vsc-bouton" type="button">VSC</button>
+            <button id="f1-panne-bouton" type="button">Panne (voiture choisie)</button>
+          </span>
+        </details>
+        <details id="f1-section-telemetrie">
+          <summary>Télémétrie</summary>
+          <label class="ligne"><input id="f1-telemetrie" type="checkbox" checked> Télémétrie (clic sur son en-tête : replier)</label>
+          <label class="ligne">Comparer avec
+            <select id="f1-comparaison">
+              <option value="devant" selected>La voiture devant</option>
+              <option value="derriere">La voiture derrière</option>
+              <option value="leader">Le leader</option>
+              <option value="coequipier">Le coéquipier</option>
+            </select>
+          </label>
+          <label class="ligne"><input id="f1-carte-chaleur" type="checkbox"> Carte de chaleur (vitesse, dépassements)</label>
+          <label class="ligne"><input id="f1-radio" type="checkbox" checked> Bulles de radio d'équipe</label>
+          <label class="ligne"><input id="f1-prediction" type="checkbox" checked> Prédiction de victoire</label>
+          <label class="ligne"><input id="f1-historique" type="checkbox"> Historique des positions</label>
+          <label class="ligne"><input id="f1-mini-carte" type="checkbox" checked> Mini-carte</label>
+        </details>
+        <details id="f1-section-stands">
+          <summary>Pit stop</summary>
+          <label class="ligne"><input id="f1-pit-spectaculaire" type="checkbox" checked> Mécaniciens, box partagé, file (nouvelle course)</label>
+          <label class="ligne"><input id="f1-feu-sortie" type="checkbox" checked> Feu de sortie des stands</label>
+          <span class="reglage ligne">
+            <label for="f1-taille-equipe">Mécaniciens par équipe</label>
+            <input id="f1-taille-equipe" type="range" min="12" max="20" step="1" value="16">
+            <output id="f1-taille-equipe-valeur" for="f1-taille-equipe">16</output>
+          </span>
+          <span class="reglage ligne">
+            <label for="f1-duree-roue">Durée d'une roue</label>
+            <input id="f1-duree-roue" type="range" min="1.5" max="4" step="0.1" value="1.8">
+            <output id="f1-duree-roue-valeur" for="f1-duree-roue">1.8 s</output>
+          </span>
+          <span class="boutons">
+            <button id="f1-penalite-5" type="button">Pénalité 5 s (voiture choisie)</button>
+            <button id="f1-penalite-10" type="button">Pénalité 10 s</button>
+          </span>
+        </details>
+        <details open>
+          <summary>Simulation</summary>
+          <span class="reglage ligne">
+            <label for="f1-vitesse-simulation">Vitesse</label>
+            <input id="f1-vitesse-simulation" type="range" min="0.25" max="4" step="0.25" value="1">
+            <output id="f1-vitesse-simulation-valeur" for="f1-vitesse-simulation">1.00x</output>
+          </span>
+        </details>
+          </div>
+          <div class="reglages-pied">
+            <button id="f1-reinitialiser" class="bouton-secondaire" type="button">Réinitialiser</button>
+            <button id="f1-relancer" class="bouton-primaire" type="button">Relancer</button>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <!-- Page d'entraînement IA (pageEntrainement.js), ouverte par le bouton « Entraînement IA » de
+         la barre du haut. La piste et les voitures d'entraînement sont dessinées par p5 au centre ;
+         à gauche le réseau, à droite les courbes, en bas les commandes. Elle ne bouge rien : c'est
+         l'Entraineur qui fait rouler les voitures. -->
+    <div id="ia-page" class="ia-page" hidden>
+      <header id="ia-barre" class="ia-barre glass">
+        <div class="ia-titre cond">Entraînement IA</div>
+        <span id="ia-etape" class="ia-etape cond">Étape 1 · seul</span>
+        <span id="ia-niveau" class="ia-niveau mono">École</span>
+        <span id="ia-statut" class="ia-statut lbl">En pause</span>
+        <button id="ia-retour" class="bouton-contour cond" type="button">Retour à la course</button>
+      </header>
+
+      <section id="ia-gauche" class="ia-panneau glass" aria-label="Réseau de neurones de la meilleure voiture">
+        <div class="ia-panneau-titre"><span class="cond">Réseau</span><span id="ia-architecture" class="lbl">8 · 12 · 4</span></div>
+        <svg id="ia-reseau-svg" role="img" aria-label="Neurones, connexions et activations" viewBox="0 0 320 440" preserveAspectRatio="xMidYMid meet"></svg>
+        <p class="ia-note">Trait : épaisseur = |poids|, rouge = positif, bleu = négatif. Neurone : couleur = activation (de −1 bleu à +1 rouge ; sorties de 0 à 1).</p>
+      </section>
+
+      <section id="ia-droite" class="ia-panneau glass" aria-label="Progrès de l'entraînement">
+        <div class="ia-chiffres">
+          <div><span class="lbl">Génération</span><b id="ia-generation" class="cond">0</b></div>
+          <div><span class="lbl">En vie</span><b id="ia-en-vie" class="cond">0/0</b></div>
+          <div><span class="lbl">Meilleur fitness</span><b id="ia-meilleur" class="mono">—</b></div>
+          <div><span class="lbl">Note (circuits inconnus)</span><b id="ia-note" class="mono">—</b></div>
+        </div>
+        <div id="ia-badge" class="ia-badge apprentissage">En apprentissage</div>
+        <div class="ia-panneau-titre"><span class="cond">Fitness par génération</span><span class="lbl ia-legende"><i class="ia-trait meilleur"></i>Meilleur <i class="ia-trait moyenne"></i>Moyenne</span></div>
+        <svg id="ia-fitness-svg" role="img" aria-label="Meilleur fitness et fitness moyen par génération" viewBox="0 0 360 170" preserveAspectRatio="none"></svg>
+        <div class="ia-panneau-titre"><span class="cond">Poids pendant un tour</span><span class="lbl ia-legende"><i class="ia-trait seek"></i>Seek <i class="ia-trait arrive"></i>Arrive <i class="ia-trait wander"></i>Wander <i class="ia-trait separation"></i>Sépar.</span></div>
+        <svg id="ia-poids-svg" role="img" aria-label="Les quatre poids de la meilleure voiture le long du tour" viewBox="0 0 360 150" preserveAspectRatio="none"></svg>
+        <p id="ia-detail" class="ia-note"></p>
+      </section>
+
+      <footer id="ia-commandes" class="ia-commandes glass">
+        <div class="ia-groupe">
+          <button id="ia-demarrer" class="bouton-primaire" type="button">Démarrer</button>
+          <button id="ia-pause" class="bouton-secondaire" type="button">Pause</button>
+          <button id="ia-reinitialiser" class="bouton-secondaire" type="button">Réinitialiser</button>
+        </div>
+        <div class="ia-groupe ia-curseurs">
+          <span class="ia-reglage"><label for="ia-vitesse">Vitesse</label><input id="ia-vitesse" type="range" min="1" max="20" step="1" value="10"><output id="ia-vitesse-valeur" for="ia-vitesse">10x</output></span>
+          <span class="ia-reglage"><label for="ia-population">Population</label><input id="ia-population" type="range" min="20" max="100" step="5" value="40"><output id="ia-population-valeur" for="ia-population">40</output></span>
+          <span class="ia-reglage"><label for="ia-taux-mutation">Taux de mutation</label><input id="ia-taux-mutation" type="range" min="0" max="0.5" step="0.01" value="0.15"><output id="ia-taux-mutation-valeur" for="ia-taux-mutation">0.15</output></span>
+          <span class="ia-reglage"><label for="ia-amplitude-mutation">Amplitude</label><input id="ia-amplitude-mutation" type="range" min="0.05" max="1.5" step="0.05" value="0.4"><output id="ia-amplitude-mutation-valeur" for="ia-amplitude-mutation">0.40</output></span>
+          <span class="ia-reglage"><label for="ia-neurones">Neurones cachés</label><input id="ia-neurones" type="range" min="10" max="15" step="1" value="12"><output id="ia-neurones-valeur" for="ia-neurones">12</output></span>
+          <span class="ia-reglage"><label for="ia-graine">Graine</label><input id="ia-graine" type="range" min="1" max="9999" step="1" value="2026"><output id="ia-graine-valeur" for="ia-graine">2026</output></span>
+          <span class="ia-reglage"><label for="ia-seuil-pret">Seuil « prêt »</label><input id="ia-seuil-pret" type="range" min="40" max="95" step="1" value="70"><output id="ia-seuil-pret-valeur" for="ia-seuil-pret">70</output></span>
+          <label class="ia-case"><input id="ia-curriculum" type="checkbox" checked> Curriculum</label>
+          <label class="ia-case"><input id="ia-arret-auto" type="checkbox"> Arrêt quand prêt</label>
+        </div>
+        <details id="ia-section-fitness" class="ia-groupe ia-fitness">
+          <summary class="cond">Pondérations du fitness</summary>
+          <div class="ia-curseurs">
+            <span class="ia-reglage"><label for="ia-poids-progression">Progression</label><input id="ia-poids-progression" type="range" min="0" max="3" step="0.1" value="1"><output id="ia-poids-progression-valeur" for="ia-poids-progression">1.0</output></span>
+            <span class="ia-reglage"><label for="ia-poids-tour">Tour</label><input id="ia-poids-tour" type="range" min="0" max="50" step="1" value="20"><output id="ia-poids-tour-valeur" for="ia-poids-tour">20</output></span>
+            <span class="ia-reglage"><label for="ia-poids-secteur">Secteur</label><input id="ia-poids-secteur" type="range" min="0" max="20" step="1" value="4"><output id="ia-poids-secteur-valeur" for="ia-poids-secteur">4</output></span>
+            <span class="ia-reglage"><label for="ia-poids-vitesse">Vitesse moyenne</label><input id="ia-poids-vitesse" type="range" min="0" max="50" step="1" value="20"><output id="ia-poids-vitesse-valeur" for="ia-poids-vitesse">20</output></span>
+            <span class="ia-reglage"><label for="ia-poids-ligne">Ligne de course</label><input id="ia-poids-ligne" type="range" min="0" max="30" step="1" value="10"><output id="ia-poids-ligne-valeur" for="ia-poids-ligne">10</output></span>
+            <span class="ia-reglage"><label for="ia-poids-sortie">Sortie de piste</label><input id="ia-poids-sortie" type="range" min="0" max="40" step="1" value="10"><output id="ia-poids-sortie-valeur" for="ia-poids-sortie">10</output></span>
+            <span class="ia-reglage"><label for="ia-poids-contact">Contact</label><input id="ia-poids-contact" type="range" min="0" max="50" step="1" value="15"><output id="ia-poids-contact-valeur" for="ia-poids-contact">15</output></span>
+            <span class="ia-reglage"><label for="ia-poids-glisse">Glisse excessive</label><input id="ia-poids-glisse" type="range" min="0" max="20" step="1" value="2"><output id="ia-poids-glisse-valeur" for="ia-poids-glisse">2</output></span>
+            <span class="ia-reglage"><label for="ia-poids-immobilite">Immobilité</label><input id="ia-poids-immobilite" type="range" min="0" max="20" step="1" value="2"><output id="ia-poids-immobilite-valeur" for="ia-poids-immobilite">2</output></span>
+            <span class="ia-reglage"><label for="ia-poids-arriere">Marche arrière</label><input id="ia-poids-arriere" type="range" min="0" max="40" step="1" value="10"><output id="ia-poids-arriere-valeur" for="ia-poids-arriere">10</output></span>
+          </div>
+        </details>
+        <div class="ia-groupe ia-modeles">
+          <input id="ia-nom-modele" type="text" maxlength="40" value="Mon pilote" aria-label="Nom du modèle" autocomplete="off" spellcheck="false">
+          <button id="ia-sauvegarder" class="bouton-secondaire" type="button">Sauvegarder</button>
+          <select id="ia-liste-modeles" aria-label="Modèles sauvegardés"></select>
+          <button id="ia-charger" class="bouton-secondaire" type="button">Charger</button>
+          <button id="ia-renommer" class="bouton-secondaire" type="button">Renommer</button>
+          <button id="ia-supprimer" class="bouton-secondaire" type="button">Supprimer</button>
+          <button id="ia-exporter" class="bouton-secondaire" type="button">Exporter</button>
+          <button id="ia-importer" class="bouton-secondaire" type="button">Importer</button>
+          <input id="ia-fichier" type="file" accept="application/json,.json" hidden>
+        </div>
+        <div class="ia-groupe">
+          <button id="ia-tester-seul" class="bouton-secondaire" type="button">Tester seul</button>
+          <button id="ia-tester-trafic" class="bouton-secondaire" type="button">Tester contre les classiques</button>
+        </div>
+      </footer>
+      <div id="ia-message" class="ia-message glass" role="status" hidden></div>
+    </div>
+    <!-- Pas besoin de déclarer un canvas pour dessiner en P5.js -->
+  </body>
+</html>
