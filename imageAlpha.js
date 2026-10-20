@@ -47,5 +47,41 @@ const ImageAlpha = (() => {
     else if (a < 1) noTint();
   }
 
-  return { dessiner, tuiles };
+  // Un motif (graphique de `cote` pixels, ou [largeur, hauteur], répété sans espace) sur le
+  // rectangle (0, 0, largeur, hauteur), à l'opacité `opacite`, une copie en (ox, oy) : sur un vrai
+  // contexte, un seul remplissage (createPattern, préparé une fois par graphique) au lieu d'une
+  // copie par tuile ; sinon, les tuiles une à une (mêmes positions).
+  const motifs = new WeakMap();
+  function motif(g, opacite, cote, largeur, hauteur, ox = 0, oy = 0) {
+    const [cl, ch] = Array.isArray(cote) ? cote : [cote, cote];
+    const a = Math.max(0, Math.min(1, opacite));
+    if (a <= 0) return;
+    const ctx = contexte();
+    const source = g && typeof g === 'object' ? g.elt : null;
+    if (ctx === null || typeof ctx.createPattern !== 'function' || !source || typeof source !== 'object') {
+      tuiles(g, a, poser => {
+        // la première tuile qui couvre le coin (0, 0)
+        const x0 = ox - Math.ceil(ox / cl) * cl;
+        const y0 = oy - Math.ceil(oy / ch) * ch;
+        for (let x = x0; x < largeur; x += cl) {
+          for (let y = y0; y < hauteur; y += ch) poser(x, y, cl, ch);
+        }
+      });
+      return;
+    }
+    let m = motifs.get(g);
+    if (m === undefined || m.ctx !== ctx) {
+      m = { ctx, motif: ctx.createPattern(source, 'repeat') };
+      motifs.set(g, m);
+    }
+    ctx.save();
+    ctx.globalAlpha *= a;
+    ctx.fillStyle = m.motif;
+    // le motif suit le repère courant : décalé de (ox, oy) en le remplissant depuis là
+    ctx.translate(ox, oy);
+    ctx.fillRect(-ox, -oy, largeur, hauteur);
+    ctx.restore();
+  }
+
+  return { dessiner, tuiles, motif };
 })();

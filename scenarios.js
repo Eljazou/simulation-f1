@@ -78,7 +78,7 @@ const Scenarios = (() => {
       qualite: Ambiance.QUALITE, traces: true, poussiere: true, billes: true, foule: true, lignesVitesse: true,
       moment: Ambiance.MOMENT, dureeCycle: Ambiance.DUREE_CYCLE,
       telemetrie: true, comparaison: Telemetrie.COMPARAISON, carteChaleur: false, radio: true, prediction: true, historique: false,
-      miniCarte: true };
+      miniCarte: true, qualiteAuto: true, compteurFps: false };
     // l'affichage de départ (bouton Réinitialiser)
     const AFFICHAGE_DEFAUT = Object.freeze({ ...affichage });
     // un décor par circuit, partagé avec la course (ses placements servent à la physique) :
@@ -640,7 +640,7 @@ const Scenarios = (() => {
         }
         if (affichage.lignesVitesse && !c.multijoueur) effets.show(zone());
         ambiance.showEcran(width, height, affichage.qualite, 0.2 + 0.5 * effets.intensite, m.theme);
-        c.meteo.show(width, height);
+        c.meteo.show(width, height, affichage.qualite);
         // interface HTML (actions.interfaceHtml) : tour, en-tête, bandeau, HUD, prédiction,
         // historique et télémétrie sont des éléments de la page ; restent ici les feux et la pause
         const html = Boolean(actions.interfaceHtml);

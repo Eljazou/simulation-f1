@@ -25,9 +25,16 @@ class BilleGomme extends Debris {
 
   // contexte : voitures = celles qui passent (balayage) ; perturbations (accident) comme un débris.
   applyBehaviors({ voitures = [], perturbations = [] } = {}) {
+    // les voitures loin de la bille (la plupart) sont écartées sur le carré de la distance, sans
+    // racine (avec une marge : la distance exacte décide pour les autres, comme avant)
+    const portee2 = BilleGomme.PORTEE * BilleGomme.PORTEE * (1 + 1e-9);
     for (const v of voitures) {
-      const d = Math.hypot(v.pos.x - this.pos.x, v.pos.y - this.pos.y);
-      if (d >= BilleGomme.PORTEE || v.vitesse < 0.5) continue;
+      if (v.vitesse < 0.5) continue;
+      const dx = v.pos.x - this.pos.x;
+      const dy = v.pos.y - this.pos.y;
+      if (dx * dx + dy * dy > portee2) continue;
+      const d = Math.hypot(dx, dy);
+      if (d >= BilleGomme.PORTEE) continue;
       // éjection : flee de la voiture (empruntée à Particule), proportionnelle à sa vitesse
       const fuite = Particule.prototype.flee.call(this, v.pos.copy());
       this.applyForce(fuite.mult(BilleGomme.EJECTION * v.vitesse * (1 - d / BilleGomme.PORTEE) / Math.max(1e-6, this.maxForce)));

@@ -55,9 +55,11 @@ class GrilleSpatiale {
 
     for (let l = Math.max(0, ligne - 1); l <= Math.min(this.lignes - 1, ligne + 1); l++) {
       for (let c = Math.max(0, colonne - 1); c <= Math.min(this.colonnes - 1, colonne + 1); c++) {
-        this.cellules[l * this.colonnes + c].forEach(autre => {
+        const cellule = this.cellules[l * this.colonnes + c];
+        for (let k = 0; k < cellule.length; k++) {
+          const autre = cellule[k];
           if (autre !== vehicule && GrilleSpatiale.proches(vehicule, autre, rayon)) trouves.push(autre);
-        });
+        }
       }
     }
     return trouves;

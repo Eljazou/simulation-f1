@@ -8,6 +8,10 @@ class Foule {
   // Portée (le long de la piste) à laquelle un passage ou un dépassement excite une tribune.
   static PORTEE = 160;
   static COULEURS_DRAPEAUX = [[230, 40, 40], [250, 250, 250], [40, 90, 220], [250, 210, 40]];
+  // Diamètre d'un spectateur, et ce qu'il gagne au sommet de la vague (tribune enthousiaste).
+  static DIAMETRE = 2.6;
+  static GONFLEMENT = 0.6;
+  static PLANCHE = null;
 
   // decor = le DecorCircuit (ses tribunes) ; circuit = le Circuit.
   constructor(decor) {
@@ -60,40 +64,38 @@ class Foule {
 
   // Le contexte 2D du canvas, s'il est réel (sinon, dans les tests, le dessin passe par p5).
   static contexte() {
-    const ctx = typeof drawingContext === 'undefined' ? null : drawingContext;
-    return ctx && typeof ctx === 'object' && typeof ctx.bezierCurveTo === 'function' ? ctx : null;
+    return PlancheSprites.contexte();
   }
 
-  // Un disque de diamètre d centré en (cx, cy), tracé exactement comme circle() de p5 1.7
-  // (Renderer2D.ellipse : quatre courbes de Bézier, constante 0,5522847498), puis rempli.
-  static disque(ctx, cx, cy, d) {
-    const x = cx - d / 2;
-    const y = cy - d / 2;
-    const k = d / 2 * 0.5522847498;
-    const xe = x + d;
-    const ye = y + d;
-    ctx.beginPath();
-    ctx.moveTo(x, cy);
-    ctx.bezierCurveTo(x, cy - k, cx - k, y, cx, y);
-    ctx.bezierCurveTo(cx + k, y, xe, cy - k, xe, cy);
-    ctx.bezierCurveTo(xe, cy + k, cx + k, ye, cx, ye);
-    ctx.bezierCurveTo(cx - k, ye, x, cy + k, x, cy);
-    ctx.fill();
+  // Les disques de la foule, un par couleur, tracés une fois (planche de sprites) : la boîte du
+  // plus gros disque (DIAMETRE + GONFLEMENT).
+  static planche() {
+    const r = (Foule.DIAMETRE + Foule.GONFLEMENT) / 2;
+    Foule.PLANCHE ??= new PlancheSprites([-r, -r, r, r]);
+    return Foule.PLANCHE;
   }
 
   // La foule, sur les gradins : chacun saute (plus haut quand la tribune s'enthousiasme), la vague
-  // parcourt les gradins, quelques drapeaux s'agitent. Les 800 disques sont tracés directement sur
-  // le contexte 2D (même tracé, même couleur, même ordre que circle() et fill() de p5, sans créer
-  // une couleur p5 par spectateur à chaque image) ; les drapeaux restent dessinés par p5.
+  // parcourt les gradins, quelques drapeaux s'agitent. Les 800 disques sont des copies d'un disque
+  // tracé une fois par couleur (planche de sprites, même ordre, mêmes centres et diamètres que
+  // circle() de p5) : une seule texture, que le GPU recopie en un lot, au lieu de 800 tracés
+  // remplis. Sans vrai contexte (tests) : circle() et fill() de p5. Les drapeaux restent dessinés
+  // par p5.
   show() {
     // couleurs de la palette courante du décor (jour, nuit, pluie)
     const couleurs = this.decor.couleursFoule ?? DecorCircuit.COULEURS_FOULE;
     const ctx = Foule.contexte();
-    if (this.styles?.couleurs !== couleurs) this.styles = { couleurs, css: couleurs.map(([r, v, b]) => `rgb(${r}, ${v}, ${b})`) };
+    const max = Foule.DIAMETRE + Foule.GONFLEMENT;
+    if (this.styles?.couleurs !== couleurs) {
+      this.styles = { couleurs, css: couleurs.map(([r, v, b]) => `rgb(${r}, ${v}, ${b})`),
+        traceurs: couleurs.map(couleur => g => { g.fill(...couleur); g.circle(0, 0, max); }) };
+    }
+    const { css, traceurs } = this.styles;
     const xy = this.positions();
+    const planche = Foule.planche();
+    const resolution = ctx === null ? 1 : planche.resolution(1, ctx);
     push();
     noStroke();
-    let style = null;
     let n0 = 0;
     this.decor.tribunes.forEach((tribune, k) => {
       const e = this.excitations[k];
@@ -102,14 +104,8 @@ class Foule {
         const y = xy[2 * (n0 + n) + 1];
         const vague = Math.max(0, Math.sin(this.horloge * 5 - u * 9));
         const saut = (0.3 + 1.6 * e) * (0.5 + 0.5 * Math.sin(this.horloge * (9 + (n % 5)) + n)) + 1.2 * e * vague;
-        const diametre = 2.6 + 0.6 * e * vague;
-        if (ctx !== null) {
-          if (style !== couleur) {
-            ctx.fillStyle = this.styles.css[couleur];
-            style = couleur;
-          }
-          Foule.disque(ctx, x, y - saut, diametre);
-        } else {
+        const diametre = Foule.DIAMETRE + Foule.GONFLEMENT * e * vague;
+        if (ctx === null || !planche.copier(css[couleur], traceurs[couleur], x, y - saut, diametre / max, resolution, ctx)) {
           fill(...couleurs[couleur]);
           circle(x, y - saut, diametre);
         }
@@ -118,8 +114,6 @@ class Foule {
           fill(...drapeau);
           const agite = Math.sin(this.horloge * 14 + n) * 2;
           triangle(x, y - saut - 2, x + 6, y - saut - 4 + agite, x, y - saut - 6);
-          // fill() de p5 a changé la couleur du contexte
-          style = null;
         }
       });
       n0 += tribune.foule.length;

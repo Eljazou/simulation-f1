@@ -7,8 +7,11 @@
 // Fréquences du design system : textes à 10 Hz, HUD à 30 Hz ; le bandeau suit chaque image (il
 // ne touche la page qu'au changement de message). Tailles « L » (≥ 1600 px) et « M » (en dessous).
 class InterfaceF1 {
+  // Mises à jour de la page par seconde : textes (barre, classement, onglets), HUD, mini-carte (ses
+  // points bougent : plus souvent, sauf en qualité basse). Rien n'est écrit si la valeur ne change pas.
   static FREQUENCE_TEXTES = 10;
-  static FREQUENCE_HUD = 30;
+  static FREQUENCE_HUD = 10;
+  static FREQUENCE_CARTE = { bas: 10, moyen: 30, eleve: 30 };
   static MARGE = 12;
   static BARRE = 40;
   static BANDEAU = 36;
@@ -195,6 +198,7 @@ class InterfaceF1 {
     }
     this.tempsTextes = Infinity;
     this.tempsHud = Infinity;
+    this.tempsCarte = Infinity;
     this.ecran = null;
     this.numeroCourse = null;
   }
@@ -237,6 +241,7 @@ class InterfaceF1 {
     }
     this.tempsTextes += dt;
     this.tempsHud += dt;
+    this.tempsCarte = (this.tempsCarte ?? Infinity) + dt;
     // en pause, les minuteries de l'interface (bandeau, « piste libre », podium) sont figées
     const dtJeu = c.pause ? 0 : dt;
     // course finie (tous arrivés, ou fin du mode pilote) : le podium HTML vient après PodiumFin.DELAI
@@ -254,9 +259,12 @@ class InterfaceF1 {
       this.tempsHud = 0;
       const v = HudCourse.voitureMontree(c);
       this.hud.mettreAJour(c, { commandes: v === null ? null : f.telemetrie?.lisses.get(v) ?? null, visible: !c.multijoueur });
-      this.carte.mettreAJour(c, { suivie: this.suivie(c), panneauOuvert: this.panneau.ouvert, visible: f.affichage.miniCarte && !c.multijoueur });
       this.duel.mettreAJour(c, { telemetrie: f.telemetrie });
       DomF1.classe(this.racine, 'duel-actif', c.multijoueur === true);
+    }
+    if (this.tempsCarte >= 1 / (InterfaceF1.FREQUENCE_CARTE[f.affichage.qualite] ?? InterfaceF1.FREQUENCE_CARTE.moyen)) {
+      this.tempsCarte = 0;
+      this.carte.mettreAJour(c, { suivie: this.suivie(c), panneauOuvert: this.panneau.ouvert, visible: f.affichage.miniCarte && !c.multijoueur });
     }
     if (this.tempsTextes >= 1 / InterfaceF1.FREQUENCE_TEXTES) {
       this.tempsTextes = 0;
@@ -381,6 +389,7 @@ class InterfaceF1 {
   forcer() {
     this.tempsTextes = Infinity;
     this.tempsHud = Infinity;
+    this.tempsCarte = Infinity;
     this.mettreAJour(0);
   }
 

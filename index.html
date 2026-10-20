@@ -45,6 +45,7 @@
     <script src="drone.js"></script>
     <!-- copie d'une image avec une opacité, sans la copie intermédiaire de tint() -->
     <script src="imageAlpha.js"></script>
+    <script src="planchesSprites.js"></script>
     <script src="livrees.js"></script>
     <script src="spriteVoiture.js"></script>
     <script src="mecanicien.js"></script>
@@ -119,6 +120,9 @@
     <script src="pageEntrainement.js"></script>
     <!-- diagnostic de performance (?debug=perf ou F9) : avant sketch.js, qui le crée -->
     <script src="diagnosticPerf.js"></script>
+    <!-- qualité du rendu (densité de pixels, détection automatique) : avant sketch.js -->
+    <script src="qualiteRendu.js"></script>
+    <script src="compteurImages.js"></script>
     <script src="sketch.js"></script>
   </head>
   <body>
@@ -710,9 +714,11 @@
             <select id="f1-qualite">
               <option value="bas">Basse</option>
               <option value="moyen" selected>Moyenne</option>
-              <option value="eleve">Élevée</option>
+              <option value="eleve">Haute</option>
             </select>
           </label>
+          <label class="ligne"><input id="f1-qualite-auto" type="checkbox" checked> Qualité automatique (sous 40 images/s)</label>
+          <label class="ligne"><input id="f1-compteur-fps" type="checkbox"> Compteur FPS</label>
         </details>
         <details id="f1-section-ambiance">
           <summary>Ambiance</summary>

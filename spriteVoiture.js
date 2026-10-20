@@ -13,6 +13,8 @@
 class SpriteVoiture {
   // pixels du graphique par unité design (77.5 unités -> 155 px : net jusqu'au zoom de la caméra)
   static RESOLUTION = 2;
+  // planche de sprites des roues (voir plancheRoues())
+  static PLANCHE_ROUES = null;
   // cadre du graphique (unités design), autour de l'origine de la voiture
   static DEMI_LONGUEUR = 42;
   static DEMI_LARGEUR = 17.5;
@@ -249,36 +251,55 @@ class SpriteVoiture {
   }
 
   // Une roue du design : pneu, flancs à la couleur du type monté, jante. cote = -1 (gauche) ou 1.
-  static roue(x, y, l, w, flanc, couleurPneu, jante, cote) {
-    fill(...SpriteVoiture.ROUE);
-    rect(x, y, l, w, 2.3);
-    fill(...couleurPneu);
+  // d : où dessiner (l'écran par défaut, ou un graphique de la planche des roues).
+  static roue(x, y, l, w, flanc, couleurPneu, jante, cote, d = globalThis) {
+    d.fill(...SpriteVoiture.ROUE);
+    d.rect(x, y, l, w, 2.3);
+    d.fill(...couleurPneu);
     // flanc extérieur (1,6) et flanc intérieur (1,2, à 75 %)
     const exterieur = cote < 0 ? y : y + w - flanc;
     const interieur = cote < 0 ? y + w - 1.2 - 0.6 : y + 0.4;
-    rect(x + 1, exterieur, l - 2, flanc);
-    fill(...couleurPneu, 0.75 * 255);
-    rect(x + 1, interieur, l - 2, 1.2);
-    fill(...jante);
-    rect(x + l / 2 - 2, y + w / 2 - 1.2, 4, 2.4, 0.6);
+    d.rect(x + 1, exterieur, l - 2, flanc);
+    d.fill(...couleurPneu, 0.75 * 255);
+    d.rect(x + 1, interieur, l - 2, 1.2);
+    d.fill(...jante);
+    d.rect(x + l / 2 - 2, y + w / 2 - 1.2, 4, 2.4, 0.6);
+  }
+
+  // La planche de sprites des roues (une case par taille, pneu, jante et côté) : la boîte de la
+  // plus grande roue (15 × 7), son coin en (0, 0).
+  static plancheRoues() {
+    SpriteVoiture.PLANCHE_ROUES ??= new PlancheSprites([0, 0, 15, 7]);
+    return SpriteVoiture.PLANCHE_ROUES;
+  }
+
+  // Une roue posée en (x, y) : la copie de sa case (tracée une fois), ou le dessin p5 (tests).
+  static poserRoue(x, y, l, w, flanc, couleurPneu, jante, cote, resolution, ctx) {
+    const S = SpriteVoiture;
+    const cle = `${l}|${w}|${flanc}|${couleurPneu}|${jante}|${cote}`;
+    if (ctx !== null && S.plancheRoues().copier(cle, g => S.roue(0, 0, l, w, flanc, couleurPneu, jante, cote, g), x, y, 1, resolution, ctx)) return;
+    S.roue(x, y, l, w, flanc, couleurPneu, jante, cote);
   }
 
   // Les parties qui bougent, dessinées à chaque image dans le repère de la voiture (unités design).
+  // Les roues sont des copies de la planche des roues (le braquage fait tourner la copie).
   static dessinerRoues(voiture, braquage, abandon) {
     const S = SpriteVoiture;
     const pneu = abandon ? S.desaturer(Pneus.type(voiture.typePneus).couleur) : Pneus.type(voiture.typePneus).couleur;
     const jante = S.JANTE;
+    const ctx = PlancheSprites.contexte();
+    const resolution = ctx === null ? 1 : S.plancheRoues().resolution(1, ctx);
     noStroke();
     // arrière : 15 × 7, fixes
-    S.roue(-31, -16, 15, 7, 1.6, pneu, jante, -1);
-    S.roue(-31, 9, 15, 7, 1.6, pneu, jante, 1);
+    S.poserRoue(-31, -16, 15, 7, 1.6, pneu, jante, -1, resolution, ctx);
+    S.poserRoue(-31, 9, 15, 7, 1.6, pneu, jante, 1, resolution, ctx);
     // avant : 13 × 6,5, braquées autour de leur centre
     const angle = Math.max(-S.BRAQUAGE_MAX, Math.min(S.BRAQUAGE_MAX, braquage));
     for (const s of [-1, 1]) {
       push();
       translate(19.5, s * 12.25);
       rotate(angle);
-      S.roue(-6.5, -3.25, 13, 6.5, 1.5, pneu, jante, s);
+      S.poserRoue(-6.5, -3.25, 13, 6.5, 1.5, pneu, jante, s, resolution, ctx);
       // plat de pneu après un blocage : une tache claire sur la bande de roulement
       if (voiture.platDePneu > 0.2) {
         fill(140, 140, 140, 220 * voiture.platDePneu);

@@ -318,20 +318,35 @@ class DecorCircuit {
     ImageAlpha.dessiner(this.graphique, opacite, 0, 0, this.circuit.largeurMonde, this.circuit.hauteurMonde);
   }
 
-  // Les abords du monde (au-delà du graphique) : la même herbe tondue, dessinée à chaque image en
-  // quelques bandes (le cadrage sur le circuit peut montrer un peu au-delà du bord du monde).
+  // Les abords du monde (au-delà du graphique) : la même herbe tondue (le cadrage sur le circuit
+  // peut montrer un peu au-delà du bord du monde). Sur un vrai contexte, le motif d'herbe du décor
+  // (bandes tournées de -18°, même phase), préparé une fois par palette, remplit seulement les
+  // quatre bandes autour du monde : rien n'est repeint sous le décor. Sinon (tests), les bandes une
+  // à une.
   showAbords(marge = 1200) {
     const c = this.circuit;
     const P = DecorCircuit.PALETTES[this.palette];
     const L = c.largeurMonde;
     const H = c.hauteurMonde;
+    const ecran = { drawingContext: typeof drawingContext === 'undefined' ? null : drawingContext };
+    const ctx = DecorCircuit.contexte(ecran);
     push();
     noStroke();
     fill(...DecorCircuit.rgb(P.herbeA));
+    if (ctx !== null) {
+      this.motifsAbords ??= new Map();
+      if (!this.motifsAbords.has(this.palette)) this.motifsAbords.set(this.palette, this.motif(ecran, 'herbe', P));
+      // fill() de p5 a posé la couleur ; le motif la remplace jusqu'au pop()
+      if (this.motifsAbords.get(this.palette) !== null) ctx.fillStyle = this.motifsAbords.get(this.palette);
+    }
     rect(-marge, -marge, L + 2 * marge, marge);
     rect(-marge, H, L + 2 * marge, marge);
     rect(-marge, 0, marge, H);
     rect(L, 0, marge, H);
+    if (ctx !== null) {
+      pop();
+      return;
+    }
     // bandes : même phase que le motif du décor (origine du monde, -18°)
     fill(...DecorCircuit.rgb(P.herbeB));
     rotate(DecorCircuit.ANGLE_TONTE * Math.PI / 180);

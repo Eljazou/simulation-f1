@@ -1,13 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadScene, F1 } from './support.mjs';
+import { loadScene, F1, near } from './support.mjs';
 
-// Foule animée : dessinée directement sur le contexte 2D (performance : 800 spectateurs à chaque
-// image), avec exactement les disques du chemin p5 (circle / fill) : mêmes centres, diamètres,
-// couleurs, même ordre. Positions de base calculées une fois par décor.
+// Foule animée (performance : 800 spectateurs à chaque image) : chaque spectateur est une copie
+// (drawImage) d'un disque tracé une fois par couleur dans une planche de sprites, avec exactement
+// les disques du chemin p5 (circle / fill) : mêmes centres, diamètres, couleurs, même ordre.
+// Positions de base calculées une fois par décor.
 
-const scene = loadScene(F1, '({ Circuit, Course, Foule })');
-const { Circuit, Course, Foule } = scene;
+const scene = loadScene(F1, '({ Circuit, Course, Foule, PlancheSprites })');
+const { Circuit, Course, Foule, PlancheSprites } = scene;
 
 function foule() {
   const c = new Course({ ...Course.parametresParDefaut(), nombreVoitures: 2, incidents: false }, Circuit.generateur(7));
@@ -30,27 +31,43 @@ function disquesP5(f) {
   return disques;
 }
 
-// Les disques du chemin direct (contexte 2D factice qui enregistre).
+// Un contexte 2D factice qui enregistre les copies (drawImage à 9 arguments), à l'échelle 1.
+function contexteCopies() {
+  return { copies: [], getTransform: () => ({ a: 1, b: 0 }), drawImage(...a) { this.copies.push(a); } };
+}
+
+// Les disques du chemin direct : chaque copie ramenée au disque qu'elle montre (centre, diamètre,
+// couleur de sa case dans la planche).
 function disquesContexte(f) {
-  const disques = [];
-  // le disque : centre = point de départ décalé d'un rayon (moveTo(x, cy)), diamètre = l'écart
-  // entre le départ et le point opposé du deuxième bezierCurveTo
-  const ctx = { fillStyle: '', beginPath() { this.pts = []; }, moveTo(x, y) { this.pts.push([x, y]); },
-    bezierCurveTo(...a) { this.pts.push([a[4], a[5]]); },
-    fill() { const [[x0, cy], , [xe]] = this.pts; disques.push([(x0 + xe) / 2, cy, xe - x0, this.fillStyle]); } };
+  const ctx = contexteCopies();
   const avant = scene.context.drawingContext;
   scene.context.drawingContext = ctx;
   scene.calls.length = 0;
   f.show();
   const triangles = scene.calls.filter(c => c[0] === 'triangle').length;
+  const cercles = scene.calls.filter(c => c[0] === 'circle').length;
   scene.context.drawingContext = avant;
-  return { disques, triangles };
+  const planche = Foule.PLANCHE;
+  const [resolution] = [...planche.planches.keys()];
+  const p = planche.planches.get(resolution);
+  const couleurDe = new Map([...p.cases].map(([css, [sx, sy]]) => [`${sx},${sy}`, css]));
+  const m = PlancheSprites.MARGE / resolution;
+  const max = Foule.DIAMETRE + Foule.GONFLEMENT;
+  const disques = ctx.copies.map(([source, sx, sy, sl, sh, dx, dy, dl, dh]) => {
+    assert.equal(source, p.source);
+    assert.equal(sl, p.l);
+    assert.equal(sh, p.h);
+    const echelle = dl * resolution / p.l;
+    near(dh * resolution / p.h, echelle);
+    return [dx - (planche.boite[0] - m) * echelle, dy - (planche.boite[1] - m) * echelle, echelle * max, couleurDe.get(`${sx},${sy}`)];
+  });
+  return { disques, triangles, cercles, planche: p };
 }
 
-test('foule : le dessin direct donne les mêmes disques que circle() / fill() de p5, dans le même ordre', () => {
+test('foule : chaque spectateur est une copie de la planche, avec les disques de circle() / fill() de p5, dans le même ordre', () => {
   const f = foule();
   const attendus = disquesP5(f);
-  const { disques, triangles } = disquesContexte(f);
+  const { disques, triangles, cercles } = disquesContexte(f);
   assert.equal(disques.length, attendus.length);
   assert.ok(disques.length >= 160);
   disques.forEach((d, k) => {
@@ -58,23 +75,25 @@ test('foule : le dessin direct donne les mêmes disques que circle() / fill() de
     assert.ok(Math.abs(d[2] - attendus[k][2]) < 1e-9, `diamètre ${k}`);
     assert.equal(d[3], attendus[k][3], `couleur ${k}`);
   });
-  // drapeaux agités : toujours dessinés par p5
+  // drapeaux agités : toujours dessinés par p5 ; aucun disque tracé sur l'écran
   assert.ok(triangles > 0);
+  assert.equal(cercles, 0);
 });
 
-test('foule : la couleur est rétablie après un drapeau (fill() de p5 change celle du contexte)', () => {
+test('foule : un disque par couleur est tracé une fois dans la planche, puis seulement recopié', () => {
   const f = foule();
-  const ctx = { fillStyle: '', beginPath() {}, moveTo() {}, bezierCurveTo() {}, fills: [], fill() { this.fills.push(this.fillStyle); } };
-  const avant = scene.context.drawingContext;
-  scene.context.drawingContext = ctx;
-  // fill() de p5 (substitut) écrit la couleur du drapeau dans le contexte, comme le vrai p5
-  const fill0 = scene.context.fill;
-  scene.context.fill = (...a) => { ctx.fillStyle = `drapeau(${a.join(',')})`; };
-  f.show();
-  scene.context.fill = fill0;
-  scene.context.drawingContext = avant;
-  assert.ok(ctx.fills.length > 0);
-  assert.ok(ctx.fills.every(s => s.startsWith('rgb(')), 'un spectateur a pris la couleur d\'un drapeau');
+  disquesContexte(f);
+  const { planche } = disquesContexte(f);
+  // une case par couleur distincte (deux indices de la palette peuvent avoir la même teinte)
+  const couleurs = new Set(f.decor.tribunes.flatMap(t => t.foule.map(([, , c]) => f.styles.css[c])));
+  assert.equal(planche.cases.size, couleurs.size);
+  // une image de plus : ni nouvelle case, ni nouveau graphique
+  const graphiques = scene.graphiques.crees.length;
+  scene.graphiques.calls.length = 0;
+  disquesContexte(f);
+  assert.equal(planche.cases.size, couleurs.size);
+  assert.equal(scene.graphiques.crees.length, graphiques);
+  assert.equal(scene.graphiques.calls.filter(c => c[0] === 'circle').length, 0);
 });
 
 test('foule : positions de base calculées une fois (pas de pointLateral à chaque image)', () => {

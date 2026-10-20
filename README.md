@@ -78,6 +78,9 @@ Le circuit est généré à partir de trois profils inventés : **Classique**, *
 - Météo sèche, manuelle, automatique (averse, orage, éclaircie) ou aléatoire.
 - Piste qui se mouille et sèche progressivement, adhérence réduite, gerbes d'eau, éclairs.
 - Jour, crépuscule, nuit ou cycle complet ; foule, traces de pneus, fumée, étincelles.
+- Qualité du rendu Haute, Moyenne ou Basse, avec détection automatique (sous 40 images/s pendant
+  3 s, la qualité baisse d'un cran) et compteur FPS (onglet Réglages, section Effets). Mesures :
+  [docs/perf-avant.md](docs/perf-avant.md), [docs/perf-apres.md](docs/perf-apres.md).
 
 ### 🎮 Modes de jeu
 - **Solo** : piloter une voiture au clavier contre les adversaires.

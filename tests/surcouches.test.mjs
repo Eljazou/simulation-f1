@@ -259,7 +259,8 @@ test('écran partagé : étiquettes J1 / J2 et HUD par joueur en HTML, duel (pos
   // derrière la ligne : tour vaut -1 au départ) ; il le mène s'il est devant J2 au classement
   const tour = () => p.evaluate('Math.max(...formule1.course.joueurs.map(j => j.tour))');
   p.evaluate('formule1.course.joueur.tour = 1');
-  p.draw(3);
+  // le HUD du duel est écrit InterfaceF1.FREQUENCE_HUD fois par seconde : un peu plus d'une période
+  p.draw(7);
   assert.match(p.evaluate('interfaceF1.duel.menes.textContent'), /^Tours menés · J1 \d+ – J2 \d+$/);
   assert.equal(p.evaluate('interfaceF1.duel.toursMenes[0] + interfaceF1.duel.toursMenes[1]'), tour());
 });

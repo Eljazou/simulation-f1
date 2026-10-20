@@ -97,7 +97,9 @@ const ReglagesF1 = (() => {
     ['traces', 'f1-traces', 'affichage'], ['poussiere', 'f1-poussiere', 'affichage'], ['billes', 'f1-billes', 'affichage'],
     ['foule', 'f1-foule', 'affichage'], ['lignesVitesse', 'f1-lignes-vitesse', 'affichage'],
     ['telemetrie', 'f1-telemetrie', 'affichage'], ['carteChaleur', 'f1-carte-chaleur', 'affichage'], ['radio', 'f1-radio', 'affichage'],
-    ['prediction', 'f1-prediction', 'affichage'], ['historique', 'f1-historique', 'affichage'], ['miniCarte', 'f1-mini-carte', 'affichage']];
+    ['prediction', 'f1-prediction', 'affichage'], ['historique', 'f1-historique', 'affichage'], ['miniCarte', 'f1-mini-carte', 'affichage'],
+    // qualité du rendu : détection automatique (voir qualiteRendu.js), compteur d'images par seconde
+    ['qualiteAuto', 'f1-qualite-auto', 'affichage'], ['compteurFps', 'f1-compteur-fps', 'affichage']];
 
   // Menus : [clé du réglage, id, valeurs permises].
   const MENUS = [['personnalites', 'f1-personnalites', ['aleatoire', ...Personnalites.NOMS]],

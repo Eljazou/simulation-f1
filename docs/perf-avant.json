@@ -1,0 +1,554 @@
+{
+  "date": "2026-10-20T10:37:04.881Z",
+  "url": "http://localhost:54129/",
+  "dpr": 1.25,
+  "duree": 30,
+  "navigateur": "155.0.8059.85",
+  "gpu": {
+    "glRenderer": "ANGLE (Intel, Intel(R) UHD Graphics (0x00009A60) Direct3D11 vs_5_0 ps_5_0, D3D11-30.0.101.1340)",
+    "gpu0": "VENDOR= 0x8086, DEVICE=0x9a60 [Intel(R) UHD Graphics], SUBSYS=0x12fb1462, REV=1, LUID={0,55656}, DRIVER_VENDOR=Intel, DRIVER_VERSION=30.0.101.1340 *ACTIVE*",
+    "gpu1": "VENDOR= 0x10de, DEVICE=0x249c [NVIDIA GeForce RTX 3080 Laptop GPU], SUBSYS=0x12fb1462, REV=161, LUID={0,56388}, DRIVER_VERSION=32.0.15.8157",
+    "actif": "Intel(R) UHD Graphics",
+    "canvas": "Hardware accelerated",
+    "compositing": "Hardware accelerated",
+    "rasterization": "Hardware accelerated",
+    "webgl": "Hardware accelerated"
+  },
+  "mesures": [
+    {
+      "scenario": "sec",
+      "qualite": "eleve",
+      "images": 370,
+      "fpsMoyen": 12.503049524274195,
+      "fpsMin": 0.983477576711206,
+      "fps1pc": 0.9931472837420412,
+      "fpsPireSeconde": 1,
+      "msParImage": 79.98048780487818,
+      "msDraw": 7.822432432430041,
+      "msDrawMax": 15.199999999953434,
+      "msUpdate": 1.6954054054017555,
+      "msShow": 5.669189189186924,
+      "msInterface": 0.39864864864864863,
+      "mutationsParSeconde": 155.24204297062454,
+      "particulesMax": 264,
+      "chrome": {
+        "principalOccupe": 11.370208108108107,
+        "js": 8.21494864864865,
+        "gc": 0.24546756756756755,
+        "styleLayout": 0.4174027027027027,
+        "peinture": 0.5879675675675675,
+        "compositeur": 1.8714837837837837,
+        "raster": 0,
+        "gpu": 18.10511081081081,
+        "viz": 1.6660594594594595,
+        "gpuPourcent": 22.321303380071473,
+        "principalPourcent": 14.018023271312066
+      },
+      "canvas": {
+        "largeur": 3840,
+        "hauteur": 2160,
+        "css": [
+          1920,
+          1080
+        ]
+      },
+      "densite": 2,
+      "ratio": 1.25,
+      "qualiteLue": "eleve",
+      "etat": "COURSE",
+      "meteo": "SEC",
+      "humidite": 0,
+      "voitures": 12,
+      "erreurs": []
+    },
+    {
+      "scenario": "sec",
+      "qualite": "moyen",
+      "images": 1375,
+      "fpsMoyen": 45.810994638713225,
+      "fpsMin": 19.607843137254903,
+      "fps1pc": 28.248587570509994,
+      "fpsPireSeconde": 40,
+      "msParImage": 21.828820960698724,
+      "msDraw": 10.008509090907024,
+      "msDrawMax": 27.300000000046566,
+      "msUpdate": 2.521018181816929,
+      "msShow": 6.979345454541628,
+      "msInterface": 0.46130909091234207,
+      "mutationsParSeconde": 552.9381189108476,
+      "particulesMax": 292,
+      "chrome": {
+        "principalOccupe": 13.095624,
+        "js": 10.353251636363636,
+        "gc": 0.1880589090909091,
+        "styleLayout": 0.33428945454545456,
+        "peinture": 0.5916472727272727,
+        "compositeur": 2.2395985454545455,
+        "raster": 0,
+        "gpu": 21.801611636363635,
+        "viz": 2.289701090909091,
+        "gpuPourcent": 99.88276845570451,
+        "principalPourcent": 59.99681131798829
+      },
+      "canvas": {
+        "largeur": 3840,
+        "hauteur": 2160,
+        "css": [
+          1920,
+          1080
+        ]
+      },
+      "densite": 2,
+      "ratio": 1.25,
+      "qualiteLue": "moyen",
+      "etat": "COURSE",
+      "meteo": "SEC",
+      "humidite": 0,
+      "voitures": 12,
+      "erreurs": []
+    },
+    {
+      "scenario": "sec",
+      "qualite": "bas",
+      "images": 1690,
+      "fpsMoyen": 56.27223902874573,
+      "fpsMin": 26.31578947368421,
+      "fps1pc": 32.8947368419541,
+      "fpsPireSeconde": 54,
+      "msParImage": 17.77075192421554,
+      "msDraw": 6.275976331364061,
+      "msDrawMax": 18.5,
+      "msUpdate": 1.359349112422481,
+      "msShow": 4.5384615384634674,
+      "msInterface": 0.3422485207124839,
+      "mutationsParSeconde": 556.262406906565,
+      "particulesMax": 177,
+      "chrome": {
+        "principalOccupe": 10.03705029585799,
+        "js": 6.645726035502959,
+        "gc": 0.14946863905325444,
+        "styleLayout": 0.24517810650887573,
+        "peinture": 0.49164792899408283,
+        "compositeur": 1.8522218934911243,
+        "raster": 0,
+        "gpu": 13.026027218934912,
+        "viz": 1.7994372781065089,
+        "gpuPourcent": 73.3222731451256,
+        "principalPourcent": 56.497605217228944
+      },
+      "canvas": {
+        "largeur": 3840,
+        "hauteur": 2160,
+        "css": [
+          1920,
+          1080
+        ]
+      },
+      "densite": 2,
+      "ratio": 1.25,
+      "qualiteLue": "bas",
+      "etat": "COURSE",
+      "meteo": "SEC",
+      "humidite": 0,
+      "voitures": 12,
+      "erreurs": []
+    },
+    {
+      "scenario": "pluie",
+      "qualite": "eleve",
+      "images": 1225,
+      "fpsMoyen": 40.804080408040804,
+      "fpsMin": 23.310023310073912,
+      "fps1pc": 26.80965147466471,
+      "fpsPireSeconde": 35,
+      "msParImage": 24.50735294117647,
+      "msDraw": 11.956734693882112,
+      "msDrawMax": 26.0999999998603,
+      "msUpdate": 3.190938775512409,
+      "msShow": 8.1988571428576,
+      "msInterface": 0.5167346938786914,
+      "mutationsParSeconde": 411.4905539065291,
+      "particulesMax": 509,
+      "chrome": {
+        "principalOccupe": 15.697742857142858,
+        "js": 12.331876734693878,
+        "gc": 0.2366130612244898,
+        "styleLayout": 0.35733224489795923,
+        "peinture": 0.7011036734693877,
+        "compositeur": 2.3424579591836734,
+        "raster": 0,
+        "gpu": 24.48381142857143,
+        "viz": 2.4808163265306122,
+        "gpuPourcent": 99.91661253193966,
+        "principalPourcent": 64.0613204875791
+      },
+      "canvas": {
+        "largeur": 3840,
+        "hauteur": 2160,
+        "css": [
+          1920,
+          1080
+        ]
+      },
+      "densite": 2,
+      "ratio": 1.25,
+      "qualiteLue": "eleve",
+      "etat": "COURSE",
+      "meteo": "ORAGE",
+      "humidite": 0.8,
+      "voitures": 12,
+      "erreurs": []
+    },
+    {
+      "scenario": "pluie",
+      "qualite": "moyen",
+      "images": 1278,
+      "fpsMoyen": 42.5722010528034,
+      "fpsMin": 20.040080160264537,
+      "fps1pc": 25.38071065995847,
+      "fpsPireSeconde": 38,
+      "msParImage": 23.4895066562256,
+      "msDraw": 11.124334898275391,
+      "msDrawMax": 23.5999999998603,
+      "msUpdate": 2.781377151797027,
+      "msShow": 7.839123630673765,
+      "msInterface": 0.4580594679170925,
+      "mutationsParSeconde": 427.66960374435763,
+      "particulesMax": 427,
+      "chrome": {
+        "principalOccupe": 14.584176056338029,
+        "js": 11.467914710485134,
+        "gc": 0.22775430359937401,
+        "styleLayout": 0.3064898278560251,
+        "peinture": 0.6449679186228482,
+        "compositeur": 2.303275430359937,
+        "raster": 0,
+        "gpu": 23.4575813771518,
+        "viz": 2.5460414710485133,
+        "gpuPourcent": 99.86771157786032,
+        "principalPourcent": 62.09030098106169
+      },
+      "canvas": {
+        "largeur": 3840,
+        "hauteur": 2160,
+        "css": [
+          1920,
+          1080
+        ]
+      },
+      "densite": 2,
+      "ratio": 1.25,
+      "qualiteLue": "moyen",
+      "etat": "COURSE",
+      "meteo": "ORAGE",
+      "humidite": 0.8,
+      "voitures": 12,
+      "erreurs": []
+    },
+    {
+      "scenario": "pluie",
+      "qualite": "bas",
+      "images": 1688,
+      "fpsMoyen": 56.23895722905624,
+      "fpsMin": 27.700831024859284,
+      "fps1pc": 32.154340836157296,
+      "fpsPireSeconde": 54,
+      "msParImage": 17.781268524007114,
+      "msDraw": 8.070142180094594,
+      "msDrawMax": 20.300000000046566,
+      "msUpdate": 1.9286137440751396,
+      "msShow": 5.70260663507247,
+      "msInterface": 0.3936018957328868,
+      "mutationsParSeconde": 443.74943794402145,
+      "particulesMax": 330,
+      "chrome": {
+        "principalOccupe": 12.301547393364928,
+        "js": 8.444976895734596,
+        "gc": 0.1884484597156398,
+        "styleLayout": 0.2695260663507109,
+        "peinture": 0.5690011848341232,
+        "compositeur": 2.1251125592417064,
+        "raster": 0,
+        "gpu": 15.846707938388624,
+        "viz": 2.2043898104265405,
+        "gpuPourcent": 89.0937592635146,
+        "principalPourcent": 69.1620686324466
+      },
+      "canvas": {
+        "largeur": 3840,
+        "hauteur": 2160,
+        "css": [
+          1920,
+          1080
+        ]
+      },
+      "densite": 2,
+      "ratio": 1.25,
+      "qualiteLue": "bas",
+      "etat": "COURSE",
+      "meteo": "ORAGE",
+      "humidite": 0.8,
+      "voitures": 12,
+      "erreurs": []
+    }
+  ],
+  "profil": {
+    "scenario": "sec",
+    "qualite": "moyen",
+    "fonctions": [
+      {
+        "fonction": "fill (natif):0",
+        "ms": 1263,
+        "pourcent": 23.6
+      },
+      {
+        "fonction": "value p5.min.js:2",
+        "ms": 1120,
+        "pourcent": 20.9
+      },
+      {
+        "fonction": "drawImage (natif):0",
+        "ms": 210,
+        "pourcent": 3.9
+      },
+      {
+        "fonction": "save (natif):0",
+        "ms": 149,
+        "pourcent": 2.8
+      },
+      {
+        "fonction": "(anonyme) foule.js:100",
+        "ms": 139,
+        "pourcent": 2.6
+      },
+      {
+        "fonction": "(garbage collector) (natif):0",
+        "ms": 125,
+        "pourcent": 2.3
+      },
+      {
+        "fonction": "bezierCurveTo (natif):0",
+        "ms": 106,
+        "pourcent": 2
+      },
+      {
+        "fonction": "restore (natif):0",
+        "ms": 65,
+        "pourcent": 1.2
+      },
+      {
+        "fonction": "stroke (natif):0",
+        "ms": 64,
+        "pourcent": 1.2
+      },
+      {
+        "fonction": "l.default.color p5.min.js:2",
+        "ms": 49,
+        "pourcent": 0.9
+      },
+      {
+        "fonction": "o.default.createVector p5.min.js:2",
+        "ms": 44,
+        "pourcent": 0.8
+      },
+      {
+        "fonction": "applyBehaviors fumee.js:33",
+        "ms": 43,
+        "pourcent": 0.8
+      },
+      {
+        "fonction": "applyBehaviors voitureF1.js:1042",
+        "ms": 43,
+        "pourcent": 0.8
+      },
+      {
+        "fonction": "arcTo (natif):0",
+        "ms": 39,
+        "pourcent": 0.7
+      },
+      {
+        "fonction": "_draw p5.min.js:2",
+        "ms": 32,
+        "pourcent": 0.6
+      },
+      {
+        "fonction": "beginPath (natif):0",
+        "ms": 29,
+        "pourcent": 0.5
+      },
+      {
+        "fonction": "profilVitesse circuit.js:519",
+        "ms": 28,
+        "pourcent": 0.5
+      },
+      {
+        "fonction": "rect (natif):0",
+        "ms": 27,
+        "pourcent": 0.5
+      },
+      {
+        "fonction": "style domF1.js:40",
+        "ms": 27,
+        "pourcent": 0.5
+      },
+      {
+        "fonction": "translate (natif):0",
+        "ms": 26,
+        "pourcent": 0.5
+      },
+      {
+        "fonction": "l.default.circle p5.min.js:2",
+        "ms": 25,
+        "pourcent": 0.5
+      },
+      {
+        "fonction": "e.default.pop p5.min.js:2",
+        "ms": 25,
+        "pourcent": 0.5
+      },
+      {
+        "fonction": "setAttribute (natif):0",
+        "ms": 25,
+        "pourcent": 0.5
+      },
+      {
+        "fonction": "update course.js:1099",
+        "ms": 23,
+        "pourcent": 0.4
+      },
+      {
+        "fonction": "show fumee.js:49",
+        "ms": 23,
+        "pourcent": 0.4
+      },
+      {
+        "fonction": "seek vehicle.js:188",
+        "ms": 23,
+        "pourcent": 0.4
+      },
+      {
+        "fonction": "update fumee.js:43",
+        "ms": 22,
+        "pourcent": 0.4
+      },
+      {
+        "fonction": "applyBehaviors mecanicien.js:41",
+        "ms": 22,
+        "pourcent": 0.4
+      },
+      {
+        "fonction": "disque foule.js:69",
+        "ms": 22,
+        "pourcent": 0.4
+      },
+      {
+        "fonction": "getAttribute (natif):0",
+        "ms": 21,
+        "pourcent": 0.4
+      }
+    ],
+    "fichiers": [
+      {
+        "fichier": "(natif)",
+        "pourcent": 42.5
+      },
+      {
+        "fichier": "p5.min.js",
+        "pourcent": 28.3
+      },
+      {
+        "fichier": "voitureF1.js",
+        "pourcent": 4.9
+      },
+      {
+        "fichier": "course.js",
+        "pourcent": 4.2
+      },
+      {
+        "fichier": "foule.js",
+        "pourcent": 3.5
+      },
+      {
+        "fichier": "fumee.js",
+        "pourcent": 2
+      },
+      {
+        "fichier": "scenarios.js",
+        "pourcent": 1.6
+      },
+      {
+        "fichier": "circuit.js",
+        "pourcent": 1.5
+      },
+      {
+        "fichier": "domF1.js",
+        "pourcent": 1.4
+      },
+      {
+        "fichier": "spriteVoiture.js",
+        "pourcent": 1.1
+      },
+      {
+        "fichier": "chronometrage.js",
+        "pourcent": 0.9
+      },
+      {
+        "fichier": "mecanicien.js",
+        "pourcent": 0.9
+      },
+      {
+        "fichier": "carteCircuit.js",
+        "pourcent": 0.8
+      },
+      {
+        "fichier": "grilleSpatiale.js",
+        "pourcent": 0.7
+      },
+      {
+        "fichier": "vehicle.js",
+        "pourcent": 0.6
+      },
+      {
+        "fichier": "decorCircuit.js",
+        "pourcent": 0.6
+      },
+      {
+        "fichier": "sketch.js",
+        "pourcent": 0.5
+      },
+      {
+        "fichier": "interfaceF1.js",
+        "pourcent": 0.5
+      },
+      {
+        "fichier": "incidents.js",
+        "pourcent": 0.4
+      },
+      {
+        "fichier": "tracesPneus.js",
+        "pourcent": 0.4
+      }
+    ],
+    "appelsParImage": {
+      "bezierCurveTo": 4769,
+      "beginPath": 1761,
+      "fill": 1570,
+      "moveTo": 1385,
+      "save": 366,
+      "restore": 366,
+      "translate": 167,
+      "rotate": 166,
+      "drawImage": 67,
+      "lineTo": 33,
+      "hors écran : beginPath": 30,
+      "hors écran : moveTo": 30,
+      "hors écran : lineTo": 30,
+      "hors écran : stroke": 30,
+      "stroke": 30,
+      "scale": 28,
+      "setTransform": 2,
+      "fillRect": 1,
+      "fillText": 1
+    }
+  }
+}

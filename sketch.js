@@ -17,6 +17,9 @@ let parametresF1;
 let interfaceF1 = null;
 // Diagnostic de performance (voir diagnosticPerf.js) : ?debug=perf dans l'adresse, ou touche F9
 let diagnostic = null;
+// Qualité du rendu : détection automatique (voir qualiteRendu.js) et compteur FPS (compteurImages.js)
+let qualiteRendu = null;
+let compteurImages = null;
 // L'élément <canvas> de la scène (son curseur devient une main au-dessus d'une voiture)
 let canvasScene = null;
 // IA entraînée : les modèles sauvegardés (voir modelesIA.js) et la page d'entraînement (voir
@@ -91,6 +94,8 @@ function setup() {
     actions: { fermer: fermerEntrainement, modelesChanges: remplirModelesF1, exporter: telecharger },
   });
   diagnostic = new DiagnosticPerf(document.body);
+  qualiteRendu = new QualiteRendu();
+  compteurImages = new CompteurImages(document.body);
   if (DiagnosticPerf.demande(typeof location === 'undefined' ? '' : location.search)) diagnostic.activer(true);
   // la fenêtre perd le focus (changement d'onglet...) : aucune touche de conduite ne reste
   // enfoncée et, en mode jeu, la partie se met en pause
@@ -127,11 +132,14 @@ function draw() {
 
   // la fenêtre a changé de hauteur sans événement (plein écran...) : le canvas la remplit
   if (height !== hauteurScene()) windowResized();
+  appliquerDensite();
 
   // page d'entraînement ouverte : elle seule avance et se dessine (la course attend, en pause)
   if (pageEntrainement !== null && pageEntrainement.ouverte) {
     pageEntrainement.update(dt);
     pageEntrainement.show();
+    // l'entraînement prend volontairement son budget de temps : ce n'est pas une course lente
+    if (qualiteRendu !== null) qualiteRendu.reinitialiser();
     if (mesure) mesurerPerf(dt, performance.now() - debutDraw);
     return;
   }
@@ -139,9 +147,26 @@ function draw() {
   scenario.update(dt, souris);
   scenario.show(debug);
   if (interfaceF1 !== null) interfaceF1.mettreAJour(dt);
+  surveillerQualite(deltaTime / 1000);
 
   afficherEtat();
   if (mesure) mesurerPerf(dt, performance.now() - debutDraw);
+}
+
+// Qualité automatique (case du panneau) : sous 40 images/s pendant 3 s, la qualité inférieure est
+// prise (moins d'effets, densité de pixels 1, pluie et traces réduites), le menu Qualité la montre
+// et le changement est annoncé discrètement. dtReel : la durée réelle de l'image (non plafonnée).
+function surveillerQualite(dtReel) {
+  if (qualiteRendu === null) return;
+  const affichage = formule1.affichage;
+  const proposee = qualiteRendu.observer(dtReel, affichage.qualite);
+  if (proposee !== null && affichage.qualiteAuto) {
+    formule1.afficher('qualite', proposee);
+    const menu = document.getElementById('f1-qualite');
+    if (menu) menu.value = proposee;
+    compteurImages.annoncer(`Qualité ${QualiteRendu.LIBELLES[proposee]} (automatique)`);
+  }
+  compteurImages.mettreAJour(dtReel, { actif: affichage.compteurFps, fps: qualiteRendu.fps });
 }
 
 // Diagnostic de performance : la durée de l'image et de draw(), les redessins du décor du circuit.
@@ -512,5 +537,16 @@ function mousePressed(evenement) {
 
 function windowResized() {
   resizeCanvas(windowWidth, hauteurScene());
+  appliquerDensite();
   formule1.redimensionner(width, height);
+}
+
+// Densité de pixels du canvas : celle de l'écran, plafonnée selon la qualité et pour que le canvas
+// ne dépasse pas 1920 × 1080 pixels réels (voir qualiteRendu.js). Vérifiée à chaque image (la
+// qualité, la fenêtre ou l'écran peuvent changer), appliquée seulement si elle change.
+function appliquerDensite() {
+  if (typeof pixelDensity !== 'function') return;
+  const ratio = typeof devicePixelRatio === 'number' ? devicePixelRatio : 1;
+  const voulue = QualiteRendu.densite(formule1 ? formule1.affichage.qualite : Ambiance.QUALITE, ratio, width, height);
+  if (pixelDensity() !== voulue) pixelDensity(voulue);
 }

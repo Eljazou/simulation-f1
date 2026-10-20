@@ -144,11 +144,13 @@ class Meteo {
   // un dessin pur (aucun objet ne bouge) : leur position est une fonction du temps.
   // Pluie (design : fiche technique, « Gouttes » et calque 14) : teinte #162434 à 10 %, motif de
   // 24 × 48 de deux traits de 1 px (#dbe8f5, 35 % et 25 %), qui défile de (-24, +48) en 320 ms.
-  // Le motif est précalculé une fois dans un p5.Graphics de 10 × 5 cellules, puis seulement
-  // recopié (une quarantaine de copies par image en 1920 × 1080).
-  // Le motif des gouttes : 10 × 5 cellules (créé une fois).
-  motifPluie() {
-    if (this.motif) return this.motif;
+  // Le motif est précalculé une fois dans un p5.Graphics de 10 × 5 cellules, puis posé d'un seul
+  // remplissage (ImageAlpha.motif), décalé selon la phase du défilement.
+  // Le motif des gouttes : 10 × 5 cellules (créé une fois). leger (qualité basse) : seulement le
+  // premier des deux traits de chaque cellule, deux fois moins de gouttes.
+  motifPluie(leger = false) {
+    const cle = leger ? 'motifLeger' : 'motif';
+    if (this[cle]) return this[cle];
     const [l, h] = Meteo.CELLULE_GOUTTES;
     const g = createGraphics(l * 10, h * 5);
     g.pixelDensity(1);
@@ -157,31 +159,29 @@ class Meteo {
       for (let j = 0; j < 5; j++) {
         g.stroke(219, 232, 245, 0.35 * 255);
         g.line(i * l + 20, j * h, i * l + 12, j * h + 18);
+        if (leger) continue;
         g.stroke(219, 232, 245, 0.25 * 255);
         g.line(i * l + 8, j * h + 26, i * l + 2, j * h + 40);
       }
     }
-    this.motif = { g, largeur: l * 10, hauteur: h * 5 };
-    return this.motif;
+    this[cle] = { g, largeur: l * 10, hauteur: h * 5 };
+    return this[cle];
   }
 
-  show(largeur, hauteur) {
+  // qualite : 'bas' pose le motif léger (deux fois moins de gouttes).
+  show(largeur, hauteur, qualite = 'moyen') {
     if (this.intensite <= 0.01 && this.flash <= 0) return;
     push();
     noStroke();
     fill(22, 36, 52, 0.1 * 255 * Math.min(1, this.intensite / 0.6));
     rect(0, 0, largeur, hauteur);
     if (this.intensite > 0.01) {
-      const motif = this.motifPluie();
+      const motif = this.motifPluie(qualite === 'bas');
       const phase = (this.chrono % Meteo.PERIODE_GOUTTES) / Meteo.PERIODE_GOUTTES;
       const dx = -24 * phase;
       const dy = 48 * phase;
-      // une seule opacité pour toutes les copies (sans la copie intermédiaire de tint())
-      ImageAlpha.tuiles(motif.g, Math.min(1, this.intensite / 0.6), poser => {
-        for (let x = -motif.largeur; x < largeur + motif.largeur; x += motif.largeur) {
-          for (let y = -motif.hauteur; y < hauteur; y += motif.hauteur) poser(x + dx, y + dy, motif.largeur, motif.hauteur);
-        }
-      });
+      // une seule opacité, un seul remplissage (sans la copie intermédiaire de tint())
+      ImageAlpha.motif(motif.g, Math.min(1, this.intensite / 0.6), [motif.largeur, motif.hauteur], largeur, hauteur, dx, dy);
     }
     if (this.flash > 0) {
       noStroke();

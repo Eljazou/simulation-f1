@@ -110,6 +110,8 @@ note 93/100 sur les circuits jamais vus (6/6 tours propres, 0 contact en trafic)
 | `fumee.js`, `etincelle.js`, `gerbeEau.js`, `gerbePoussiere.js`, `debris.js`, `billeGomme.js`, `drone.js`, `commissaire.js`, `mecanicien.js`, `confetti.js` | Autres objets mobiles (effets, dépanneuse, mécaniciens, confettis) |
 | `chronometrage.js`, `incidents.js`, `voieDesStands.js`, `equipeDeStand.js`, `meteo.js`, `glisse.js`, `surfaces.js`, `strategie.js`, `pneus.js`, `personnalites.js`, `ordresEquipe.js` | Règles de course |
 | `decorCircuit.js`, `spriteVoiture.js`, `livrees.js`, `ambiance.js`, `foule.js`, `effetsVitesse.js`, `tracesPneus.js`, `camera.js` | Rendu et caméra |
+| `planchesSprites.js`, `imageAlpha.js` | Petits dessins répétés (foule, mécaniciens, roues) tracés une fois puis recopiés ; opacités et motifs sans copie intermédiaire |
+| `qualiteRendu.js`, `compteurImages.js`, `diagnosticPerf.js` | Qualité Haute / Moyenne / Basse (densité de pixels, détection automatique), compteur FPS, diagnostic F9 |
 | `interfaceF1.js`, `interfaceF1.css`, `domF1.js`, `barreHaut.js`, `tourClassement.js`, `hudCourse.js`, `panneauLateral.js`, `menuModes.js`, … | Interface HTML (elle lit la course) |
 | `reglages.js`, `reglagesF1.js` | Plages et liaison des curseurs |
 | `entrainer.mjs`, `serveur.mjs`, `start.bat` | Entraînement sans affichage (Node) ; serveur local ; lanceur Windows |

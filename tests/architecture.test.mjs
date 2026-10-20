@@ -38,6 +38,7 @@ const F1_FIXES = { 'circuit.js': 'Circuit', 'decorCircuit.js': 'DecorCircuit', '
   'feuxDepart.js': 'FeuxDepart', 'bandeauNeutralisation.js': 'BandeauNeutralisation', 'panneauStand.js': 'PanneauStand',
   'podiumFin.js': 'PodiumFin', 'ecranRejouer.js': 'EcranRejouer', 'hudDuel.js': 'HudDuel',
   'diagnosticPerf.js': 'DiagnosticPerf', 'consignePilote.js': 'ConsignePilote',
+  'planchesSprites.js': 'PlancheSprites', 'qualiteRendu.js': 'QualiteRendu', 'compteurImages.js': 'CompteurImages',
   'incidentJoueur.js': 'IncidentJoueur', 'decompteReprise.js': 'DecompteReprise', 'encartRejouer.js': 'EncartRejouer',
   'menuPause.js': 'MenuPause', 'menuModes.js': 'MenuModes',
   // IA entraînée : réseau, capteurs, entraîneur, modèles, page et onglet ne bougent rien

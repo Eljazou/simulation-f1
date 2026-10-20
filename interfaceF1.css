@@ -4,8 +4,10 @@
    Historique · Réglages », « Fenêtre d'aide »). Le calque ne bouge rien : il lit la course. */
 
 :root {
-  --bg-panel: rgba(15, 17, 21, .85);
-  --blur: 14px;
+  /* fond des panneaux : un rgba simple, sans backdrop-filter (le flou de ce qui passe derrière était
+     recalculé à chaque image du canvas, sur toute la surface des panneaux), un peu plus opaque
+     que le verre dépoli du design pour rester aussi lisible */
+  --bg-panel: rgba(15, 17, 21, .9);
   --line: rgba(255, 255, 255, .08);
   --text: #e6edf3;
   --text-2: #8b949e;
@@ -62,7 +64,6 @@
 
 .theme-pluie {
   --bg-panel: rgba(13, 16, 20, .90);
-  --blur: 18px;
 }
 
 .cond { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; }
@@ -91,9 +92,6 @@
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  backdrop-filter: blur(var(--blur));
-  -webkit-backdrop-filter: blur(var(--blur));
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
 }
 
 #f1-ui {
@@ -309,9 +307,10 @@
 
 /* ---- HUD pilote : bottom 12 · left 12 · 460 × 212 ---- */
 @keyframes clignote { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+/* l'anneau rouge seul (une ombre sans flou) : le HUD n'a plus d'ombre portée à repeindre */
 @keyframes alerte {
-  0%, 100% { box-shadow: 0 8px 24px rgba(0, 0, 0, .35), 0 0 0 1px rgba(231, 76, 60, .9); }
-  50% { box-shadow: 0 8px 24px rgba(0, 0, 0, .35), 0 0 0 3px rgba(231, 76, 60, .35); }
+  0%, 100% { box-shadow: 0 0 0 1px rgba(231, 76, 60, .9); }
+  50% { box-shadow: 0 0 0 3px rgba(231, 76, 60, .35); }
 }
 
 #f1-hud {
@@ -347,7 +346,8 @@
 .hud-commandes { display: flex; flex-direction: column; justify-content: center; gap: 9px; }
 .jauge { display: grid; grid-template-columns: 40px 1fr 34px; align-items: center; gap: 6px; }
 .jauge .piste { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .08); overflow: hidden; }
-.jauge .barre { display: block; height: 100%; border-radius: 4px; width: 0; transition: width 60ms linear; }
+/* le HUD est écrit 10 fois par seconde : la barre glisse d'une valeur à la suivante */
+.jauge .barre { display: block; height: 100%; border-radius: 4px; width: 0; transition: width 100ms linear; }
 .jauge.gaz .barre { background: var(--gain); }
 .jauge.frein .barre { background: var(--loss); }
 .jauge .nombre { font-size: 11px; text-align: right; color: #c9d1d9; }
@@ -794,9 +794,7 @@
   position: fixed;
   inset: 0;
   z-index: 20;
-  background: rgba(5, 6, 8, .62);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  background: rgba(5, 6, 8, .72);
   font-family: 'Barlow', system-ui, sans-serif;
   color: var(--text);
 }
@@ -860,7 +858,6 @@ kbd {
   height: var(--map-h);
   background: rgba(15, 17, 21, .88);
   border-color: rgba(255, 255, 255, .09);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
   overflow: hidden;
   font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   transition: right var(--std) ease-out, width var(--std) ease-out, height var(--std) ease-out;
@@ -981,7 +978,7 @@ kbd {
   position: absolute; top: calc(var(--gap) * 2 + var(--bar-h)); left: 50%; transform: translateX(-50%);
   width: 640px; height: 44px; box-sizing: border-box; border-radius: 8px; overflow: hidden;
   display: flex; align-items: center; gap: 12px; padding: 0 16px 0 0;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .35); animation: neutralisation-entree var(--std) ease-out;
+  animation: neutralisation-entree var(--std) ease-out;
   transition: opacity var(--slow);
 }
 .neutralisation-icone { width: 44px; height: 44px; flex: none; display: flex; align-items: center; justify-content: center; }
@@ -1374,8 +1371,7 @@ kbd {
 .ia-fitness summary { cursor: pointer; font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text); }
 .ia-fitness[open] > .ia-curseurs {
   position: absolute; bottom: calc(100% + 12px); left: -14px; width: 600px; display: flex; flex-wrap: wrap; padding: 12px 14px;
-  background: var(--bg-panel); border: 1px solid var(--line); border-radius: var(--radius); backdrop-filter: blur(var(--blur));
-  -webkit-backdrop-filter: blur(var(--blur)); box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+  background: var(--bg-panel); border: 1px solid var(--line); border-radius: var(--radius);
 }
 .ia-modeles input[type="text"], .ia-modeles select {
   height: 30px; box-sizing: border-box; padding: 0 8px; border: 1px solid rgba(255, 255, 255, .16); border-radius: 6px;
@@ -1387,3 +1383,23 @@ kbd {
   position: absolute; left: 50%; bottom: calc(var(--gap) * 2 + var(--ia-bas)); transform: translateX(-50%);
   max-width: 560px; padding: 8px 14px; font-size: 13px; text-align: center;
 }
+
+/* ---- Compteur FPS et annonce de la qualité automatique (compteurImages.js) : petit, discret, à
+   droite de la tour de classement ; fond rgba simple, sans flou ni ombre ---- */
+#f1-compteur-images {
+  position: fixed;
+  top: calc(var(--gap) * 2 + var(--bar-h));
+  left: calc(var(--gap) * 2 + var(--tower-w));
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--text-2);
+}
+#f1-compteur-images[hidden] { display: none; }
+#f1-compteur-images span:empty { display: none; }
+#f1-compteur-images span { padding: 2px 6px; border-radius: 4px; background: rgba(15, 17, 21, .7); }
+#f1-compteur-images .compteur-fps { color: var(--text); align-self: flex-start; }

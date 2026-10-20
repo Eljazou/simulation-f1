@@ -253,11 +253,8 @@ class Ambiance {
     if (qualite === 'bas') return;
     this.preparerEcran(largeur, hauteur);
     push();
-    ImageAlpha.tuiles(this.grain, (qualite === 'eleve' ? 28 : 16) / 255, poser => {
-      for (let x = 0; x < largeur; x += 256) {
-        for (let y = 0; y < hauteur; y += 256) poser(x, y, 256, 256);
-      }
-    });
+    // le grain : un seul remplissage par son motif (au lieu d'une copie par tuile de 256 px)
+    ImageAlpha.motif(this.grain, (qualite === 'eleve' ? 28 : 16) / 255, 256, largeur, hauteur);
     ImageAlpha.dessiner(this.lumiereDe(largeur, hauteur, theme), Math.max(0.6, Math.min(1, 0.7 + intensiteVignette * 0.5)), 0, 0, largeur, hauteur);
     pop();
   }

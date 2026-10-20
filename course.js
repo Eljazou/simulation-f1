@@ -269,7 +269,7 @@ class Course {
     // options d'affichage (cases du panneau) : elles ne changent jamais la simulation
     this.affichage = { decor: true, classement: true, gomme: true, fumee: true, ombres: true, drone: true, ecarts: 'leader', etincelles: true,
       qualite: Ambiance.QUALITE, traces: true, poussiere: true, billes: true, foule: true, lignesVitesse: true,
-      moment: Ambiance.MOMENT, dureeCycle: Ambiance.DUREE_CYCLE };
+      moment: Ambiance.MOMENT, dureeCycle: Ambiance.DUREE_CYCLE, qualiteAuto: true, compteurFps: false };
     // la météo : non mobile, à graine fixe
     this.meteo = new Meteo(parametres);
     // mode pilote : rang de grille de la voiture du joueur (null tant qu'il n'a pas choisi) ;
@@ -549,14 +549,23 @@ class Course {
     }
     this.grille.reconstruire(tous);
     const { devant, derriere } = this.calculerQuiEstDevant();
+    // les voisins de chaque véhicule, cherchés une fois par pas : decide() et applyBehaviors() les
+    // demandent tous deux, sans que rien ne bouge entre les deux (ni positions, ni grille)
+    this.voisinsDuPas ??= new Map();
+    this.voisinsDuPas.clear();
     this.perception = { taille, devant, derriere };
   }
 
   // Ce que perçoit un véhicule : ses voisins, celui de devant, celui de derrière, la météo.
   contexteDe(vehicule) {
     const { taille, devant, derriere } = this.perception;
+    let voisins = this.voisinsDuPas.get(vehicule);
+    if (voisins === undefined) {
+      voisins = this.grille.voisins(vehicule, taille);
+      this.voisinsDuPas.set(vehicule, voisins);
+    }
     return {
-      voisins: this.grille.voisins(vehicule, taille),
+      voisins,
       devant: devant.get(vehicule) ?? null,
       derriere: derriere.get(vehicule) ?? null,
       meteo: this.meteo,
@@ -1116,7 +1125,9 @@ class Course {
     this.billes.forEach(bille => bille.update(dt));
     // traces de pneus : la gomme est toujours déposée (elle change l'adhérence) ; le trait n'est
     // dessiné que si l'option d'affichage est cochée
-    this.traces.deposer(this.voitures, this.affichage.traces);
+    // qualité basse : pas de calque des traces (la gomme de la piste, qui compte pour l'adhérence,
+    // est toujours déposée)
+    this.traces.deposer(this.voitures, this.affichage.traces && this.affichage.qualite !== 'bas');
     this.gerbes.forEach(gerbe => gerbe.update(dt));
     this.surfaces.update(dt, this.meteo.humidite);
     this.debris.forEach(morceau => morceau.update(dt));
@@ -1142,7 +1153,7 @@ class Course {
     const humidite = this.meteo.humidite;
     if (p.gerbes && humidite > Course.HUMIDITE_GERBES) {
       this.voitures.forEach(voiture => {
-        if (voiture.auStand || voiture.vitesse < Course.VITESSE_FUMEE || this.gerbes.length >= p.quantiteGerbes) return;
+        if (voiture.auStand || voiture.vitesse < Course.VITESSE_FUMEE || this.gerbes.length >= p.quantiteGerbes * Math.min(1, this.facteurQualite)) return;
         if (this.aleaEffets() > humidite) return;
         const cap = voiture.cap;
         const recul = VoitureF1.LONGUEUR / 2;
@@ -1153,9 +1164,9 @@ class Course {
         }));
       });
     }
-    this.gerbes = this.gerbes.filter(gerbe => !gerbe.terminee);
-    this.debris = this.debris.filter(morceau => !morceau.termine);
-    this.perturbations = this.perturbations.filter(perturbation => !perturbation.terminee);
+    Course.garder(this.gerbes, Course.EN_COURS);
+    Course.garder(this.debris, Course.PAS_FINI);
+    Course.garder(this.perturbations, Course.EN_COURS);
 
     // règle de scène : un nuage de fumée naît derrière une voiture qui freine fort ou qui glisse
     // (effet visuel)
@@ -1186,15 +1197,29 @@ class Course {
         }));
       });
     }
-    this.etincelles = this.etincelles.filter(etincelle => !etincelle.terminee);
+    Course.garder(this.etincelles, Course.EN_COURS);
     this.emettreLesPoussieres();
-    this.poussieres = this.poussieres.filter(nuage => !nuage.terminee);
-    this.billes = this.billes.filter(bille => !bille.termine);
+    Course.garder(this.poussieres, Course.EN_COURS);
+    Course.garder(this.billes, Course.PAS_FINI);
     // règle de scène : les nuages éteints et les vieux messages disparaissent
-    this.fumees = this.fumees.filter(fumee => !fumee.terminee);
+    Course.garder(this.fumees, Course.EN_COURS);
     this.evenements.forEach(evenement => { evenement.age += dt; });
     this.evenements = this.evenements.filter(evenement => evenement.age < Course.DUREE_EVENEMENT);
   }
+
+  // Les particules encore vivantes restent, dans le même ordre, dans le MÊME tableau (pas un
+  // nouveau tableau par groupe et par pas, comme filter()) ; garder(x) = vrai pour celles qui restent.
+  static garder(liste, garder) {
+    let n = 0;
+    for (let k = 0; k < liste.length; k++) {
+      if (garder(liste[k])) liste[n++] = liste[k];
+    }
+    liste.length = n;
+    return liste;
+  }
+
+  static EN_COURS = particule => !particule.terminee;
+  static PAS_FINI = particule => !particule.termine;
 
   // Plafond des particules selon la qualité du rendu.
   get facteurQualite() {
@@ -1274,7 +1299,7 @@ class Course {
     const detail = this.voitures.length <= VoitureF1.DETAIL_MAX;
     const { ombres } = this.affichage;
     if (debug) this.showDebug();
-    if (this.affichage.traces) this.traces.show();
+    if (this.affichage.traces && this.affichage.qualite !== 'bas') this.traces.show();
     if (this.affichage.billes) this.billes.forEach(bille => bille.show());
     if (this.affichage.poussiere) this.poussieres.forEach(nuage => nuage.show());
     if (this.affichage.fumee) this.fumees.forEach(fumee => fumee.show());
